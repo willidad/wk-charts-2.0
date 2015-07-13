@@ -1,0 +1,13 @@
+{
+  "jspm": {
+    "directories": {},
+    "dependencies": {
+      "d3": "npm:d3@^3.5.6",
+      "lodash": "npm:lodash@^3.10.0",
+      "ts": "github:frankwallis/plugin-typescript@^2.0.1"
+    },
+    "devDependencies": {
+      "typescript": "github:mhegazy/typescript@v1.5-beta2"
+    }
+  }
+}

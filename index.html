@@ -1,0 +1,26 @@
+<html>
+<head>
+    <title>Jspm sample</title>
+    <script src="jspm_packages/system.src.js"></script>
+    <script src="config.js"></script>
+    <link href="app/css/css.css" type="text/css" rel="stylesheet">
+</head>
+<body>
+    <div id="content"></div>
+    <div>
+        <input id="rotation" type="range" min="-180" max="180" value="0" oninput="rotate()" style="width:400px;">
+        <span id="rotationvalue"></span>
+    
+    <script>
+        System.import('app/app.ts').then(function(m) {
+            var element = document.getElementById("content");
+            m.main(element);
+        });
+        
+        function rotate() {
+            var rVal = document.getElementById('rotation').value;
+            document.getElementById('rotationvalue').textContent = rVal
+        }
+    </script>
+</body>
+</html>

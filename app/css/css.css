@@ -1,0 +1,13 @@
+.wk-chart-axis {
+	fill:none;
+	stroke: black;
+	stroke-width: 1px;
+}
+.wk-chart-axis > tick > text {
+	fill:black
+}
+
+.wk-chart {
+	width: 100%;
+	height: 50%;
+}
