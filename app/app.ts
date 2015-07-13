@@ -6,6 +6,7 @@ import { Position, Axis } from './models/axis';
 import { Line } from './layouts/line'
 import { Column } from './layouts/column'
 import { Grid } from './models/grid'
+import { Marker } from './models/markers'
 
 export function main(el: HTMLElement): void {
     
@@ -37,7 +38,11 @@ export function main(el: HTMLElement): void {
     column1.columnStyle = {opacity:0.3}
     column2.columnStyle = {opacity:0.3}
     
+    var marker1 = new Marker(yScale,'y',xScale,'x', colorScale)
+    var marker2 = new Marker(y2Scale,'y2',x2Scale,'x', colorScale, true)
+    
     chart.layout.push(column1, column2, line1, line2)
+    chart.marker.push(marker1, marker2)
   
     chart.data = [{x:'aaaa', y:12, y2:24},{x:'bbb', y:13, y2:3},{x:'Äaaaaaa', y:18, y2:11},{x:'ddd', y:3, y2:9},{x:'eeee', y:-7, y2:-15}]
     chart.draw()

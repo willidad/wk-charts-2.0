@@ -6,7 +6,13 @@ import {chart as chartDefaults ,axis as defaults} from './defaults'
 
 export class Layout {
 	
-	constructor(public valueScale:Scale, public valueProperty:string, public keyScale, public keyProperty:string, public colorScale?:Scale) {}
+	private static cnt:number = 0
+	private _id:number
+	
+	constructor(public valueScale:Scale, public valueProperty:string, public keyScale, public keyProperty:string, public colorScale?:Scale) {
+		Layout.cnt += 1;
+		this._id = Layout.cnt;
+	}
 	
 	protected valFn = (val):any => {
 		return this.valueScale.map(val[this.valueProperty])
@@ -32,7 +38,15 @@ export class Layout {
 		}
 	}
 	
+	protected drawLayout = (container, data) => {} //override
+	
 	public draw = (container, data) => {
-		
+		var l = container.select(`.wk-layout-${this._id}`)
+		if (l.empty()) {
+			l = container.append('g').attr('class', `wk-layout-${this._id}` )
+		}
+		this.drawLayout(l, data)
 	}
+	
+	
 }

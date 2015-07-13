@@ -31,4 +31,8 @@ export var column = {
 	columnStyle: {}
 }
 
+export var markers = {
+	markerStyle: {},
+	markerSize: 5
+}
 

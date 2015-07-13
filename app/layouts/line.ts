@@ -18,7 +18,7 @@ export class Line extends Layout {
 	set lineStyle(val) { this._lineStyle = val; }
 	get lineStyle() { return _.defaults(this._lineStyle, defaults.lineStyle)}
 	
-	public draw = (container, data) => {
+	public drawLayout = (container, data) => {
 		var offset = this.keyScale.isOrdinal ? this.keyScale.getRangeBand() / 2 : 0
 		if (this.isVertical) {
         	this.line

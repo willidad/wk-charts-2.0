@@ -4,7 +4,7 @@ import {Scale} from './scale'
 import {Position , Axis} from './axis'
 import {Layout} from './layout'
 import {Grid} from './grid'
-import {Markers} from './markers'
+import {Marker} from './markers'
 import {DataLabels} from './dataLabels'
 import * as d3 from 'd3'
 import * as _ from 'lodash'
@@ -103,6 +103,11 @@ export class Chart {
 		})
 	}
 	
+	private drawMarkers = () => {
+		this.marker.forEach((marker) => {
+			marker.draw(this.d3Sel('.wk-chart-label-marker-area'), this.data)
+		})
+	}
 	
 	constructor(drawInto:HTMLElement, public title?:string, public subTitle?:string) {	
 		Chart._id += 1;
@@ -161,6 +166,7 @@ export class Chart {
 	public axis: Axis[] = []
 	public layout: Layout[] = []
 	public grid: Grid[] = []
+	public marker: Marker[] = []
 	public data: any;
 	
 	public draw = (data?:any) => {
@@ -176,6 +182,7 @@ export class Chart {
 		this.drawAxis()
 		this.drawGrids()
 		this.drawLayouts()
+		this.drawMarkers()
 		
 		
 
