@@ -1,6 +1,5 @@
 import * as d3 from 'd3'
 import * as _ from 'lodash'
-import {defaults} from './../models/defaults'
 
 export function measureLabel(text:string, container, labelStyle, bgStyle):ClientRect {
 	
@@ -14,6 +13,7 @@ export function measureLabel(text:string, container, labelStyle, bgStyle):Client
 		rectElem = container.append('rect')
 	}
 	textElem.text(text).style(labelStyle);
+	rectElem.style(bgStyle).attr(textElem.node().getBBox())
 	var size = textElem.node().getBBox()
 	return size
 }

@@ -1,8 +1,8 @@
-import {Scale} from './scale'
+import {Scale} from './../core/scale'
 import * as d3 from 'd3'
 import * as _ from 'lodash'
 import * as drawing from './../tools/drawing'
-import {chart as chartDefaults ,axis as defaults} from './defaults'
+import {chart as chartDefaults ,axis as axisDefaults} from './../core/defaults'
 
 export class Layout {
 	
@@ -16,6 +16,10 @@ export class Layout {
 	
 	protected valFn = (val):any => {
 		return this.valueScale.map(val[this.valueProperty])
+	}
+	
+	protected valFnZero = ():any => {
+		return this.valueScale.mapZero()
 	}
 	
 	protected val = (val):any => {
@@ -38,15 +42,25 @@ export class Layout {
 		}
 	}
 	
-	protected drawLayout = (container, data) => {} //override
+	protected colorFn = (val):any => {
+		if (this.colorScale) {
+			return this.colorScale.map(val[this.keyProperty])
+		} else {
+			return null
+		}
+	}
 	
-	public draw = (container, data) => {
+	protected drawLayout = (container, data, drawingAreaSize?) => {} //override
+	protected beforeDraw = (container, data, drawingAreaSize?) => {}
+	protected afterDraw = (container, data, drawingAreaSize?) => {}
+	
+	public draw = (container, data, drawingAreaSize) => {
 		var l = container.select(`.wk-layout-${this._id}`)
 		if (l.empty()) {
 			l = container.append('g').attr('class', `wk-layout-${this._id}` )
 		}
-		this.drawLayout(l, data)
-	}
-	
-	
+		this.beforeDraw(l, data, drawingAreaSize)
+		this.drawLayout(l, data, drawingAreaSize)
+		this.afterDraw(l, data, drawingAreaSize)
+	}	
 }

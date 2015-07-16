@@ -1,17 +1,13 @@
-import {Scale} from './../models/scale'
-import {Layout} from './../models/layout'
+import { Scale } from './../core/scale'
+import { XYLayout } from './../baseLayouts/xyLayout'
 import * as d3 from 'd3'
 import * as _ from 'lodash'
 import * as drawing from './../tools/drawing'
-import {column as defaults} from './../models/defaults'
+import { column as defaults } from './../core/defaults'
 
-export class Column extends Layout {
+export class Columns extends XYLayout {
       
       private _columnStyle = {}
-
-      constructor(public valueScale:Scale, public valueProperty:string, public keyScale:Scale, public keyProperty:string, public colorScale?:Scale, public isVertical:boolean = false) {
-      	super(valueScale, valueProperty, keyScale, keyProperty, colorScale)
-      }
       
       set columnStyle(val) { this._columnStyle = val; }
 	get columnStyle() { return _.defaults(this._columnStyle, defaults.columnStyle)}

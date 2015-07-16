@@ -1,3 +1,7 @@
+import { Style, Margins } from './interfaces'
+
+const emptyStyle:Style = {}
+
 export var chart = {
 		titleStyle: {'font-size': '1.8em'},
 		titleBgStyle: {fill: 'lightgrey'},
@@ -18,21 +22,34 @@ export var grid = {
 export var axis = {
 		titleStyle: {'font-size': '1em'},
 		titleBgStyle: {fill: 'none', stroke:'red'},
-		tickLabelStyle: {},
+		tickLabelStyle: emptyStyle,
 		tickLabelBgStyle: {fill:'yellow', opacity:0.3},
 		tickLineStyle: {stroke:'green'}
 	}
 	
 export var line = {
-	lineStyle: {}
+	lineStyle: emptyStyle
+}
+
+export var area = {
+	areaStyle: emptyStyle
 }
 
 export var column = {
-	columnStyle: {}
+	columnStyle: emptyStyle
+}
+
+export var pie = {
+	pieStyle: {opacity: 0.4}
 }
 
 export var markers = {
-	markerStyle: {},
+	markerStyle: emptyStyle,
 	markerSize: 5
 }
 
+export var dataLabels = {
+	labelStyle: emptyStyle, 
+	labelPadding: 5,
+	labelBgStyle: {fill:'none', stroke:'lightblue'}
+}

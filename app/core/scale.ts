@@ -13,7 +13,7 @@ export class Scale {
 	constructor(type:string, public properties:string[], public domainRange:DomainCalc = DomainCalc.none) {
 		this.type = type
 	}
-	 // instanciate the d3 Scale according to the specified type
+	 // setter and getter to create d3 scale
 	set type(t:string) {
 		//TODO: Implement custom scales
 		if (_.has(d3.scale, t)) { 
@@ -29,15 +29,18 @@ export class Scale {
 		return _.has(this._d3Scale, 'rangeBand');
 	}
 	
+	public isInverted:boolean = false;
+	
 	public getD3Scale = () => { return this._d3Scale }
 	
 	public getTicks = () => { return this.isOrdinal ? this.getDomain() : this._d3Scale.ticks() }
 	
 	public setRange = (range:[number,number]) => {
+		var invertedRange = [range[1], range[0]]
 		if (this.isOrdinal) {
-			this._d3Scale.rangeBands(range)
+			this._d3Scale.rangeBands(this.isInverted ? invertedRange : range)
 		} else {		
-			this._d3Scale.range(range)
+			this._d3Scale.range(this.isInverted ? invertedRange : range)
 		}
 	}
 	
@@ -82,5 +85,9 @@ export class Scale {
 	
 	public map = (value:any):any => {
 		return this._d3Scale(value)
+	}
+	
+	public mapZero = ():any => {
+		return this._d3Scale(0)
 	}
 }

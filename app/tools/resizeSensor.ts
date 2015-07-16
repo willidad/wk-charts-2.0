@@ -3,12 +3,8 @@
  * directory of this distribution and at
  * https://github.com/marcj/css-element-queries/blob/master/LICENSE.
  */
- 
- interface ResizeSensor {
-     (elem:HTMLElement, cb:Function):void
- }
 
-(function() {
+//(function() {
     /**
      * Class for dimension change detection.
      *
@@ -17,7 +13,12 @@
      *
      * @constructor
      */
-    this.ResizeSensor = function(element, callback) {
+    //this.ResizeSensor = function(element, callback) {
+// converted to typescript style
+
+export class ResizeSensor {
+    
+    constructor(element:Element, callback) {
         /**
          *
          * @constructor
@@ -128,4 +129,4 @@
             attachResizeEvent(element, callback);
         }
     }
-})()
+}

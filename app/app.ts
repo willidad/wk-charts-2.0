@@ -1,57 +1,62 @@
 /// <reference path="./../typings/tsd.d.ts" />
 
-import { Chart } from './models/chart';
-import { DomainCalc , Scale } from './models/scale';
-import { Position, Axis } from './models/axis';
+import { Chart } from './core/chart';
+import { DomainCalc , Scale } from './core/scale';
+import { Position, Axis } from './core/axis';
 import { Line } from './layouts/line'
-import { Column } from './layouts/column'
-import { Grid } from './models/grid'
-import { Marker } from './models/markers'
+import { Area } from './layouts/area'
+import { Columns } from './layouts/column'
+import { Pie } from './layouts/pie'
+import { Donut } from './layouts/donut'
+import { Grid } from './core/grid'
+import { XYDataLabels } from './baseLayouts/xyDataLabels'
 
 export function main(el: HTMLElement): void {
     
     var chart = new Chart(el, 'This is the chart title', "Subtitle");
     
-    var xScale = new Scale('ordinal', ['x'])
-    var x2Scale = new Scale('ordinal', ['x'])
-    var yScale = new Scale('linear', ['y'], DomainCalc.extentZero)
-    var y2Scale = new Scale('linear', ['y2'], DomainCalc.extent)
-    var colorScale = new Scale('category10',[])
+    var xScale = chart.addScale('ordinal', ['x'])
+    var x2Scale = chart.addScale('ordinal', ['x'])
+    x2Scale.isInverted = true
+    var yScale = chart.addScale('linear', ['y'], DomainCalc.extentZero)
+    var y2Scale = chart.addScale('linear', ['y2'], DomainCalc.extent)
+    var colorScale = chart.addScale('category10',[])
+    var keyColors = chart.addScale('category10', ['x'])
     
-    var axisBottom = new Axis(Position.bottom, xScale, 'X - Scale')
-    var axisTop = new Axis(Position.top, y2Scale, 'X - Scale Top')
-    var axisLeft = new Axis(Position.left, yScale, 'Y - Scale')
-    var axisRight = new Axis(Position.right, x2Scale, 'Y - Axis Right')
+    var axisBottom = chart.addAxis(Position.bottom, xScale, 'X - Scale')
+    var axisTop = chart.addAxis(Position.top, y2Scale, 'X - Scale Top')
+    var axisLeft = chart.addAxis(Position.left, yScale, 'Y - Scale')
+    var axisRight = chart.addAxis(Position.right, x2Scale, 'Y - Axis Right')
 
-    var leftGrid = new Grid(axisLeft)
-    var gridRight = new Grid(axisRight)
+    var leftGrid = chart.addGrid(axisLeft)
+    var gridRight = chart.addGrid(axisRight)
     gridRight.lineStyle = {stroke:'blue', opacity:0.3}
-    var gridBottom = new Grid(axisBottom)
+    var gridBottom = chart.addGrid(axisBottom)
     
-    chart.axis.push(axisBottom, axisLeft, axisTop, axisRight)
-    chart.grid.push(leftGrid, gridBottom, gridRight)
-    
-    var line1 = new Line(yScale,'y',xScale,'x', colorScale)
-    var line2 = new Line(y2Scale,'y2',x2Scale,'x', colorScale, true, true)
-    var column1 = new Column(yScale,'y',xScale,'x', colorScale)
-    var column2 = new Column(y2Scale,'y2',x2Scale,'x', colorScale, true)
+    var line1 = chart.addLayout(new Line(yScale,'y',xScale,'x', colorScale))
+    line1.markers = true
+    //var line2 = chart.addLayout(new Line(y2Scale,'y2',x2Scale,'x', colorScale, true, true))
+    var area2 = chart.addLayout(new Area(y2Scale,'y2',x2Scale,'x', colorScale, true, true))
+    area2.markers = true
+    var column1 = chart.addLayout(new Columns(yScale,'y',xScale,'x', colorScale))
+    var column2 = chart.addLayout(new Columns(y2Scale,'y2',x2Scale,'x', colorScale, true))
     column1.columnStyle = {opacity:0.3}
     column2.columnStyle = {opacity:0.3}
     
-    var marker1 = new Marker(yScale,'y',xScale,'x', colorScale)
-    var marker2 = new Marker(y2Scale,'y2',x2Scale,'x', colorScale, true)
+    var pie = chart.addLayout(new Donut(yScale, 'y', xScale, 'x', keyColors))
     
-    chart.layout.push(column1, column2, line1, line2)
-    chart.marker.push(marker1, marker2)
+    var dataLabels1 = chart.addDataLabel(yScale,'y',xScale,'x')
+    var dataLabels2 = chart.addDataLabel(y2Scale,'y2',x2Scale,'x', true)
+    dataLabels2.labelRotation = 45
   
     chart.data = [{x:'aaaa', y:12, y2:24},{x:'bbb', y:13, y2:3},{x:'Äaaaaaa', y:18, y2:11},{x:'ddd', y:3, y2:9},{x:'eeee', y:-7, y2:-15}]
     chart.draw()
     
     document.getElementById('rotation').addEventListener('input',(ev) => {
-        axisBottom.tickRotation = +ev.target.value
-        axisLeft.tickRotation = +ev.target.value
-        axisRight.tickRotation = +ev.target.value
-        axisTop.tickRotation = +ev.target.value
+        axisBottom.tickRotation = Number((<HTMLInputElement>ev.target).value)
+        axisLeft.tickRotation = Number((<HTMLInputElement>ev.target).value)
+        axisRight.tickRotation = Number((<HTMLInputElement>ev.target).value)
+        axisTop.tickRotation = Number((<HTMLInputElement>ev.target).value)
         chart.draw()
     })
 }
