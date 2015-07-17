@@ -16,16 +16,16 @@ export class Grid {
 	set lineStyle(val) { this._lineStyle = val; }
 	get lineStyle() { return _.defaults(this._lineStyle, defaults.lineStyle)}
 	
-	public draw = (container, gridAreaSize:ClientRect) => {
+	public draw = (container, ranges) => {
 		var ticks = this._axis.ticks;
 		var offset = this._axis.scale.getRangeBand() / 2
 		var gridContainer = container.select('.wk-chart-grid-area')
 		var gridLines = gridContainer.selectAll(`.wk-chart-grid-${Position[this._axis.orientation]}`).data(ticks, function(d:number) { return d })
 		gridLines.enter().append('line').attr('class', `wk-chart-grid-${Position[this._axis.orientation]}`).style(this.lineStyle).style('pointer-events', 'none')
 		if (this._axis.isVertical) {
-			gridLines.attr('x1', 0).attr('x2', gridAreaSize.width).attr('transform', (d) => { return `translate(0, ${this._axis.scale.map(d) + offset})` })
+			gridLines.attr('x1', ranges.x[0]).attr('x2', ranges.x[1]).attr('transform', (d) => { return `translate(0, ${this._axis.scale.map(d) + offset})` })
 		} else {
-			gridLines.attr('y1', 0).attr('y2', gridAreaSize.height).attr('transform', (d) => { return `translate(${this._axis.scale.map(d) + offset})` })
+			gridLines.attr('y1', ranges.y[0]).attr('y2', ranges.y[1]).attr('transform', (d) => { return `translate(${this._axis.scale.map(d) + offset})` })
 		}
 	}
 }
