@@ -2,6 +2,9 @@ System.config({
   "baseURL": "/",
   "defaultJSExtensions": true,
   "transpiler": "typescript",
+  "typescriptOptions": {
+    "noImplicitAny": true
+  },
   "paths": {
     "github:*": "jspm_packages/github/*",
     "npm:*": "jspm_packages/npm/*"
@@ -11,13 +14,10 @@ System.config({
       "defaultExtension": "ts",
       "meta": {
         "*.ts": {
-          "loader": "ts" 
+          "loader": "ts"
         }
       }
     }
-  },
-  typescriptOptions: {
-    "noImplicitAny": true
   }
 });
 
@@ -25,9 +25,9 @@ System.config({
   "map": {
     "d3": "npm:d3@3.5.6",
     "lodash": "npm:lodash@3.10.0",
-    "ts": "github:frankwallis/plugin-typescript@2.0.1",
+    "ts": "github:frankwallis/plugin-typescript@2.0.2",
     "typescript": "github:mhegazy/typescript@v1.5-beta2",
-    "github:frankwallis/plugin-typescript@2.0.1": {
+    "github:frankwallis/plugin-typescript@2.0.2": {
       "typescript": "github:mhegazy/typescript@v1.5-beta2"
     },
     "github:jspm/nodelibs-process@0.1.1": {

@@ -1,4 +1,4 @@
-import { Style, Margins } from './interfaces'
+import { Style, IMargins } from './interfaces'
 
 const emptyStyle:Style = {}
 

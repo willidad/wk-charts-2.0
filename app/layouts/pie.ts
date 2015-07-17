@@ -13,14 +13,11 @@ export class Pie extends Layout {
 	protected innerRadius:number = 0
 	
 	set pieStyle(val:Style) { this._pieStyle = val; }
-	get pieStyle():Style { return _.defaults(this._pieStyle, pieDefaults.pieStyle)}
+	get pieStyle():Style { return <Style>_.defaults(this._pieStyle, pieDefaults.pieStyle)}
 	
 	
 	public drawLayout = (container, data, drawingAreaSize) => {
 		var	radius = Math.min(drawingAreaSize.width, drawingAreaSize.height) / 2
-		//if _labels then radius -= 25
-		//if _donut
-		//innerRadius = radius * 0.65
 		var arc = d3.svg.arc().outerRadius(radius).innerRadius(this.innerRadius)
 		var pie = d3.layout.pie()
 			.value(this.valFn)

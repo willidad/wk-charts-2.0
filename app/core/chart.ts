@@ -1,11 +1,10 @@
 
-import { Style, Margins } from './interfaces'
+import { Style, IMargins } from './interfaces'
 import { DomainCalc, Scale } from './scale'
 import { Position , Axis } from './axis'
 import { Layout}  from './../baseLayouts/layout'
 import { Grid } from './grid'
 import { XYLayout } from './../baseLayouts/xyLayout'
-import { XYDataLabels } from './../baseLayouts/xyDataLabels'
 import * as d3 from 'd3'
 import * as _ from 'lodash'
 import * as drawing from './../tools/drawing'
@@ -23,12 +22,18 @@ export class Chart {
 	private _container:HTMLElement
 	private _d3Container;
 	private _containerSize:ClientRect;
-	private _layoutMargins:Margins = {
+	private _layoutMargins:IMargins = {
 		top:0,
 		bottom:0,
 		left:0,
 		right:0
 	};
+	private _layoutPadding:IMargins = {
+		top:0,
+		bottom:0,
+		left:0,
+		right:0
+	}
 	
 	private _drawingAreaSize = {
 		width: 0,
@@ -115,30 +120,26 @@ export class Chart {
 	private drawLayouts = () => {
 		
 		this.layouts.forEach((layout:Layout) => {
-			layout.draw(this.d3Sel('.wk-chart-layout-area'), this.data, this._drawingAreaSize)
+			layout.draw(this.d3Sel(`.${layout.targetContainer}`), this.data, this._drawingAreaSize)
 		})
 	}
 	
-	private measureDataLabels = () => {
-		var vertical = [];
-		var horizontal = [];
+	private getLayoutPadding = () => {
+		this._layoutPadding = {top:0, bottom:0, left:0, right:0}
 		for (var layout of this.layouts) {
-			if (layout instanceof XYLayout) {
-				var space = layout.getDataLabelSpace(this.d3Sel('.wk-chart-container'),this.data, this._drawingAreaSize)
-				if (layout.isVertical) {
-					vertical.push(space)
-				} else {
-					horizontal.push(space)
-				}
+			if (layout.needsPadding) {
+				var padding = layout.getPadding(this.d3Sel(`.${layout.targetContainer}`),this.data, this._drawingAreaSize)
+				this._layoutPadding.top = Math.max(padding.top, this._layoutPadding.top)
+				this._layoutPadding.bottom = Math.max(padding.bottom, this._layoutPadding.bottom)
+				this._layoutPadding.left = Math.max(padding.left, this._layoutPadding.left)
+				this._layoutPadding.right = Math.max(padding.right, this._layoutPadding.right)
 			}
 		}
-		this._dataLabelSpace.top = _.max(vertical)
-		this._dataLabelSpace.left = _.max(horizontal)
 	}
 	
 	private sizeRange = () => {
-		this._ranges.x = [0, this._drawingAreaSize.width - this._dataLabelSpace.left]
-		this._ranges.y = [this._drawingAreaSize.height, this._dataLabelSpace.top]
+		this._ranges.x = [this._layoutPadding.left, this._drawingAreaSize.width - this._layoutPadding.right]
+		this._ranges.y = [this._drawingAreaSize.height-this._layoutPadding.bottom, this._layoutPadding.top]
 	}
 
 	
@@ -237,23 +238,20 @@ export class Chart {
 		}
 		console.log("draw called")
 		this._containerSize = this._d3Container.select('.wk-chart-svg').node().getBoundingClientRect(); // get the outer bounds of teh drawing area
-		this._layoutMargins = <Margins>_.assign(this._layoutMargins, chartDefaults.margins)
+		this._layoutMargins = <IMargins>_.assign(this._layoutMargins, chartDefaults.margins)
 		this.measureTitles(); // create the title elements and reserver space for them. Titles are not removed after measuring
 		this.measureAxis()
 		this.sizeLayoutArea() //measure space requirements for axis and compute layout size
 		this.positionLayout() // finally position the layout container
-		this.measureDataLabels() //
-		this.sizeRange()
-		//this.measureDataLabels(); //measure space requirements for data labels and re-compute layout size
+		this.getLayoutPadding() // if needed draw the layout and measure if it fits into the drawing area
+		this.sizeRange() //add padding to the range values
+
 		// draw container content
 		
 		this.drawTitles()
 		this.drawAxis()
 		this.drawGrids()
 		this.drawLayouts() 
-		//this.drawDataLabels()
-		
-		
 
 	}
 }

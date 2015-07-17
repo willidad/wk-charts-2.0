@@ -1,3 +1,4 @@
+import { IMargins } from './../core/interfaces'
 import {Scale} from './../core/scale'
 import * as d3 from 'd3'
 import * as _ from 'lodash'
@@ -7,34 +8,34 @@ import {chart as chartDefaults ,axis as axisDefaults} from './../core/defaults'
 export class Layout {
 	
 	private static cnt:number = 0
-	private _id:number
+	protected _id:number
 	
 	constructor(public valueScale:Scale, public valueProperty:string, public keyScale, public keyProperty:string, public colorScale?:Scale) {
 		Layout.cnt += 1;
 		this._id = Layout.cnt;
 	}
 	
-	protected valFn = (val):any => {
+	public valFn = (val):any => {
 		return this.valueScale.map(val[this.valueProperty])
 	}
 	
-	protected valFnZero = ():any => {
+	public valFnZero = ():any => {
 		return this.valueScale.mapZero()
 	}
 	
-	protected val = (val):any => {
+	public val = (val):any => {
 		return val[this.valueProperty]
 	}
 	
-	protected keyFn = (val):any => {
+	public keyFn = (val):any => {
 		return this.keyScale.map(val[this.keyProperty])
 	}
 	
-	protected key = (val):any => {
+	public key = (val):any => {
 		return val[this.keyProperty]
 	}
 	
-	protected propertyColor = ():string => {
+	public propertyColor = ():string => {
 		if (this.colorScale) {
 			return this.colorScale.map(this.valueProperty)
 		} else {
@@ -42,7 +43,7 @@ export class Layout {
 		}
 	}
 	
-	protected colorFn = (val):any => {
+	public colorFn = (val):any => {
 		if (this.colorScale) {
 			return this.colorScale.map(val[this.keyProperty])
 		} else {
@@ -50,9 +51,15 @@ export class Layout {
 		}
 	}
 	
-	protected drawLayout = (container, data, drawingAreaSize?) => {} //override
+	//override functions
+	public targetContainer = 'wk-chart-layout-area';
+	public needsPadding:boolean = false
+	public getPadding = (container, data, drawingAreaSize):IMargins => {return}
+	
+	protected drawLayout = (container, data, drawingAreaSize?) => {} 
 	protected beforeDraw = (container, data, drawingAreaSize?) => {}
 	protected afterDraw = (container, data, drawingAreaSize?) => {}
+	//-------------------------------------------------------------------------------
 	
 	public draw = (container, data, drawingAreaSize) => {
 		var l = container.select(`.wk-layout-${this._id}`)

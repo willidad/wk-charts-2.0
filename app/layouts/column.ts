@@ -1,39 +1,37 @@
+import { Style } from './../core/interfaces'
 import { Scale } from './../core/scale'
-import { XYLayout } from './../baseLayouts/xyLayout'
+import { XYElement } from './../baseLayouts/xyElement'
 import * as d3 from 'd3'
 import * as _ from 'lodash'
 import * as drawing from './../tools/drawing'
 import { column as defaults } from './../core/defaults'
 
-export class Columns extends XYLayout {
+export class Columns extends XYElement {
       
-      private _columnStyle = {}
+      private _columnStyle:Style = {}
+      private _columnSize;
       
-      set columnStyle(val) { this._columnStyle = val; }
-	get columnStyle() { return _.defaults(this._columnStyle, defaults.columnStyle)}
+      set columnStyle(val:Style) { this._columnStyle = val; }
+	get columnStyle():Style { return <Style>_.defaults(this._columnStyle, defaults.columnStyle)}
       
-      public drawLayout = (container, data) => {
-      	var columnSize = this.keyScale.getRangeBand()
-      	var columns = container.selectAll(`rect.wk-chart-column`).data(data, this.key)
-      	var enter = columns.enter().append('rect').attr('class',`wk-chart-column`)
-      	
-      	if (this.isVertical) {
-                  columns.attr('height', columnSize)
-                        .attr('width', (d) => Math.abs(this.valueScale.map(0) - this.valFn(d)))
-                        .attr('x', (d) => Math.min(this.valueScale.map(0), this.valFn(d)))
-                        .attr('transform', (d) => `translate(0, ${this.keyFn(d)})`)
+      protected getSelector():string { return '.wk-chart-column' }
+      
+	protected create(selection:d3.Selection<any>, caller:Columns) {
+            selection.append('rect').attr('class', 'wk-chart-column')
+      }
+      
+	protected update(selection:d3.Selection<any>, caller:Columns) {
+            if (caller.isVertical) {
+                  selection
+                        .attr('height', caller.keyScale.getRangeBand())
+                        .attr('width', (d) => Math.abs(caller.valFnZero() - caller.valFn(d)))
+                        .attr('x', (d) => caller.val(d) > 0 ? -Math.abs(caller.valFnZero() - caller.valFn(d)) : 0)                        
             } else {
-                  columns.attr('width', columnSize)
-                        .attr('height', (d) => Math.abs(this.valueScale.map(0) - this.valFn(d)))
-                        .attr('y', (d) => Math.min(this.valueScale.map(0), this.valFn(d)))
-                        .attr('transform', (d) => `translate(${this.keyFn(d)}, 0)`)
+                  selection
+                        .attr('width', caller.keyScale.getRangeBand())
+                        .attr('height', (d) => Math.abs(caller.valFnZero() - caller.valFn(d)))
+                        .attr('y', (d) => caller.val(d) < 0 ? -Math.abs(caller.valFnZero() - caller.valFn(d)) : 0)
             }
-            if (this.colorScale) {
-      		columns.style('fill', this.propertyColor())
-      	}
-            
-            columns.style(this.columnStyle)
-            
-            columns.exit().remove()	
+            selection.style('fill', caller.propertyColor()).style(caller.columnStyle)
       }
 }
