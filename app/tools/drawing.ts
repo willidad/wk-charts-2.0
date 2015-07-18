@@ -3,7 +3,6 @@ import * as _ from 'lodash'
 
 export function measureLabel(text:string, container, labelStyle, bgStyle):ClientRect {
 	
-	container.style('display', 'none')
 	var textElem = container.select('text')
 	if (textElem.empty()) {
 		textElem = container.append('text')
@@ -13,8 +12,8 @@ export function measureLabel(text:string, container, labelStyle, bgStyle):Client
 		rectElem = container.append('rect')
 	}
 	textElem.text(text).style(labelStyle);
-	rectElem.style(bgStyle).attr(textElem.node().getBBox())
 	var size = textElem.node().getBBox()
+	rectElem.style(bgStyle).attr(size)
 	return size
 }
 

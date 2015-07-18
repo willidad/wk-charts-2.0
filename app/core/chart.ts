@@ -62,7 +62,6 @@ export class Chart {
 	private axis: Axis[] = []
 	private layouts: Layout[] = []
 	private grids: Grid[] = []
-	private dataLabels: XYDataLabels[] = []
 	
 	private d3Sel = (selector:string) => {
 		return this._d3Container.select(selector)
@@ -160,11 +159,11 @@ export class Chart {
 						<rect class="wk-chart-brush wk-chart-brush-rect2" style="fill:rgba(255,255,255,0.5)"></rect>
 					</mask>
 				</defs>
-				<g class="wk-chart-title" style="display:none">
+				<g class="wk-chart-title">
 					<rect />
 					<text style="text-anchor:middle;"></text>
 				</g>
-				<g class="wk-chart-subtitle" style="display:none">
+				<g class="wk-chart-subtitle">
 					<rect />
 					<text style="text-anchor:middle;"></text>
 				</g>
@@ -216,12 +215,6 @@ export class Chart {
 		var g = new Grid(axis)
 		this.grids.push(g)
 		return g
-	}
-	
-	public addDataLabel = (valueScale:Scale, valueProperty:string, keyScale:Scale, keyProperty:string, isVertical?:boolean):XYDataLabels => {
-		var d = new XYDataLabels(valueScale, valueProperty, keyScale, keyProperty, undefined , isVertical)
-		this.dataLabels.push(d)
-		return d
 	}
 	
 	public addLayout = <T extends Layout>(l:T):T => { //Todo : implement a factory function as soon as ...rest operator is available

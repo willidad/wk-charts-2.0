@@ -1,13 +1,13 @@
 import { IMargins } from './../core/interfaces'
 import { Style , XYGroupItem} from './../core/interfaces'
-import { XYLayout } from './xyLayout'
+import { Layout } from './layout'
 import { Scale } from './../core/scale'
 import * as d3 from 'd3'
 import * as _ from 'lodash'
 import * as drawing from './../tools/drawing'
 import {markers as markerDefaults} from './../core/defaults'
 
-export class XYElement extends XYLayout {
+export class XYElement extends Layout {
 	
 	// override functions used to create, update and remove the positioned element. 
 	
@@ -19,6 +19,10 @@ export class XYElement extends XYLayout {
 	//--------------------------------------------------------------------------------
 	
 	protected offset:number = 0; 
+	
+	constructor(public valueScale:Scale, public valueProperty:string, public keyScale:Scale, public keyProperty:string, public colorScale?:Scale, public isVertical:boolean = false) {
+		super(valueScale, valueProperty, keyScale, keyProperty, colorScale)
+	}
 	
 	public getPadding = (container, data, drawingAreaSize):IMargins => {
 		var padding:IMargins = {top:0, bottom:0, left:0, right:0}

@@ -1,48 +1,38 @@
 import { Scale } from './../core/scale'
-import { XYLayout } from './../baseLayouts/xyLayout'
+import { XYPath } from './../baseLayouts/xyPath'
 import * as d3 from 'd3'
 import * as _ from 'lodash'
 import * as drawing from './../tools/drawing'
 import { line as defaults } from './../core/defaults'
 
-export class Line extends XYLayout {
+export class Line extends XYPath {
 	
-	private line = d3.svg.line()
 	private _lineStyle = {}
-	private path;
-	
+
 	constructor(public valueScale:Scale, public valueProperty:string, public keyScale:Scale, public keyProperty:string, public colorScale?:Scale, public isVertical:boolean = false, public spline:boolean = false) {
 		super(valueScale,valueProperty,keyScale,keyProperty, colorScale, isVertical)
+	
+		this.pathGen = d3.svg.line()
+		
+		if (this.isVertical) {
+        	this.pathGen
+          		.y((d) => this.keyFn(d) + this.offset)
+          		.x((d) => this.valFn(d))
+		} else {      
+	        this.pathGen
+          		.x((d) => this.keyFn(d) + this.offset)
+          		.y((d) => this.valFn(d))
+		}
+	
+		if (this.spline) {
+			this.pathGen.interpolate('cardinal')
+		}
 	}
 	
 	set lineStyle(val) { this._lineStyle = val; }
 	get lineStyle() { return _.defaults(this._lineStyle, defaults.lineStyle)}
 	
-	public drawLayout = (container, data) => {
-		var offset = this.keyScale.isOrdinal ? this.keyScale.getRangeBand() / 2 : 0
-		if (this.isVertical) {
-        	this.line
-          		.y((d) => this.keyFn(d) + offset)
-          		.x((d) => this.valFn(d))
-		} else {      
-	        this.line
-          		.x((d) => this.keyFn(d) + offset)
-          		.y((d) => this.valFn(d))
-		}
-	
-		if (this.spline) {
-			this.line.interpolate('cardinal')
-		}
-		
-		if (!this.path) {
-			this.path = container.append('path')
-		}
-		
-		this.path.datum(data, this.key)
-			.attr('d', this.line)
-		if (this.colorScale) {
-			this.path.style('stroke', this.propertyColor())
-		}
+	protected afterDraw = (container, data, drawingAreaSize) => {
 		this.path.style(this.lineStyle).style('fill','none')
-	}
+	}		
 }

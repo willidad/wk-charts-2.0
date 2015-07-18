@@ -32,7 +32,7 @@ export var line = {
 }
 
 export var area = {
-	areaStyle: emptyStyle
+	areaStyle: {opacity:0.5}
 }
 
 export var column = {

@@ -1,3 +1,4 @@
+<!DOCTYPE html5>
 <html>
 <head>
     <title>Jspm sample</title>
@@ -8,9 +9,9 @@
 <body>
     <div id="content"></div>
     <div>
-        <input id="rotation" type="range" min="-180" max="180" value="0" oninput="rotate()" style="width:400px;">
+        <input id="rotation" type="range" min="-180" max="180" value="0" onchange="rotate()" style="width:400px;">
         <span id="rotationvalue"></span>
-    
+    </div>
     <script>
         System.import('app/app.ts').then(function(m) {
             var element = document.getElementById("content");
