@@ -28,11 +28,11 @@ export class DataMarker extends XYElement {
 		selection.style('fill', (d) =>caller.propertyColor())
 	}
 	protected remove(selection:d3.Selection<any>, caller:XYElement) {
-		selection.remove()
 	}
 	
-	protected beforeDraw = (container, data, drawingAreaSize?) => {
+	public beforeDraw = (container, data, drawingAreaSize?) => {
 		this.offset = this.keyScale.isOrdinal ? this.keyScale.getRangeBand() / 2 : 0
+		console.log('dataLabels', data)
 	}
 	
 	

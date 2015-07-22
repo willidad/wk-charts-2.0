@@ -1,3 +1,4 @@
+import { Style , XYPathLayout } from './../core/interfaces'
 import { Scale } from './../core/scale'
 import { XYPath } from './../baseLayouts/xyPath'
 import * as d3 from 'd3'
@@ -5,34 +6,32 @@ import * as _ from 'lodash'
 import * as drawing from './../tools/drawing'
 import { line as defaults } from './../core/defaults'
 
-export class Line extends XYPath {
+export class Line extends XYPath implements XYPathLayout {
 	
-	private _lineStyle = {}
+	private _lineStyle:Style = {}
+	public colorProp = 'stroke'
 
-	constructor(public valueScale:Scale, public valueProperty:string, public keyScale:Scale, public keyProperty:string, public colorScale?:Scale, public isVertical:boolean = false, public spline:boolean = false) {
-		super(valueScale,valueProperty,keyScale,keyProperty, colorScale, isVertical)
+	public pathGenerator = () => {
 	
-		this.pathGen = d3.svg.line()
+		var line = d3.svg.line()
 		
 		if (this.isVertical) {
-        	this.pathGen
-          		.y((d) => this.keyFn(d) + this.offset)
-          		.x((d) => this.valFn(d))
+        	line
+          		.y((d) => d.keyPos + this.offset)
+          		.x((d) => d.valPos)
 		} else {      
-	        this.pathGen
-          		.x((d) => this.keyFn(d) + this.offset)
-          		.y((d) => this.valFn(d))
+	        line
+          		.x((d) => d.keyPos + this.offset)
+          		.y((d) => d.valPos)
 		}
-	
-		if (this.spline) {
-			this.pathGen.interpolate('cardinal')
-		}
+		
+		return line
 	}
 	
-	set lineStyle(val) { this._lineStyle = val; }
-	get lineStyle() { return _.defaults(this._lineStyle, defaults.lineStyle)}
+	set lineStyle(val:Style) { this._lineStyle = val; }
+	get lineStyle():Style { return <Style>_.defaults(this._lineStyle, defaults.lineStyle)}
 	
-	protected afterDraw = (container, data, drawingAreaSize) => {
+	public afterDraw = (container, data, drawingAreaSize) => {
 		this.path.style(this.lineStyle).style('fill','none')
 	}		
 }

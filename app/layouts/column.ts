@@ -1,12 +1,12 @@
 import { Style } from './../core/interfaces'
 import { Scale } from './../core/scale'
-import { XYElement } from './../baseLayouts/xyElement'
+import { XYRectElement } from './../baseLayouts/xyRectElement'
 import * as d3 from 'd3'
 import * as _ from 'lodash'
 import * as drawing from './../tools/drawing'
 import { column as defaults } from './../core/defaults'
 
-export class Columns extends XYElement {
+export class Columns extends XYRectElement {
       
       private _columnStyle:Style = {}
       private _columnSize;
@@ -23,15 +23,15 @@ export class Columns extends XYElement {
 	protected update(selection:d3.Selection<any>, caller:Columns) {
             if (caller.isVertical) {
                   selection
-                        .attr('height', caller.keyScale.getRangeBand())
-                        .attr('width', (d) => Math.abs(caller.valFnZero() - caller.valFn(d)))
-                        .attr('x', (d) => caller.val(d) > 0 ? -Math.abs(caller.valFnZero() - caller.valFn(d)) : 0)                        
+                        .attr('height', (d) => d.added |d.deleted ? 0 : caller.keyScale.getRangeBand())
+                        .attr('width', (d) => Math.abs(caller.valFnZero() - d.valPos))
+                        .attr('x', (d) => d.value > 0 ? -Math.abs(caller.valFnZero() - d.valPos) : 0)                        
             } else {
                   selection
-                        .attr('width', caller.keyScale.getRangeBand())
-                        .attr('height', (d) => Math.abs(caller.valFnZero() - caller.valFn(d)))
-                        .attr('y', (d) => caller.val(d) < 0 ? -Math.abs(caller.valFnZero() - caller.valFn(d)) : 0)
+                        .attr('width', (d) => d.added |d.deleted ? 0 : caller.keyScale.getRangeBand())
+                        .attr('height', (d) => Math.abs(caller.valFnZero() - d.valPos))
+                        .attr('y', (d) => d.value < 0 ? -Math.abs(caller.valFnZero() - d.valPos) : 0)
             }
-            selection.style('fill', caller.propertyColor()).style(caller.columnStyle)
+            selection.style('fill', (d) => caller.mapColor(d.key)).style(caller.columnStyle)
       }
 }

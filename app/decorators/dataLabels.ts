@@ -29,21 +29,21 @@ export class XYDataLabel extends XYElement {
 	private updateItem = (item:d3.Selection<any>, d) => {
 		if (this.isVertical) {
 			var text = item.select('g text')
-				.text(this.val(d))
-				.style('text-anchor', this.val(d) < 0 ? 'end' : 'start')
+				.text(d.value)
+				.style('text-anchor', d.value < 0 ? 'end' : 'start')
 				.attr('dy', '0.35em')
 				.style(this.labelStyle)
 			item.select('g rect').style(this.labelBgStyle).attr(text.node().getBBox())
-			item.select('g').attr('transform', `translate(${(this.val(d) > 0 ? 1 : -1) * labelDefaults.labelPadding},0) rotate(${this.labelRotation})`)
+			item.select('g').attr('transform', `translate(${(d.value > 0 ? 1 : -1) * labelDefaults.labelPadding},0) rotate(${this.labelRotation})`)
 		} else {
 			var text = item.select('g text')
-				.text(this.val(d))
+				.text(d.value)
 				.style('text-anchor', 'middle')
-				.attr('dy', this.val(d) < 0 ? '0.71em' : null)
+				.attr('dy', d.value < 0 ? '0.71em' : null)
 				.style(this.labelStyle)
 			item.select('g rect').style(this.labelBgStyle)
 				.attr(text.node().getBBox())
-			item.select('g').attr('transform', `translate(0,${(this.val(d) > 0 ? -1 : 1) * labelDefaults.labelPadding}) rotate(${this.labelRotation})`)
+			item.select('g').attr('transform', `translate(0,${(d.value > 0 ? -1 : 1) * labelDefaults.labelPadding}) rotate(${this.labelRotation})`)
 		}
 	}
 	
@@ -61,7 +61,7 @@ export class XYDataLabel extends XYElement {
 		selection.remove()
 	}
 	
-	protected beforeDraw = (container, data, drawingAreaSize?) => {
+	public beforeDraw = (container, data, drawingAreaSize?) => {
 		this.offset = this.keyScale.isOrdinal ? this.keyScale.getRangeBand() / 2 : 0
 	}
 	

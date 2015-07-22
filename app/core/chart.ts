@@ -4,13 +4,12 @@ import { DomainCalc, Scale } from './scale'
 import { Position , Axis } from './axis'
 import { Layout}  from './../baseLayouts/layout'
 import { Grid } from './grid'
-import { XYLayout } from './../baseLayouts/xyLayout'
 import * as d3 from 'd3'
 import * as _ from 'lodash'
 import * as drawing from './../tools/drawing'
 import { ResizeSensor} from './../tools/resizeSensor'
 
-import {chart as chartDefaults} from './defaults'
+import {chart as chartDefaults, duration} from './defaults'
 
 import './../tools/innerSVG'
 
@@ -49,6 +48,9 @@ export class Chart {
 		x: [0,1],
 		y: [0,1]
 	}
+	
+	private _newData:boolean = false;
+	private _initialDraw:boolean = true;
 	
 	private _titleStyle = {};
 	private _titleBgStyle = {};
@@ -92,15 +94,15 @@ export class Chart {
 		}
 	}
 	
-	private drawAxis = () => {
+	private drawAxis = (animate:boolean) => {
 		this.axis.forEach((axis) => {
-			axis.draw(this.d3Sel('.wk-chart-container'), this.data, this._drawingAreaSize, this._ranges)
+			axis.draw(this.d3Sel('.wk-chart-container'), this.data, this._drawingAreaSize, this._ranges, animate)
 		})
 	}
 	
-	private drawGrids = () => {
+	private drawGrids = (animate:boolean) => {
 		this.grids.forEach((grid) => {
-			grid.draw(this.d3Sel('.wk-chart-container'), this._ranges)
+			grid.draw(this.d3Sel('.wk-chart-container'), this._ranges, animate)
 		})
 	}
 	
@@ -109,17 +111,53 @@ export class Chart {
 		this._drawingAreaSize.width = this._containerSize.width - this._layoutMargins.left - this._layoutMargins.right
 	}
 	
-	private positionLayout = () => {
+	private positionLayout = (animate:boolean) => {
 		var cntr = this.d3Sel('.wk-chart-container')
-		cntr.attr('transform', `translate(${this._layoutMargins.left}, ${this._layoutMargins.top})`)
-		this._d3Container.selectAll('.wk-chart-bottom').attr('transform', `translate(0,${this._drawingAreaSize.height})`)
-		this._d3Container.selectAll('.wk-chart-right').attr('transform', `translate(${this._drawingAreaSize.width})`)
+		if (animate) {
+			console.log('animated Position')
+			cntr.transition().duration(duration).attr('transform', `translate(${this._layoutMargins.left}, ${this._layoutMargins.top})`)
+			this._d3Container.selectAll('.wk-chart-bottom').transition().duration(duration).attr('transform', `translate(0,${this._drawingAreaSize.height})`)
+			this._d3Container.selectAll('.wk-chart-right').transition().duration(duration).attr('transform', `translate(${this._drawingAreaSize.width})`)
+		} else {
+			cntr.attr('transform', `translate(${this._layoutMargins.left}, ${this._layoutMargins.top})`)
+			this._d3Container.selectAll('.wk-chart-bottom').attr('transform', `translate(0,${this._drawingAreaSize.height})`)
+			this._d3Container.selectAll('.wk-chart-right').attr('transform', `translate(${this._drawingAreaSize.width})`)
+		}
 	}
 	
-	private drawLayouts = () => {
-		
+	private prepeareData = () => {
 		this.layouts.forEach((layout:Layout) => {
-			layout.draw(this.d3Sel(`.${layout.targetContainer}`), this.data, this._drawingAreaSize)
+			layout.prepeareData(this.data)
+		})
+	}
+	
+	private setupLayouts = () => {	
+		this.layouts.forEach((layout:Layout) => {
+			layout.setupLayout()
+		})
+	}
+	
+	private drawAnimation = () => {	
+		this.layouts.forEach((layout:Layout) => {
+			layout.drawAnimation(this.d3Sel(`.${layout.targetContainer}`), this.data, this._drawingAreaSize)
+		})
+	}
+	
+	private drawStartLayouts = () => {	
+		this.layouts.forEach((layout:Layout) => {
+			layout.drawStart(this.d3Sel(`.${layout.targetContainer}`), this.data, this._drawingAreaSize)
+		})
+	}
+	
+	private drawEndLayouts = () => {
+		this.layouts.forEach((layout:Layout) => {
+			layout.drawEnd(this.d3Sel(`.${layout.targetContainer}`), this.data, this._drawingAreaSize)
+		})
+	}
+	
+	private updateDomains = () => {	
+		this.layouts.forEach((layout:Layout) => {
+			layout.updateDomains(this.data)
 		})
 	}
 	
@@ -228,23 +266,56 @@ export class Chart {
 	public draw = (data?:any) => {
 		if (data) {
 			this.data = data;
+			this._newData = true
+		} else {
+			this._newData = false
 		}
+		
 		console.log("draw called")
+		
+		// diff key data to prepeare animation
+		
+		this.setupLayouts()
+		this.prepeareData()
+		
+		if (this._newData && !this._initialDraw) {
+			this.drawStartLayouts()
+		}
+		
 		this._containerSize = this._d3Container.select('.wk-chart-svg').node().getBoundingClientRect(); // get the outer bounds of teh drawing area
 		this._layoutMargins = <IMargins>_.assign(this._layoutMargins, chartDefaults.margins)
 		this.measureTitles(); // create the title elements and reserver space for them. Titles are not removed after measuring
 		this.measureAxis()
 		this.sizeLayoutArea() //measure space requirements for axis and compute layout size
-		this.positionLayout() // finally position the layout container
-		this.getLayoutPadding() // if needed draw the layout and measure if it fits into the drawing area
-		this.sizeRange() //add padding to the range values
+		//this.positionLayout(false) // finally position the layout container
+		
 
 		// draw container content
 		
 		this.drawTitles()
-		this.drawAxis()
-		this.drawGrids()
-		this.drawLayouts() 
+		this.updateDomains()
+		//this.getLayoutPadding() // if needed draw the layout and measure if it fits into the drawing area
+		this.sizeRange() //add padding to the range values
+		if (this._initialDraw || !this._newData) {
+			console.log('initial draw')
+			this.positionLayout(false) // finally position the layout container
+			this.getLayoutPadding() // if needed draw the layout and measure if it fits into the drawing area
+			this.sizeRange() //add padding to the range values
+			this.drawAxis(false)
+			this.drawGrids(false)
+			this.drawEndLayouts()
+		} else {
+			this.positionLayout(true) // finally position the layout container
+			this.getLayoutPadding() // if needed draw the layout and measure if it fits into the drawing area
+			this.sizeRange() //add padding to the range values
+			this.drawAxis(true)
+			this.positionLayout(true)
+			this.drawGrids(true)
+			this.drawAnimation() 
+			console.log('animated draw')
+		}
+		
+		this._initialDraw = false
 
 	}
 }

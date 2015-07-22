@@ -53,3 +53,5 @@ export var dataLabels = {
 	labelPadding: 5,
 	labelBgStyle: {fill:'none', stroke:'lightblue'}
 }
+
+export const duration = 1000

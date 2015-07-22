@@ -3,7 +3,7 @@ import { Scale } from './scale'
 import * as d3 from 'd3'
 import * as _ from 'lodash'
 import * as drawing from './../tools/drawing'
-import { chart as chartDefaults, axis as axisDefaults } from './defaults'
+import { chart as chartDefaults, axis as axisDefaults, duration } from './defaults'
 
 export enum Position {
 		top, bottom, left, right
@@ -111,7 +111,7 @@ export class Axis {
 		return this._requiredSpace
 	}
 	
-	public draw = (ctnr, data, layoutSize, ranges) => {
+	public draw = (ctnr, data, layoutSize, ranges, animate:boolean) => {
 		// setup scale
 		var d3Scale = this._scale.getD3Scale()
 		this._d3Axis.scale(d3Scale).orient(Position[this._orient])
@@ -122,7 +122,12 @@ export class Axis {
 		if (drawTo.empty()) {
 			drawTo = ctnr.insert('g', '.wk-chart-layout-area').attr('class',`wk-chart-axis wk-chart-${Position[this._orient]}`)
 		}
-		drawTo.call(this._d3Axis)
+		
+		if (animate) {
+			drawTo.transition().duration(duration).call(this._d3Axis)
+		} else {
+			drawTo.call(this._d3Axis)
+		}
 		
 		// rotate labels if required
 
@@ -169,11 +174,12 @@ export class Axis {
 			lRect.attr(lText.node().getBBox())
 			lRect.style(this.titleBgStyle)
 			
+			var l:any = animate ? labelG.transition().duration(duration) : labelG
 			switch (this._orient) {
-				case Position.left: labelG.attr('transform', `translate(${-this._requiredSpace}, ${layoutSize.height / 2}) rotate(-90)`) ;break
-				case Position.right: labelG.attr('transform', `translate(${this._requiredSpace}, ${layoutSize.height / 2}) rotate(90)`) ;break
-				case Position.top: labelG.attr('transform', `translate(${layoutSize.width / 2}, ${-this._requiredSpace})`) ;break
-				case Position.bottom: labelG.attr('transform', `translate(${layoutSize.width / 2}, ${this._requiredSpace})`) ;break
+				case Position.left: l.attr('transform', `translate(${-this._requiredSpace}, ${layoutSize.height / 2}) rotate(-90)`) ;break
+				case Position.right: l.attr('transform', `translate(${this._requiredSpace}, ${layoutSize.height / 2}) rotate(90)`) ;break
+				case Position.top: l.attr('transform', `translate(${layoutSize.width / 2}, ${-this._requiredSpace})`) ;break
+				case Position.bottom: l.attr('transform', `translate(${layoutSize.width / 2}, ${this._requiredSpace})`) ;break
 			}
 		}
 	}

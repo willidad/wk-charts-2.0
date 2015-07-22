@@ -27,7 +27,7 @@ export class Pie extends Layout {
 		var path = container.selectAll('path')
 			.data(segments, (d) => this.keyFn(d.data)) 
 		
-		var pathEnter = path.enter()
+		path.enter()
 			.append('path')
 		
 		path

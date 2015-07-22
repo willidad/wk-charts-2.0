@@ -1,3 +1,4 @@
+import { Style, XYPathLayout } from './../core/interfaces'
 import { Scale } from './../core/scale'
 import { XYPath } from './../baseLayouts/xyPath'
 import * as d3 from 'd3'
@@ -5,37 +6,35 @@ import * as _ from 'lodash'
 import * as drawing from './../tools/drawing'
 import { area as defaults } from './../core/defaults'
 
-export class Area extends XYPath {
+export class Area extends XYPath implements XYPathLayout {
 	
-	private _areaStyle = {}
+	private _areaStyle:Style = {}
+	public colorProp = 'fill'
+	public splineType = 'cardinal'
 	
-	constructor(public valueScale:Scale, public valueProperty:string, public keyScale:Scale, public keyProperty:string, public colorScale?:Scale, public isVertical:boolean = false, public spline:boolean = false) {
-		super(valueScale,valueProperty,keyScale,keyProperty, colorScale, isVertical)
+	public pathGenerator = () => {
 		
-		this.pathGen = d3.svg.area()
-		this.colorProp = 'fill'
+		var area = d3.svg.area()
 		
 		if (this.isVertical) {
-        	this.pathGen
-          		.y((d) => this.keyFn(d) + this.offset)
+        	area
+          		.y((d) => d.keyPos + this.offset)
 			  	.x0((d) => this.valFnZero())
-          		.x1((d) => this.valFn(d))
+          		.x1((d) => d.valPos)
 		} else {      
-	        this.pathGen
-          		.x((d) => this.keyFn(d) + this.offset)
+	        area
+          		.x((d) => d.keyPos + this.offset)
 			  	.y0((d) => this.valFnZero())
-          		.y1((d) => this.valFn(d))
+          		.y1((d) => d.valPos)
 		}
-	
-		if (this.spline) {
-			this.pathGen.interpolate('cardinal')
-		}
+		
+		return area
 	}
 	
-	set areaStyle(val) { this._areaStyle = val; }
-	get areaStyle() { return _.defaults(this._areaStyle, defaults.areaStyle)}
+	set areaStyle(val:Style) { this._areaStyle = val; }
+	get areaStyle():Style { return <Style>_.defaults(this._areaStyle, defaults.areaStyle)}
 	
-	protected afterDraw = (container, data, drawingAreaSize) => {
+	public afterDraw = (container, data, drawingAreaSize) => {
 		this.path.style(this.areaStyle)
 	}
 }
