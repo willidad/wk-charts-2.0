@@ -2,11 +2,10 @@ import { Layout } from './../baseLayouts/layout'
 
 import * as d3 from 'd3'
 import * as _ from 'lodash'
-
 import { Style } from './../core/interfaces'
 import { pie as pieDefaults, duration} from './../core/defaults'
 
-export class Pie extends Layout {
+export class PieDataLabels extends Layout {
 	
 	private _pieStyle:Style = {};
 	

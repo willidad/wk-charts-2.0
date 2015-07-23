@@ -21,7 +21,7 @@ export class Layout {
 	private _prevValues:{} = {}
 	
 	
-	constructor(public valueScale:Scale, public valueProperty:string, public keyScale:Scale, public keyProperty:string, public colorScale?:Scale) {
+	constructor(public valueScale:Scale, public valueProperty:string, public keyScale:Scale, public keyProperty:string, public colorScale?:Scale, public isVertical?:boolean) {
 		Layout.cnt += 1;
 		this._id = Layout.cnt;
 	}
@@ -62,10 +62,10 @@ export class Layout {
 		}
 	}
 	
-	public mapColor = (val):any =>
-	{
+	public mapColor = (val):any => {
 		return this.colorScale.map(val)
 	}	
+	
 	public colorFn = (val):any => {
 		if (this.colorScale) {
 			return this.colorScale.map(val[this.keyProperty])
@@ -97,12 +97,12 @@ export class Layout {
 		for (var point of this.diffSeq) {
 			var op = point[0]
 			var key = point[1]
+			var val = this._prevValues[key] || this._values[key]
 			seq.push({
 				keyPos: rangeIdx < range.length ? range[rangeIdx] : range[range.length-1] + interv,
-				key:key,
-				valPos:this.mapVal(this._prevValues[key] || this._values[key]),
-				value:this._prevValues[key] || this._values[key],
-				targetPos: this._prevValues[key],
+				key: key,
+				valPos: this.mapVal(val),
+				value: val,
 				added: op === '+'
 			})
 			if (op !== '+') rangeIdx++
@@ -118,11 +118,12 @@ export class Layout {
 		for (var point of this.diffSeq) {
 			var op = point[0]
 			var key = point[1]
+			var val = this._values[key] || this._prevValues[key]
 			seq.push({
-				keyPos:rangeIdx < range.length ? range[rangeIdx] : range[range.length-1] + interv, 
-				key:key,
-				valPos:this.mapVal(this._values[key] || this._prevValues[key]),
-				value:this._values[key] || this._prevValues[key],
+				keyPos: rangeIdx < range.length ? range[rangeIdx] : range[range.length-1] + interv, 
+				key: key,
+				valPos: this.mapVal(val),
+				value: val,
 				deleted: op === '-'
 			})
 			if (op !== '-') rangeIdx++	
@@ -138,8 +139,8 @@ export class Layout {
 			seq.push({
 				keyPos: this.keyFn(point),
 				key: this.key(point),
-				valPos:this.valFn(point),
-				value:this.val(point)
+				valPos: this.valFn(point),
+				value: this.val(point)
 			})
 		}
 		return seq

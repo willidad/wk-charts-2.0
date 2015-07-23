@@ -11,7 +11,7 @@ export class Donut extends Pie {
 	
 	protected innerRadius:number = 0
 	
-	protected beforeDraw = (container, data, drawingAreaSize?) => {
+	public beforeDraw = (container, data, drawingAreaSize?) => {
 		this.innerRadius = (Math.min(drawingAreaSize.width, drawingAreaSize.height) / 2) * .65
 	}
 }
