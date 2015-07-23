@@ -1,5 +1,5 @@
 import { IMargins } from './../core/interfaces'
-import { Style } from './../core/interfaces'
+import { Style, Point } from './../core/interfaces'
 import { Layout } from './layout'
 import { Scale } from './../core/scale'
 import * as d3 from 'd3'
@@ -19,30 +19,54 @@ export class XYElement extends Layout {
 	//--------------------------------------------------------------------------------
 	
 	protected offset:number = 0; 
+	protected fadeInOut:boolean = false;
 	
 	constructor(public valueScale:Scale, public valueProperty:string, public keyScale:Scale, public keyProperty:string, public colorScale?:Scale, public isVertical:boolean = false) {
 		super(valueScale, valueProperty, keyScale, keyProperty, colorScale)
 	}
 	
+	private removeDeleted(d) {
+		if (d.deleted) {
+			d3.select(<any>this).remove()  //this gets called from d3 with its context ('this'). Type checker gets confused without forced type
+		}
+	}
 	
+	private getTranslate (d:Point) {
+		if (this.isVertical) {
+			return `translate(${d.valPos}, ${d.keyPos + (d.added || d.deleted ? 0 : this.offset)})`
+		} else {
+			return `translate(${d.keyPos + (d.added || d.deleted ? 0 : this.offset)}, ${d.valPos})`
+		}
+	}
+	
+	private doFade(sel, fade) {
+		if (fade) sel.style('opacity',(d:Point) => d.added || d.deleted ? 0 : 1)
+	}
 	
 	public drawLayout = (container, data, drawingAreaSize?, animate?, cbAnimationEnd?) => {
 				
-		var items = container.selectAll(this.getSelector()).data(data, (d) => d.key)
-		var enter = items.enter().call(this.create, this)
-		
-		var it = (animate ? items.transition().duration(this._duration) : items)
-		var itExit = (animate ? items.exit().transition().duration(duration) : items.exit())
-		
-		it.call(this.update, this)
-		if (this.isVertical) {
-			it.attr('transform', (d) => `translate(${d.valPos}, ${d.keyPos + (d.added || d.deleted ? 0 : this.offset)})`)		
+		var items = container.selectAll(this.getSelector()).data(data, (d:Point) => d.key)
+		var enter = items.enter()
+			.call(this.create, this)
+				
+		if (animate) {
+			items.transition().duration(this._duration)
+				.call(this.update, this)
+				.attr('transform', (d:Point) => this.getTranslate(d))
+				.call(this.doFade, this.fadeInOut)
+				.each('end', this.removeDeleted)
+			items.exit().transition().duration(this._duration)
+				.call(this.remove, this)
+				.remove()		
 		} else {
-			it.attr('transform', (d) => `translate(${d.keyPos + (d.added || d.deleted ? 0 : this.offset)}, ${d.valPos})`)
+			items
+				.call(this.update, this)
+				.attr('transform', (d:Point) => this.getTranslate(d))
+				.call(this.doFade, this.fadeInOut)
+			items.exit()
+				.call(this.remove, this)
+				.remove()	
 		}
-		it.style('opacity',(d) => d.added || d.deleted ? 0 : 1)
-		
-		items.exit().call(this.remove, this).remove()
 	}
 }
 

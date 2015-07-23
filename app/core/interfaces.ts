@@ -51,3 +51,12 @@ export interface XYPathLayout {
 	 */
 	afterDraw(container:d3.Selection<any>, data:any[], drawingAreaSize?: AreaSize)
 }
+
+export interface Point {
+	key: any;
+	keyPos: number;
+	value: any;
+	valPos: number;
+	added?: boolean;
+	deleted?: boolean
+}

@@ -206,7 +206,6 @@ export class Chart {
 					<text style="text-anchor:middle;"></text>
 				</g>
 				<g class="wk-chart-container">
-					<g class="wk-chart-grid-area" />
 					<g class="wk-chart-layout-area" />
 					<g class="wk-chart-marker-area" />
 					<g class="wk-chart-label-area" />

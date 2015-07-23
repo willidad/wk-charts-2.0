@@ -33,7 +33,7 @@ export class Scale {
 	
 	public getD3Scale = () => { return this._d3Scale }
 	
-	public getTicks = () => { return this.isOrdinal ? this.getDomain() : this._d3Scale.ticks() }
+	public getTicks = () => { return this.isOrdinal ? this._d3Scale.domain() : this._d3Scale.ticks() }
 	
 	public setRange = (range:[number,number]) => {
 		var invertedRange = [range[1], range[0]]

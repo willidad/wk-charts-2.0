@@ -1,10 +1,10 @@
-import { IMargins } from './../core/interfaces'
-import {Scale} from './../core/scale'
+import { IMargins, Point } from './../core/interfaces'
+import { Scale } from './../core/scale'
 import * as d3 from 'd3'
 import * as _ from 'lodash'
 import * as drawing from './../tools/drawing'
 import { Diff } from './../tools/array-diff'
-import {chart as chartDefaults ,axis as axisDefaults, duration} from './../core/defaults'
+import { chart as chartDefaults ,axis as axisDefaults, duration} from './../core/defaults'
 
 export class Layout {
 	
@@ -77,8 +77,6 @@ export class Layout {
 	private diffData = (data) => {
 		this._prevKeyValues = this._keyValues
 		this._prevValues = this._values
-		//this._keyValues = _.pluck(data, this.keyProperty)
-		//this._values = _.indexBy(data, this.keyProperty)
 		this._keyValues = []
 		this._values = {}
 		for (var d of data) {
@@ -88,10 +86,10 @@ export class Layout {
 		this.diffSeq = this.differ(this._prevKeyValues,this._keyValues)
 	}
 	
-	private startPos = ():number[] => {
+	private startPos = ():Point[] => {
 		var range = this.keyScale.getRange()
 		var interv = range.length > 1 ? range[1] - range[0] : undefined //TODO something more meainingful
-		var seq = []
+		var seq:Point[] = []
 		var rangeIdx = 0
 		var targetPos
 		for (var point of this.diffSeq) {
@@ -110,10 +108,10 @@ export class Layout {
 		return seq
 	}
 	
-	private endPos = ():number[] => {
+	private endPos = ():Point[] => {
 		var range = this.keyScale.getRange()
 		var interv = range.length > 1 ? range[1] - range[0] : undefined //TODO something more meainingful
-		var seq = []
+		var seq:Point[] = []
 		var rangeIdx = 0
 		for (var point of this.diffSeq) {
 			var op = point[0]
@@ -131,9 +129,9 @@ export class Layout {
 		return seq
 	}
 	
-	private cleanPos = (data):number[] => {
+	private cleanPos = (data):Point[] => {
 		var range = this.keyScale.getRange()
-		var seq = []
+		var seq:Point[] = []
 		var rangeIdx = 0
 		for (var point of data) {			
 			seq.push({
@@ -146,11 +144,11 @@ export class Layout {
 		return seq
 	}
 	
-	protected cleanSequence = (data) => {
-		var seq = []
+	protected cleanSequence = (data):Point[] => {
+		var seq:Point[] = []
 		var pred = undefined
 		for (var d of data) {
-			seq.push({key: this.key(d), value:this.val(d), originalKey:this.key(d), originalValue:this.val(d)})
+			seq.push({key: this.key(d), value:this.val(d), keyPos:this.keyFn(d), valPos:this.valFn(d)})
 		}
 		return seq
 	}
@@ -189,7 +187,7 @@ export class Layout {
 		padding.top = box.y < 0 ? Math.abs(box.y) : 0
 		padding.bottom = box.y + box.height > drawingAreaSize.height ? Math.abs(drawingAreaSize.height - box.y - box.height) : 0
 		padding.right = box.x + box.width > drawingAreaSize.width ? Math.abs(drawingAreaSize.width - box.x - box.width) : 0
-		console.log('padding', padding, box, drawingAreaSize)
+		//console.log('padding', padding, box, drawingAreaSize)
 		l.remove()
 		return padding
 	}
@@ -200,16 +198,16 @@ export class Layout {
 	
 	public prepeareData(data) {
 		this.diffData(data)
-		console.log('diff result', this.diffSeq)
+		//console.log('diff result', this.diffSeq)
 	}
 	
-	public drawStart = (container, data, drawingAreaSize?) => {
+	public drawStart = (container, data, drawingAreaSize) => {
 		var l = container.select(`.wk-layout-${this._id}`)
 		if (l.empty()) {
 			l = container.append('g').attr('class', `wk-layout-${this._id}` )
 		}
 		var startData = this.startPos()
-		console.log('startPos', startData)
+		//console.log('startPos', startData)
 		this.beforeDraw(l, startData, drawingAreaSize)
 		this.drawLayout(l, startData, drawingAreaSize, false)
 		this.afterDraw(l, startData, drawingAreaSize)
@@ -228,7 +226,7 @@ export class Layout {
 		}
 		
 		var endData = this.endPos()
-		console.log('endPos', endData)
+		//console.log('endPos', endData)
 		this.beforeDraw(l, endData, drawingAreaSize)
 		this.drawLayout(l, endData, drawingAreaSize, true, () => {
 			this.drawEnd(container, data, drawingAreaSize)
@@ -245,7 +243,7 @@ export class Layout {
 		}
 
 		var cleanData = this.cleanPos(data)
-		console.log('cleanPos', cleanData)
+		//console.log('cleanPos', cleanData)
 		this.beforeDraw(l, cleanData, drawingAreaSize)
 		this.drawLayout(l, cleanData, drawingAreaSize)
 		this.afterDraw(l, cleanData, drawingAreaSize)

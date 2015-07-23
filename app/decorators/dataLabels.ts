@@ -26,6 +26,8 @@ export class XYDataLabel extends XYElement {
 		return '.wk-chart-label-marker' 
 	}
 	
+	protected fadeInOut:boolean = true;
+	
 	private updateItem = (item:d3.Selection<any>, d) => {
 		if (this.isVertical) {
 			var text = item.select('g text')

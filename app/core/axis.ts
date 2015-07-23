@@ -79,7 +79,7 @@ export class Axis {
 	}
 	
 	get ticks() {
-		return this._scale.getTicks()
+		return this._d3Axis.tickValues() ? this._d3Axis.tickValues() : this._scale.getTicks()
 	}
 	
 	get isVertical():boolean {

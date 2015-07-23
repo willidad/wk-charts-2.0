@@ -25,15 +25,15 @@ export function main(el: HTMLElement): void {
     var colorScale = chart.addScale('category10',[])
     var keyColors = chart.addScale('category10', ['x'])
     
-    //var axisBottom = chart.addAxis(Position.bottom, xScale, 'X - Scale')
-    //var axisTop = chart.addAxis(Position.top, y2Scale, 'X - Scale Top')
-    //var axisLeft = chart.addAxis(Position.left, yScale, 'Y - Scale')
-    //var axisRight = chart.addAxis(Position.right, x2Scale, 'Y - Axis Right')
+    var axisBottom = chart.addAxis(Position.bottom, xScale, 'X - Scale')
+    var axisTop = chart.addAxis(Position.top, y2Scale, 'X - Scale Top')
+    var axisLeft = chart.addAxis(Position.left, yScale, 'Y - Scale')
+    var axisRight = chart.addAxis(Position.right, x2Scale, 'Y - Axis Right')
 
-    //var leftGrid = chart.addGrid(axisLeft)
+    var leftGrid = chart.addGrid(axisLeft)
     //var gridRight = chart.addGrid(axisRight)
     //gridRight.lineStyle = {stroke:'blue', opacity:0.7}
-    //var gridBottom = chart.addGrid(axisBottom)
+    var gridBottom = chart.addGrid(axisBottom)
     
     //var line1 = chart.addLayout(new Line(yScale,'y',xScale,'x', colorScale, false, true))
     //var area1 = chart.addLayout(new Area(yScale,'y',xScale,'x', colorScale, null, true))
@@ -43,13 +43,13 @@ export function main(el: HTMLElement): void {
     //var area2 = chart.addLayout(new Area(y2Scale,'y2',x2Scale,'x', colorScale, true, true))
     //var areaMarker = chart.addLayout(new DataMarker(y2Scale,'y2',x2Scale,'x', colorScale, true))
 
-    //var column1 = chart.addLayout(new Columns(yScale,'y',xScale,'x', colorScale))
+    var column1 = chart.addLayout(new Columns(yScale,'y',xScale,'x', colorScale))
     //var column2 = chart.addLayout(new Columns(y2Scale,'y2',x2Scale,'x', colorScale, true))
     //column1.columnStyle = {opacity: 0.3}
     //column2.columnStyle = {opacity: 0.3}
-    var pie = chart.addLayout(new Donut(yScale, 'y', xScale, 'x', keyColors))
+    //var pie = chart.addLayout(new Donut(yScale, 'y', xScale, 'x', keyColors))
 
-    //var dataLabels1 = chart.addLayout(new XYDataLabel(yScale,'y',xScale,'x'))
+    var dataLabels1 = chart.addLayout(new XYDataLabel(yScale,'y',xScale,'x'))
     //var dataLabels2 = chart.addLayout(new XYDataLabel(y2Scale,'y2',x2Scale,'x', null ,true))
     //dataLabels2.labelRotation = 0
     //dataLabels1.labelRotation = 0
@@ -64,12 +64,12 @@ export function main(el: HTMLElement): void {
     
     function rotationHandler(ev) {
         var r = Number((<HTMLInputElement>ev.target).value)
-        //axisBottom.tickRotation = r
-        //axisLeft.tickRotation = r
-        //axisRight.tickRotation = r
-        //axisTop.tickRotation = r
+        axisBottom.tickRotation = r
+        axisLeft.tickRotation = r
+        axisRight.tickRotation = r
+        axisTop.tickRotation = r
         //dataLabels2.labelRotation = r
-        //dataLabels1.labelRotation = r
+        dataLabels1.labelRotation = r
         chart.draw()
     }
     
