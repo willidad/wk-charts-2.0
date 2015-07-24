@@ -1,0 +1,25 @@
+<!DOCTYPE html5>
+<html>
+<head>
+    <title>wk-charts 2.0</title>
+    <script src="build/build.js"></script>
+    <link href="app/css/css.css" type="text/css" rel="stylesheet">
+    <base href="/"></base>
+</head>
+<body>
+    <div id="content"></div>
+    <div>
+        <input id="rotation" type="range" min="-180" max="180" value="0" onchange="rotate()" style="width:400px;">
+        <span id="rotationvalue"></span>
+    </div>
+    <div id="data-table">
+    </div>
+    <script>
+        
+        function rotate() {
+            var rVal = document.getElementById('rotation').value;
+            document.getElementById('rotationvalue').textContent = rVal
+        }
+    </script>
+</body>
+</html>

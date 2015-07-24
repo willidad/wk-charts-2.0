@@ -22,7 +22,7 @@ gulp.task('bundle', function(cb) {
 
    builder.loadConfig("./config.js")
       .then(function() {
-         return builder.buildSFX("app", "build/build.js");
+         return builder.buildSFX("app/app", "build/build.js");
       })
       .then(function() {
          console.log('Build complete, go to http://127.0.0.1:8080/index-bundle.html');
@@ -44,7 +44,7 @@ gulp.task('check', function(cb) {
 
    builder.loadConfig("config.js")
       .then(function() {
-         return builder.buildSFX("app"); // build in-memory
+         return builder.buildSFX("app/app"); // build in-memory
       })
       .then(function() {
          cb();

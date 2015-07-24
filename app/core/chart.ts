@@ -3,6 +3,12 @@ import { Style, IMargins } from './interfaces'
 import { DomainCalc, Scale } from './scale'
 import { Position , Axis } from './axis'
 import { Layout}  from './../baseLayouts/layout'
+import { XYElement } from './../baseLayouts/XYElement'
+import { XYDataLabel } from './../decorators/dataLabels'
+import { DataMarker } from './../decorators/dataMarker'
+import { Columns } from './../layouts/column'
+import { Line } from './../layouts/line'
+import { Area } from './../layouts/area'
 import { Grid } from './grid'
 import * as d3 from 'd3'
 import * as _ from 'lodash'
@@ -250,6 +256,16 @@ export class Chart {
 		var g = new Grid(axis)
 		this.grids.push(g)
 		return g
+	}
+	
+	public addDataLabels = (layout:Columns):XYDataLabel => {
+		var l = this.addLayout(new XYDataLabel(layout.valueScale, layout.valueProperty, layout.keyScale, layout.keyProperty, layout.colorScale, layout.isVertical))
+		l.labelOffset = layout.padding
+		return l
+	}
+	public addDataMarkers = (layout:Line | Area):DataMarker => {
+		var l = this.addLayout(new DataMarker(layout.valueScale, layout.valueProperty, layout.keyScale, layout.keyProperty, layout.colorScale, layout.isVertical))
+		return l
 	}
 	
 	public addLayout = <T extends Layout>(l:T):T => { //Todo : implement a factory function as soon as ...rest operator is available

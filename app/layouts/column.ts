@@ -15,7 +15,7 @@ export class Columns extends XYElement {
 
       
       set columnStyle(val:Style) { this._columnStyle = val; }
-	get columnStyle():Style { return <Style>_.defaults(this._columnStyle, defaults.columnStyle)}
+	get columnStyle():Style { return <Style>_.defaults(this._columnStyle, defaults.columnStyle) }
       
       protected getSelector():string { return '.wk-chart-column' }
       
@@ -31,13 +31,13 @@ export class Columns extends XYElement {
                         .attr('height', (d) => d.added |d.deleted ? 0 : caller.keyScale.getRangeBand() - leftTopPadding - rightBottomPadding)
                         .attr('width', (d) => Math.abs(caller.valFnZero() - d.valPos))
                         .attr('x', (d) => d.value > 0 ? -Math.abs(caller.valFnZero() - d.valPos) : 0)    
-                        .attr('y', (d) => d.added |d.deleted ? 0 : leftTopPadding)                    
+                        .attr('y', (d) => d.added | d.deleted ? 0 : leftTopPadding)                    
             } else {
                   selection
                         .attr('width', (d) => d.added |d.deleted ? 0 : caller.keyScale.getRangeBand() - leftTopPadding - rightBottomPadding)
                         .attr('height', (d) => Math.abs(caller.valFnZero() - d.valPos))
                         .attr('y', (d) => d.value < 0 ? -Math.abs(caller.valFnZero() - d.valPos) : 0)
-                        .attr('x', (d) => d.added |d.deleted ? 0 : leftTopPadding) 
+                        .attr('x', (d) => d.added | d.deleted ? 0 : leftTopPadding) 
             }
             selection.style('fill', (d) => caller.rowColor || caller.mapColor(d.key)).style(caller.columnStyle)
       }

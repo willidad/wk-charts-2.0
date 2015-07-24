@@ -44,21 +44,18 @@ export function main(el: HTMLElement): void {
     //var areaMarker = chart.addLayout(new DataMarker(y2Scale,'y2',x2Scale,'x', colorScale, true))
 
     var column1 = chart.addLayout(new Columns(yScale,'y',xScale,'x', colorScale))
-    column1.padding = [0.1,0.55]
-    column1.rowColor = 'red'
+    column1.padding = [0.13,0.52]
+    column1.rowColor = colorScale.map('y')
     var column2 = chart.addLayout(new Columns(yScale,'y2',xScale,'x', colorScale))
-    column2.padding = [0.55,0.1]
-    column2.rowColor = 'green'
+    column2.padding = [0.52,0.13]
+    column2.rowColor = colorScale.map('y2')
     //var column2 = chart.addLayout(new Columns(y2Scale,'y2',x2Scale,'x', colorScale, true))
     //column1.columnStyle = {opacity: 0.3}
     //column2.columnStyle = {opacity: 0.3}
     //var pie = chart.addLayout(new Donut(yScale, 'y', xScale, 'x', keyColors))
 
-    var dataLabels1 = chart.addLayout(new XYDataLabel(yScale,'y',xScale,'x'))
-    dataLabels1.labelOffset = column1.padding
-    var dataLabels1 = chart.addLayout(new XYDataLabel(yScale,'y2',xScale,'x'))
-    dataLabels1.labelOffset = column2.padding
-    //var dataLabels2 = chart.addLayout(new XYDataLabel(y2Scale,'y2',x2Scale,'x', null ,true))
+    var dataLabels1 = chart.addDataLabels(column1) 
+    var dataLabels2 = chart.addDataLabels(column2)
     //dataLabels2.labelRotation = 0
     //dataLabels1.labelRotation = 0
 
@@ -89,5 +86,139 @@ export function main(el: HTMLElement): void {
     
     document.getElementById('rotation').addEventListener('input',(ev) => {
         rotationHandler(ev)
+    })
+    
+    document.getElementById('col').addEventListener('click', (ev) => {
+        chart = new Chart(el, 'This is the chart title', "Subtitle");
+        var xScale = chart.addScale('ordinal', ['x'])
+        var yScale = chart.addScale('linear', ['y', 'y2'], DomainCalc.extentZero)
+        var colorScale = chart.addScale('category10',[])      
+        axisBottom = chart.addAxis(Position.bottom, xScale, 'X - Scale')
+        axisLeft = chart.addAxis(Position.left, yScale, 'Y - Scale')  
+        var leftGrid = chart.addGrid(axisLeft)
+        var gridBottom = chart.addGrid(axisBottom)
+        var column1 = chart.addLayout(new Columns(yScale,'y',xScale,'x', colorScale))
+        column1.padding = [0.13,0.52]
+        column1.rowColor = colorScale.map('y')
+        var column2 = chart.addLayout(new Columns(yScale,'y2',xScale,'x', colorScale))
+        column2.padding = [0.52,0.13]
+        column2.rowColor = colorScale.map('y2') 
+        var dataLabels1 = chart.addDataLabels(column1) 
+        var dataLabels2 = chart.addDataLabels(column2)
+        
+        chart.draw(data)
+    })
+    
+    document.getElementById('bar').addEventListener('click', (ev) => {
+        chart = new Chart(el, 'This is the chart title', "Subtitle");
+        var yScale = chart.addScale('ordinal', ['x'])
+        var xScale = chart.addScale('linear', ['y', 'y2'], DomainCalc.extentZero)
+        var colorScale = chart.addScale('category10',[])      
+        axisTop = chart.addAxis(Position.top, xScale, 'X - Scale Top')
+        axisRight = chart.addAxis(Position.right, yScale, 'Y - Axis Right')
+        var gridRight = chart.addGrid(axisRight)
+        var gridTop = chart.addGrid(axisTop)
+        var column1 = chart.addLayout(new Columns(xScale,'y',yScale,'x', colorScale,true))
+        column1.padding = [0.13,0.52]
+        column1.rowColor = colorScale.map('y')
+        var column2 = chart.addLayout(new Columns(xScale,'y2',yScale,'x', colorScale, true))
+        column2.padding = [0.52,0.13]
+        column2.rowColor = colorScale.map('y2') 
+        var dataLabels1 = chart.addDataLabels(column1) 
+        var dataLabels2 = chart.addDataLabels(column2)
+        
+        chart.draw(data)
+    })
+    
+    document.getElementById('pie').addEventListener('click', (ev) => {
+        chart = new Chart(el, 'This is the chart title', "Subtitle");
+        var xScale = chart.addScale('ordinal', ['x']) 
+        var yScale = chart.addScale('linear', ['y', 'y2'], DomainCalc.extentZero)  
+        var keyColors = chart.addScale('category10', ['x'])
+        var pie = chart.addLayout(new Donut(yScale, 'y', xScale, 'x', keyColors))
+        
+        chart.draw(data)
+    })
+    
+    document.getElementById('lineHor').addEventListener('click', (ev) => {
+        chart = new Chart(el, 'This is the chart title', "Subtitle");
+    
+        var xScale = chart.addScale('ordinal', ['x'])
+        var yScale = chart.addScale('linear', ['y'], DomainCalc.extentZero)
+        var colorScale = chart.addScale('category10',[])
+        var keyColors = chart.addScale('category10', ['x'])
+        
+        axisBottom = chart.addAxis(Position.bottom, xScale, 'X - Scale')
+        axisLeft = chart.addAxis(Position.left, yScale, 'Y - Scale')
+    
+        var leftGrid = chart.addGrid(axisLeft)
+        var gridBottom = chart.addGrid(axisBottom)
+        
+        var line1 = chart.addLayout(new Line(yScale,'y',xScale,'x', colorScale, false, true))
+        var line1Marker = chart.addLayout(new DataMarker(yScale,'y',xScale,'x', colorScale))
+        
+        chart.draw(data)
+
+    })
+    
+    document.getElementById('areaHor').addEventListener('click', (ev) => {
+        chart = new Chart(el, 'This is the chart title', "Subtitle");
+    
+        var xScale = chart.addScale('ordinal', ['x'])
+        var yScale = chart.addScale('linear', ['y'], DomainCalc.extentZero)
+        var colorScale = chart.addScale('category10',[])
+        var keyColors = chart.addScale('category10', ['x'])
+        
+        axisBottom = chart.addAxis(Position.bottom, xScale, 'X - Scale')
+        axisLeft = chart.addAxis(Position.left, yScale, 'Y - Scale')
+    
+        var leftGrid = chart.addGrid(axisLeft)
+        var gridBottom = chart.addGrid(axisBottom)
+        
+        var area = chart.addLayout(new Area(yScale,'y',xScale,'x', colorScale, false, true))
+        var line1Marker = chart.addLayout(new DataMarker(yScale,'y',xScale,'x', colorScale))
+        
+        chart.draw(data)
+
+    })
+    
+    document.getElementById('lineVert').addEventListener('click', (ev) => {
+        chart = new Chart(el, 'This is the chart title', "Subtitle");
+    
+        var yScale = chart.addScale('ordinal', ['x'])
+        var xScale = chart.addScale('linear', ['y'], DomainCalc.extentZero)
+        var colorScale = chart.addScale('category10',[])
+        var keyColors = chart.addScale('category10', ['x'])
+        
+        axisBottom = chart.addAxis(Position.bottom, xScale, 'X - Scale')
+        axisLeft = chart.addAxis(Position.left, yScale, 'Y - Scale')
+    
+        var leftGrid = chart.addGrid(axisLeft)
+        var gridBottom = chart.addGrid(axisBottom)
+        
+        var line1 = chart.addLayout(new Line(xScale,'y',yScale,'x', colorScale, true, true))
+        var line1Marker = chart.addDataMarkers(line1)
+        
+        chart.draw(data)
+
+    })
+    
+    document.getElementById('areaVert').addEventListener('click', (ev) => {
+        chart = new Chart(el, 'This is the chart title', "Subtitle");
+    
+        var yScale = chart.addScale('ordinal', ['x'])
+        var xScale = chart.addScale('linear', ['y'], DomainCalc.extentZero)
+        var colorScale = chart.addScale('category10',[])
+        var keyColors = chart.addScale('category10', ['x']) 
+        var axisBottom = chart.addAxis(Position.bottom, xScale, 'X - Scale')
+        var axisLeft = chart.addAxis(Position.left, yScale, 'Y - Scale')
+        var leftGrid = chart.addGrid(axisLeft)
+        var gridBottom = chart.addGrid(axisBottom)
+        
+        var line1 = chart.addLayout(new Area(xScale,'y',yScale,'x', colorScale, true, true))
+        var line1Marker = chart.addDataMarkers(line1)
+        
+        chart.draw(data)
+
     })
 }
