@@ -18,9 +18,11 @@ export class XYDataLabel extends XYElement {
 	get labelBgStyle() { return <Style>_.defaults(this._labelBgStyle, labelDefaults.labelBgStyle)}
 	
 	public labelRotation:number = 0;
+	public labelOffset:[number,number] = [0,0];
 		
 	public targetContainer = 'wk-chart-label-area'
 	public needsPadding = true
+	
 	
 	protected getSelector():string { 
 		return '.wk-chart-label-marker' 
@@ -64,7 +66,7 @@ export class XYDataLabel extends XYElement {
 	}
 	
 	public beforeDraw = (container, data, drawingAreaSize?) => {
-		this.offset = this.keyScale.isOrdinal ? this.keyScale.getRangeBand() / 2 : 0
+		this.offset = this.keyScale.isOrdinal ? (this.keyScale.getRangeBand() * (1 - (this.labelOffset[1] - this.labelOffset[0]))) / 2 : 0
 	}
 	
 	

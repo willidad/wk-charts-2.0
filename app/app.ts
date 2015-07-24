@@ -20,7 +20,7 @@ export function main(el: HTMLElement): void {
     var xScale = chart.addScale('ordinal', ['x'])
     var x2Scale = chart.addScale('ordinal', ['x'])
     x2Scale.isInverted = true
-    var yScale = chart.addScale('linear', ['y'], DomainCalc.extentZero)
+    var yScale = chart.addScale('linear', ['y', 'y2'], DomainCalc.extentZero)
     var y2Scale = chart.addScale('linear', ['y2'], DomainCalc.extent)
     var colorScale = chart.addScale('category10',[])
     var keyColors = chart.addScale('category10', ['x'])
@@ -44,12 +44,20 @@ export function main(el: HTMLElement): void {
     //var areaMarker = chart.addLayout(new DataMarker(y2Scale,'y2',x2Scale,'x', colorScale, true))
 
     var column1 = chart.addLayout(new Columns(yScale,'y',xScale,'x', colorScale))
+    column1.padding = [0.1,0.55]
+    column1.rowColor = 'red'
+    var column2 = chart.addLayout(new Columns(yScale,'y2',xScale,'x', colorScale))
+    column2.padding = [0.55,0.1]
+    column2.rowColor = 'green'
     //var column2 = chart.addLayout(new Columns(y2Scale,'y2',x2Scale,'x', colorScale, true))
     //column1.columnStyle = {opacity: 0.3}
     //column2.columnStyle = {opacity: 0.3}
     //var pie = chart.addLayout(new Donut(yScale, 'y', xScale, 'x', keyColors))
 
     var dataLabels1 = chart.addLayout(new XYDataLabel(yScale,'y',xScale,'x'))
+    dataLabels1.labelOffset = column1.padding
+    var dataLabels1 = chart.addLayout(new XYDataLabel(yScale,'y2',xScale,'x'))
+    dataLabels1.labelOffset = column2.padding
     //var dataLabels2 = chart.addLayout(new XYDataLabel(y2Scale,'y2',x2Scale,'x', null ,true))
     //dataLabels2.labelRotation = 0
     //dataLabels1.labelRotation = 0
