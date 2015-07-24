@@ -215,9 +215,7 @@ export class Chart {
 				</g>
 			</svg>
 		</div>`
-		
-		
-		
+				
 		// attach resize handler to container
 		
 		new ResizeSensor(this._container.querySelector(".wk-chart"), this.draw)
