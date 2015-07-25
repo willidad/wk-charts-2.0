@@ -88,7 +88,7 @@ export class Layout {
 	
 	private startPos = ():Point[] => {
 		var range = this.keyScale.getRange()
-		var interv = range.length > 1 ? range[1] - range[0] : undefined //TODO something more meainingful
+		var interv = range.length > 1 ? Math.abs(range[1] - range[0]) : undefined //TODO something more meainingful
 		var seq:Point[] = []
 		var rangeIdx = 0
 		var targetPos
@@ -110,7 +110,7 @@ export class Layout {
 	
 	private endPos = ():Point[] => {
 		var range = this.keyScale.getRange()
-		var interv = range.length > 1 ? range[1] - range[0] : undefined //TODO something more meainingful
+		var interv = range.length > 1 ? Math.abs(range[1] - range[0]) : undefined //TODO something more meainingful
 		var seq:Point[] = []
 		var rangeIdx = 0
 		for (var point of this.diffSeq) {

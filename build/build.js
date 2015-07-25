@@ -12556,6 +12556,187 @@ System.register("app/core/defaults.ts", [], function(exports_1) {
   };
 });
 
+var __moduleName = "file:///app/tools/array-diff.ts";
+System.register("app/tools/array-diff.ts", ["npm:lodash@3.10.0.js"], function(exports_1) {
+  var _;
+  var indexMap,
+      longestCommonSubstring,
+      diff,
+      orderedSetDiff,
+      compress;
+  function Diff(opts) {
+    opts = opts || {};
+    return function(before, after) {
+      var result = opts.unique ? orderedSetDiff(before, after) : diff(before, after);
+      return opts.compress ? compress(result) : result;
+    };
+  }
+  exports_1("Diff", Diff);
+  return {
+    setters: [function(__) {
+      _ = __;
+    }],
+    execute: function() {
+      indexMap = function(list) {
+        var map = {};
+        list.forEach(function(each, i) {
+          map[each] = map[each] || [];
+          map[each].push(i);
+        });
+        return map;
+      };
+      longestCommonSubstring = function(seq1, seq2) {
+        var result = {
+          startString1: 0,
+          startString2: 0,
+          length: 0
+        };
+        var indexMapBefore = indexMap(seq1);
+        var previousOverlap = [];
+        seq2.forEach(function(eachAfter, indexAfter) {
+          var overlapLength;
+          var overlap = [];
+          var indexesBefore = indexMapBefore[eachAfter] || [];
+          indexesBefore.forEach(function(indexBefore) {
+            overlapLength = ((indexBefore && previousOverlap[indexBefore - 1]) || 0) + 1;
+            if (overlapLength > result.length) {
+              result.length = overlapLength;
+              result.startString1 = indexBefore - overlapLength + 1;
+              result.startString2 = indexAfter - overlapLength + 1;
+            }
+            overlap[indexBefore] = overlapLength;
+          });
+          previousOverlap = overlap;
+        });
+        return result;
+      };
+      diff = function(before, after) {
+        var commonSeq = longestCommonSubstring(before, after);
+        var startBefore = commonSeq.startString1;
+        var startAfter = commonSeq.startString2;
+        if (commonSeq.length == 0) {
+          var result = before.map(function(each) {
+            return ['-', each];
+          });
+          return result.concat(after.map(function(each) {
+            return ['+', each];
+          }));
+        }
+        var beforeLeft = before.slice(0, startBefore);
+        var afterLeft = after.slice(0, startAfter);
+        var equal = after.slice(startAfter, startAfter + commonSeq.length).map(function(each) {
+          return ['=', each];
+        });
+        var beforeRight = before.slice(startBefore + commonSeq.length);
+        var afterRight = after.slice(startAfter + commonSeq.length);
+        return _.union(diff(beforeLeft, afterLeft), equal, diff(beforeRight, afterRight));
+      };
+      orderedSetDiff = function(before, after) {
+        var diffRes = diff(before, after);
+        var result = [];
+        diffRes.forEach(function(each) {
+          switch (each[0]) {
+            case '=':
+              result.push(each);
+              break;
+            case '-':
+              result.push((after.indexOf(each[1]) > -1) ? ['x', each[1]] : ['-', each[1]]);
+              break;
+            case '+':
+              result.push((before.indexOf(each[1]) > -1) ? ['p', each[1]] : ['+', each[1]]);
+          }
+        });
+        return result;
+      };
+      compress = function(diff) {
+        var result = [];
+        var modifier;
+        var section = [];
+        diff.forEach(function(each) {
+          if (modifier && (each[0] == modifier)) {
+            section.push(each[1]);
+          } else {
+            if (modifier)
+              result.push([modifier, section]);
+            section = [each[1]];
+            modifier = each[0];
+          }
+        });
+        if (modifier)
+          result.push([modifier, section]);
+        return result;
+      };
+    }
+  };
+});
+
+var __moduleName = "file:///app/decorators/dataMarker.ts";
+var __extends = (this && this.__extends) || function(d, b) {
+  for (var p in b)
+    if (b.hasOwnProperty(p))
+      d[p] = b[p];
+  function __() {
+    this.constructor = d;
+  }
+  __.prototype = b.prototype;
+  d.prototype = new __();
+};
+System.register("app/decorators/dataMarker.ts", ["app/baseLayouts/xyElement.ts", "npm:lodash@3.10.0.js", "app/core/defaults.ts"], function(exports_1) {
+  var xyElement_1,
+      _,
+      defaults_1;
+  var DataMarker;
+  return {
+    setters: [function(_xyElement_1) {
+      xyElement_1 = _xyElement_1;
+    }, function(__) {
+      _ = __;
+    }, function(_defaults_1) {
+      defaults_1 = _defaults_1;
+    }],
+    execute: function() {
+      DataMarker = (function(_super) {
+        __extends(DataMarker, _super);
+        function DataMarker() {
+          var _this = this;
+          _super.apply(this, arguments);
+          this._markerStyle = {};
+          this.targetContainer = 'wk-chart-marker-area';
+          this.needsPadding = true;
+          this.beforeDraw = function(container, data, drawingAreaSize) {
+            _this.offset = _this.keyScale.isOrdinal ? _this.keyScale.getRangeBand() / 2 : 0;
+            console.log('dataLabels', data);
+          };
+        }
+        Object.defineProperty(DataMarker.prototype, "markerStyle", {
+          get: function() {
+            return _.defaults(this._markerStyle, defaults_1.markers.markerStyle);
+          },
+          set: function(val) {
+            this._markerStyle = val;
+          },
+          enumerable: true,
+          configurable: true
+        });
+        DataMarker.prototype.getSelector = function() {
+          return '.wk-chart-data-marker';
+        };
+        DataMarker.prototype.create = function(selection, caller) {
+          selection.append('circle').attr('class', 'wk-chart-data-marker').attr('r', 5);
+        };
+        DataMarker.prototype.update = function(selection, caller) {
+          selection.style('fill', function(d) {
+            return caller.propertyColor();
+          });
+        };
+        DataMarker.prototype.remove = function(selection, caller) {};
+        return DataMarker;
+      })(xyElement_1.XYElement);
+      exports_1("DataMarker", DataMarker);
+    }
+  };
+});
+
 var __moduleName = "file:///app/core/grid.ts";
 System.register("app/core/grid.ts", ["app/core/axis.ts", "app/core/defaults.ts", "npm:d3@3.5.6.js", "npm:lodash@3.10.0.js"], function(exports_1) {
   var axis_1,
@@ -12815,121 +12996,7 @@ System.register("app/tools/innerSVG.ts", [], function(exports_1) {
   };
 });
 
-var __moduleName = "file:///app/tools/array-diff.ts";
-System.register("app/tools/array-diff.ts", ["npm:lodash@3.10.0.js"], function(exports_1) {
-  var _;
-  var indexMap,
-      longestCommonSubstring,
-      diff,
-      orderedSetDiff,
-      compress;
-  function Diff(opts) {
-    opts = opts || {};
-    return function(before, after) {
-      var result = opts.unique ? orderedSetDiff(before, after) : diff(before, after);
-      return opts.compress ? compress(result) : result;
-    };
-  }
-  exports_1("Diff", Diff);
-  return {
-    setters: [function(__) {
-      _ = __;
-    }],
-    execute: function() {
-      indexMap = function(list) {
-        var map = {};
-        list.forEach(function(each, i) {
-          map[each] = map[each] || [];
-          map[each].push(i);
-        });
-        return map;
-      };
-      longestCommonSubstring = function(seq1, seq2) {
-        var result = {
-          startString1: 0,
-          startString2: 0,
-          length: 0
-        };
-        var indexMapBefore = indexMap(seq1);
-        var previousOverlap = [];
-        seq2.forEach(function(eachAfter, indexAfter) {
-          var overlapLength;
-          var overlap = [];
-          var indexesBefore = indexMapBefore[eachAfter] || [];
-          indexesBefore.forEach(function(indexBefore) {
-            overlapLength = ((indexBefore && previousOverlap[indexBefore - 1]) || 0) + 1;
-            if (overlapLength > result.length) {
-              result.length = overlapLength;
-              result.startString1 = indexBefore - overlapLength + 1;
-              result.startString2 = indexAfter - overlapLength + 1;
-            }
-            overlap[indexBefore] = overlapLength;
-          });
-          previousOverlap = overlap;
-        });
-        return result;
-      };
-      diff = function(before, after) {
-        var commonSeq = longestCommonSubstring(before, after);
-        var startBefore = commonSeq.startString1;
-        var startAfter = commonSeq.startString2;
-        if (commonSeq.length == 0) {
-          var result = before.map(function(each) {
-            return ['-', each];
-          });
-          return result.concat(after.map(function(each) {
-            return ['+', each];
-          }));
-        }
-        var beforeLeft = before.slice(0, startBefore);
-        var afterLeft = after.slice(0, startAfter);
-        var equal = after.slice(startAfter, startAfter + commonSeq.length).map(function(each) {
-          return ['=', each];
-        });
-        var beforeRight = before.slice(startBefore + commonSeq.length);
-        var afterRight = after.slice(startAfter + commonSeq.length);
-        return _.union(diff(beforeLeft, afterLeft), equal, diff(beforeRight, afterRight));
-      };
-      orderedSetDiff = function(before, after) {
-        var diffRes = diff(before, after);
-        var result = [];
-        diffRes.forEach(function(each) {
-          switch (each[0]) {
-            case '=':
-              result.push(each);
-              break;
-            case '-':
-              result.push((after.indexOf(each[1]) > -1) ? ['x', each[1]] : ['-', each[1]]);
-              break;
-            case '+':
-              result.push((before.indexOf(each[1]) > -1) ? ['p', each[1]] : ['+', each[1]]);
-          }
-        });
-        return result;
-      };
-      compress = function(diff) {
-        var result = [];
-        var modifier;
-        var section = [];
-        diff.forEach(function(each) {
-          if (modifier && (each[0] == modifier)) {
-            section.push(each[1]);
-          } else {
-            if (modifier)
-              result.push([modifier, section]);
-            section = [each[1]];
-            modifier = each[0];
-          }
-        });
-        if (modifier)
-          result.push([modifier, section]);
-        return result;
-      };
-    }
-  };
-});
-
-var __moduleName = "file:///app/decorators/dataLabels.ts";
+var __moduleName = "file:///app/baseLayouts/xyPath.ts";
 var __extends = (this && this.__extends) || function(d, b) {
   for (var p in b)
     if (b.hasOwnProperty(p))
@@ -12940,15 +13007,84 @@ var __extends = (this && this.__extends) || function(d, b) {
   __.prototype = b.prototype;
   d.prototype = new __();
 };
-System.register("app/decorators/dataLabels.ts", ["app/baseLayouts/xyElement.ts", "npm:d3@3.5.6.js", "npm:lodash@3.10.0.js", "app/core/defaults.ts"], function(exports_1) {
-  var xyElement_1,
+System.register("app/baseLayouts/xyPath.ts", ["app/baseLayouts/layout.ts"], function(exports_1) {
+  var layout_1;
+  var XYPath;
+  return {
+    setters: [function(_layout_1) {
+      layout_1 = _layout_1;
+    }],
+    execute: function() {
+      XYPath = (function(_super) {
+        __extends(XYPath, _super);
+        function XYPath(valueScale, valueProperty, keyScale, keyProperty, colorScale, isVertical, spline) {
+          var _this = this;
+          if (isVertical === void 0) {
+            isVertical = false;
+          }
+          if (spline === void 0) {
+            spline = false;
+          }
+          _super.call(this, valueScale, valueProperty, keyScale, keyProperty, colorScale);
+          this.valueScale = valueScale;
+          this.valueProperty = valueProperty;
+          this.keyScale = keyScale;
+          this.keyProperty = keyProperty;
+          this.colorScale = colorScale;
+          this.isVertical = isVertical;
+          this.spline = spline;
+          this.offset = 0;
+          this.colorProp = 'stroke';
+          this.splineType = 'cardinal';
+          this.pathGenerator = function() {};
+          this.drawLayout = function(container, data, drawingAreaSize, animate) {
+            _this.offset = _this.keyScale.isOrdinal ? _this.keyScale.getRangeBand() / 2 : 0;
+            if (!_this.path) {
+              _this.path = container.append('path');
+            }
+            if (animate) {
+              _this.path.datum(data).transition().duration(_this._duration).attr('d', _this.pathGen);
+            } else {
+              _this.path.datum(data).attr('d', _this.pathGen);
+            }
+            if (_this.colorScale) {
+              _this.path.style(_this.colorProp, _this.propertyColor());
+            }
+          };
+        }
+        XYPath.prototype.setupLayout = function() {
+          this.pathGen = this.pathGenerator();
+          if (this.spline) {
+            this.pathGen.interpolate('cardinal');
+          }
+        };
+        return XYPath;
+      })(layout_1.Layout);
+      exports_1("XYPath", XYPath);
+    }
+  };
+});
+
+var __moduleName = "file:///app/layouts/area.ts";
+var __extends = (this && this.__extends) || function(d, b) {
+  for (var p in b)
+    if (b.hasOwnProperty(p))
+      d[p] = b[p];
+  function __() {
+    this.constructor = d;
+  }
+  __.prototype = b.prototype;
+  d.prototype = new __();
+};
+System.register("app/layouts/area.ts", ["app/baseLayouts/xyPath.ts", "npm:d3@3.5.6.js", "npm:lodash@3.10.0.js", "app/core/defaults.ts"], function(exports_1) {
+  var xyPath_1,
       d3,
       _,
       defaults_1;
-  var XYDataLabel;
+  var Area;
   return {
-    setters: [function(_xyElement_1) {
-      xyElement_1 = _xyElement_1;
+    setters: [function(_xyPath_1) {
+      xyPath_1 = _xyPath_1;
     }, function(_d3) {
       d3 = _d3;
     }, function(__) {
@@ -12957,72 +13093,287 @@ System.register("app/decorators/dataLabels.ts", ["app/baseLayouts/xyElement.ts",
       defaults_1 = _defaults_1;
     }],
     execute: function() {
-      XYDataLabel = (function(_super) {
-        __extends(XYDataLabel, _super);
-        function XYDataLabel() {
+      Area = (function(_super) {
+        __extends(Area, _super);
+        function Area() {
           var _this = this;
           _super.apply(this, arguments);
-          this._labelStyle = {};
-          this._labelBgStyle = {};
-          this.labelRotation = 0;
-          this.labelOffset = [0, 0];
-          this.targetContainer = 'wk-chart-label-area';
-          this.needsPadding = true;
-          this.fadeInOut = true;
-          this.updateItem = function(item, d) {
+          this._areaStyle = {};
+          this.colorProp = 'fill';
+          this.splineType = 'cardinal';
+          this.pathGenerator = function() {
+            var area = d3.svg.area();
             if (_this.isVertical) {
-              var text = item.select('g text').text(d.value).style('text-anchor', d.value < 0 ? 'end' : 'start').attr('dy', '0.35em').style(_this.labelStyle);
-              item.select('g rect').style(_this.labelBgStyle).attr(text.node().getBBox());
-              item.select('g').attr('transform', "translate(" + (d.value > 0 ? 1 : -1) * defaults_1.dataLabels.labelPadding + ",0) rotate(" + _this.labelRotation + ")");
+              area.y(function(d) {
+                return d.keyPos + _this.offset;
+              }).x0(function(d) {
+                return _this.valFnZero();
+              }).x1(function(d) {
+                return d.valPos;
+              });
             } else {
-              var text = item.select('g text').text(d.value).style('text-anchor', 'middle').attr('dy', d.value < 0 ? '0.71em' : null).style(_this.labelStyle);
-              item.select('g rect').style(_this.labelBgStyle).attr(text.node().getBBox());
-              item.select('g').attr('transform', "translate(0," + (d.value > 0 ? -1 : 1) * defaults_1.dataLabels.labelPadding + ") rotate(" + _this.labelRotation + ")");
+              area.x(function(d) {
+                return d.keyPos + _this.offset;
+              }).y0(function(d) {
+                return _this.valFnZero();
+              }).y1(function(d) {
+                return d.valPos;
+              });
             }
+            return area;
           };
-          this.beforeDraw = function(container, data, drawingAreaSize) {
-            _this.offset = _this.keyScale.isOrdinal ? (_this.keyScale.getRangeBand() * (1 - (_this.labelOffset[1] - _this.labelOffset[0]))) / 2 : 0;
+          this.afterDraw = function(container, data, drawingAreaSize) {
+            _this.path.style(_this.areaStyle);
           };
         }
-        Object.defineProperty(XYDataLabel.prototype, "labelStyle", {
+        Object.defineProperty(Area.prototype, "areaStyle", {
           get: function() {
-            return _.defaults(this._labelStyle, defaults_1.dataLabels.labelStyle);
+            return _.defaults(this._areaStyle, defaults_1.area.areaStyle);
           },
           set: function(val) {
-            this._labelStyle = val;
+            this._areaStyle = val;
           },
           enumerable: true,
           configurable: true
         });
-        Object.defineProperty(XYDataLabel.prototype, "labelBgStyle", {
+        return Area;
+      })(xyPath_1.XYPath);
+      exports_1("Area", Area);
+    }
+  };
+});
+
+var __moduleName = "file:///app/layouts/column.ts";
+var __extends = (this && this.__extends) || function(d, b) {
+  for (var p in b)
+    if (b.hasOwnProperty(p))
+      d[p] = b[p];
+  function __() {
+    this.constructor = d;
+  }
+  __.prototype = b.prototype;
+  d.prototype = new __();
+};
+System.register("app/layouts/column.ts", ["app/baseLayouts/xyElement.ts", "npm:lodash@3.10.0.js", "app/core/defaults.ts"], function(exports_1) {
+  var xyElement_1,
+      _,
+      defaults_1;
+  var Columns;
+  return {
+    setters: [function(_xyElement_1) {
+      xyElement_1 = _xyElement_1;
+    }, function(__) {
+      _ = __;
+    }, function(_defaults_1) {
+      defaults_1 = _defaults_1;
+    }],
+    execute: function() {
+      Columns = (function(_super) {
+        __extends(Columns, _super);
+        function Columns() {
+          _super.apply(this, arguments);
+          this._columnStyle = {};
+          this.padding = [0, 0];
+          this.rowColor = undefined;
+        }
+        Object.defineProperty(Columns.prototype, "columnStyle", {
           get: function() {
-            return _.defaults(this._labelBgStyle, defaults_1.dataLabels.labelBgStyle);
+            return _.defaults(this._columnStyle, defaults_1.column.columnStyle);
           },
           set: function(val) {
-            this._labelBgStyle = val;
+            this._columnStyle = val;
           },
           enumerable: true,
           configurable: true
         });
-        XYDataLabel.prototype.getSelector = function() {
-          return '.wk-chart-label-marker';
+        Columns.prototype.getSelector = function() {
+          return '.wk-chart-column';
         };
-        XYDataLabel.prototype.create = function(selection, caller) {
-          var lg = selection.append('g').attr('class', 'wk-chart-label-marker').append('g');
-          lg.append('rect');
-          lg.append('text');
+        Columns.prototype.create = function(selection, caller) {
+          selection.append('rect').attr('class', 'wk-chart-column');
         };
-        XYDataLabel.prototype.update = function(selection, caller) {
-          selection.each(function(d) {
-            caller.updateItem(d3.select(this), d);
+        Columns.prototype.update = function(selection, caller) {
+          var leftTopPadding = caller.keyScale.getRangeBand() * caller.padding[0];
+          var rightBottomPadding = caller.keyScale.getRangeBand() * caller.padding[1];
+          if (caller.isVertical) {
+            selection.attr('height', function(d) {
+              return d.added | d.deleted ? 0 : caller.keyScale.getRangeBand() - leftTopPadding - rightBottomPadding;
+            }).attr('width', function(d) {
+              return Math.abs(caller.valFnZero() - d.valPos);
+            }).attr('x', function(d) {
+              return d.value > 0 ? -Math.abs(caller.valFnZero() - d.valPos) : 0;
+            }).attr('y', function(d) {
+              return d.added | d.deleted ? 0 : leftTopPadding;
+            });
+          } else {
+            selection.attr('width', function(d) {
+              return d.added | d.deleted ? 0 : caller.keyScale.getRangeBand() - leftTopPadding - rightBottomPadding;
+            }).attr('height', function(d) {
+              return Math.abs(caller.valFnZero() - d.valPos);
+            }).attr('y', function(d) {
+              return d.value < 0 ? -Math.abs(caller.valFnZero() - d.valPos) : 0;
+            }).attr('x', function(d) {
+              return d.added | d.deleted ? 0 : leftTopPadding;
+            });
+          }
+          selection.style('fill', function(d) {
+            return caller.rowColor || caller.mapColor(d.key);
+          }).style(caller.columnStyle);
+        };
+        return Columns;
+      })(xyElement_1.XYElement);
+      exports_1("Columns", Columns);
+    }
+  };
+});
+
+var __moduleName = "file:///app/layouts/pie.ts";
+var __extends = (this && this.__extends) || function(d, b) {
+  for (var p in b)
+    if (b.hasOwnProperty(p))
+      d[p] = b[p];
+  function __() {
+    this.constructor = d;
+  }
+  __.prototype = b.prototype;
+  d.prototype = new __();
+};
+System.register("app/layouts/pie.ts", ["app/baseLayouts/layout.ts", "npm:d3@3.5.6.js", "npm:lodash@3.10.0.js", "app/core/defaults.ts"], function(exports_1) {
+  var layout_1,
+      d3,
+      _,
+      defaults_1;
+  var Pie;
+  return {
+    setters: [function(_layout_1) {
+      layout_1 = _layout_1;
+    }, function(_d3) {
+      d3 = _d3;
+    }, function(__) {
+      _ = __;
+    }, function(_defaults_1) {
+      defaults_1 = _defaults_1;
+    }],
+    execute: function() {
+      Pie = (function(_super) {
+        __extends(Pie, _super);
+        function Pie() {
+          var _this = this;
+          _super.apply(this, arguments);
+          this._pieStyle = {};
+          this.innerRadius = 0;
+          this.drawLayout = function(container, data, drawingAreaSize, animate) {
+            var radius = Math.min(drawingAreaSize.width, drawingAreaSize.height) / 2;
+            var arc = d3.svg.arc().outerRadius(radius).innerRadius(_this.innerRadius);
+            var pie = d3.layout.pie().value(function(d) {
+              return d.added || d.deleted ? 0 : Math.abs(d.value);
+            }).sort(null);
+            function arcTween(a) {
+              var i = d3.interpolate(this._current, a);
+              this._current = i(0);
+              return function(t) {
+                return arc(i(t));
+              };
+            }
+            var segments = pie(data);
+            var path = container.selectAll('path').data(segments, function(d) {
+              return d.data.key;
+            });
+            path.enter().append('path').each(function(d) {
+              this._current = d;
+            });
+            if (animate) {
+              path.transition().duration(defaults_1.duration).attrTween('d', arcTween);
+            } else {
+              path.attr('d', arc);
+            }
+            path.attr('fill', function(d) {
+              return _this.mapColor(d.data.key);
+            }).style(_this.pieStyle);
+            path.exit().remove();
+            container.attr('transform', "translate(" + drawingAreaSize.width / 2 + ", " + drawingAreaSize.height / 2 + ")");
+          };
+        }
+        Object.defineProperty(Pie.prototype, "pieStyle", {
+          get: function() {
+            return _.defaults(this._pieStyle, defaults_1.pie.pieStyle);
+          },
+          set: function(val) {
+            this._pieStyle = val;
+          },
+          enumerable: true,
+          configurable: true
+        });
+        return Pie;
+      })(layout_1.Layout);
+      exports_1("Pie", Pie);
+    }
+  };
+});
+
+var __moduleName = "file:///app/decorators/datamarker.ts";
+var __extends = (this && this.__extends) || function(d, b) {
+  for (var p in b)
+    if (b.hasOwnProperty(p))
+      d[p] = b[p];
+  function __() {
+    this.constructor = d;
+  }
+  __.prototype = b.prototype;
+  d.prototype = new __();
+};
+System.register("app/decorators/datamarker.ts", ["app/baseLayouts/xyElement.ts", "npm:lodash@3.10.0.js", "app/core/defaults.ts"], function(exports_1) {
+  var xyElement_1,
+      _,
+      defaults_1;
+  var DataMarker;
+  return {
+    setters: [function(_xyElement_1) {
+      xyElement_1 = _xyElement_1;
+    }, function(__) {
+      _ = __;
+    }, function(_defaults_1) {
+      defaults_1 = _defaults_1;
+    }],
+    execute: function() {
+      DataMarker = (function(_super) {
+        __extends(DataMarker, _super);
+        function DataMarker() {
+          var _this = this;
+          _super.apply(this, arguments);
+          this._markerStyle = {};
+          this.targetContainer = 'wk-chart-marker-area';
+          this.needsPadding = true;
+          this.beforeDraw = function(container, data, drawingAreaSize) {
+            _this.offset = _this.keyScale.isOrdinal ? _this.keyScale.getRangeBand() / 2 : 0;
+            console.log('dataLabels', data);
+          };
+        }
+        Object.defineProperty(DataMarker.prototype, "markerStyle", {
+          get: function() {
+            return _.defaults(this._markerStyle, defaults_1.markers.markerStyle);
+          },
+          set: function(val) {
+            this._markerStyle = val;
+          },
+          enumerable: true,
+          configurable: true
+        });
+        DataMarker.prototype.getSelector = function() {
+          return '.wk-chart-data-marker';
+        };
+        DataMarker.prototype.create = function(selection, caller) {
+          selection.append('circle').attr('class', 'wk-chart-data-marker').attr('r', 5);
+        };
+        DataMarker.prototype.update = function(selection, caller) {
+          selection.style('fill', function(d) {
+            return caller.propertyColor();
           });
         };
-        XYDataLabel.prototype.remove = function(selection, caller) {
-          selection.remove();
-        };
-        return XYDataLabel;
+        DataMarker.prototype.remove = function(selection, caller) {};
+        return DataMarker;
       })(xyElement_1.XYElement);
-      exports_1("XYDataLabel", XYDataLabel);
+      exports_1("DataMarker", DataMarker);
     }
   };
 });
@@ -13623,6 +13974,115 @@ System.register("app/baseLayouts/layout.ts", ["app/tools/array-diff.ts", "app/co
   };
 });
 
+var __moduleName = "file:///app/layouts/line.ts";
+var __extends = (this && this.__extends) || function(d, b) {
+  for (var p in b)
+    if (b.hasOwnProperty(p))
+      d[p] = b[p];
+  function __() {
+    this.constructor = d;
+  }
+  __.prototype = b.prototype;
+  d.prototype = new __();
+};
+System.register("app/layouts/line.ts", ["app/baseLayouts/xyPath.ts", "npm:d3@3.5.6.js", "npm:lodash@3.10.0.js", "app/core/defaults.ts"], function(exports_1) {
+  var xyPath_1,
+      d3,
+      _,
+      defaults_1;
+  var Line;
+  return {
+    setters: [function(_xyPath_1) {
+      xyPath_1 = _xyPath_1;
+    }, function(_d3) {
+      d3 = _d3;
+    }, function(__) {
+      _ = __;
+    }, function(_defaults_1) {
+      defaults_1 = _defaults_1;
+    }],
+    execute: function() {
+      Line = (function(_super) {
+        __extends(Line, _super);
+        function Line() {
+          var _this = this;
+          _super.apply(this, arguments);
+          this._lineStyle = {};
+          this.colorProp = 'stroke';
+          this.pathGenerator = function() {
+            var line = d3.svg.line();
+            if (_this.isVertical) {
+              line.y(function(d) {
+                return d.keyPos + _this.offset;
+              }).x(function(d) {
+                return d.valPos;
+              });
+            } else {
+              line.x(function(d) {
+                return d.keyPos + _this.offset;
+              }).y(function(d) {
+                return d.valPos;
+              });
+            }
+            return line;
+          };
+          this.afterDraw = function(container, data, drawingAreaSize) {
+            _this.path.style(_this.lineStyle).style('fill', 'none');
+          };
+        }
+        Object.defineProperty(Line.prototype, "lineStyle", {
+          get: function() {
+            return _.defaults(this._lineStyle, defaults_1.line.lineStyle);
+          },
+          set: function(val) {
+            this._lineStyle = val;
+          },
+          enumerable: true,
+          configurable: true
+        });
+        return Line;
+      })(xyPath_1.XYPath);
+      exports_1("Line", Line);
+    }
+  };
+});
+
+var __moduleName = "file:///app/layouts/donut.ts";
+var __extends = (this && this.__extends) || function(d, b) {
+  for (var p in b)
+    if (b.hasOwnProperty(p))
+      d[p] = b[p];
+  function __() {
+    this.constructor = d;
+  }
+  __.prototype = b.prototype;
+  d.prototype = new __();
+};
+System.register("app/layouts/donut.ts", ["app/layouts/pie.ts"], function(exports_1) {
+  var pie_1;
+  var Donut;
+  return {
+    setters: [function(_pie_1) {
+      pie_1 = _pie_1;
+    }],
+    execute: function() {
+      Donut = (function(_super) {
+        __extends(Donut, _super);
+        function Donut() {
+          var _this = this;
+          _super.apply(this, arguments);
+          this.innerRadius = 0;
+          this.beforeDraw = function(container, data, drawingAreaSize) {
+            _this.innerRadius = (Math.min(drawingAreaSize.width, drawingAreaSize.height) / 2) * .65;
+          };
+        }
+        return Donut;
+      })(pie_1.Pie);
+      exports_1("Donut", Donut);
+    }
+  };
+});
+
 System.registerDynamic("github:jspm/nodelibs-process@0.1.1/index.js", ["npm:process@0.10.1.js"], true, function(require, exports, module) {
   var global = this,
       __define = global.define;
@@ -13728,7 +14188,7 @@ System.registerDynamic("github:jspm/nodelibs-process@0.1.1.js", ["github:jspm/no
   return module.exports;
 });
 
-var __moduleName = "file:///app/layouts/column.ts";
+var __moduleName = "file:///app/decorators/dataLabels.ts";
 var __extends = (this && this.__extends) || function(d, b) {
   for (var p in b)
     if (b.hasOwnProperty(p))
@@ -13739,75 +14199,89 @@ var __extends = (this && this.__extends) || function(d, b) {
   __.prototype = b.prototype;
   d.prototype = new __();
 };
-System.register("app/layouts/column.ts", ["app/baseLayouts/xyElement.ts", "npm:lodash@3.10.0.js", "app/core/defaults.ts"], function(exports_1) {
+System.register("app/decorators/dataLabels.ts", ["app/baseLayouts/xyElement.ts", "npm:d3@3.5.6.js", "npm:lodash@3.10.0.js", "app/core/defaults.ts"], function(exports_1) {
   var xyElement_1,
+      d3,
       _,
       defaults_1;
-  var Columns;
+  var XYDataLabel;
   return {
     setters: [function(_xyElement_1) {
       xyElement_1 = _xyElement_1;
+    }, function(_d3) {
+      d3 = _d3;
     }, function(__) {
       _ = __;
     }, function(_defaults_1) {
       defaults_1 = _defaults_1;
     }],
     execute: function() {
-      Columns = (function(_super) {
-        __extends(Columns, _super);
-        function Columns() {
+      XYDataLabel = (function(_super) {
+        __extends(XYDataLabel, _super);
+        function XYDataLabel() {
+          var _this = this;
           _super.apply(this, arguments);
-          this._columnStyle = {};
-          this.padding = [0, 0];
-          this.rowColor = undefined;
+          this._labelStyle = {};
+          this._labelBgStyle = {};
+          this.labelRotation = 0;
+          this.labelOffset = [0, 0];
+          this.targetContainer = 'wk-chart-label-area';
+          this.needsPadding = true;
+          this.fadeInOut = true;
+          this.updateItem = function(item, d) {
+            if (_this.isVertical) {
+              var text = item.select('g text').text(d.value).style('text-anchor', d.value < 0 ? 'end' : 'start').attr('dy', '0.35em').style(_this.labelStyle);
+              item.select('g rect').style(_this.labelBgStyle).attr(text.node().getBBox());
+              item.select('g').attr('transform', "translate(" + (d.value > 0 ? 1 : -1) * defaults_1.dataLabels.labelPadding + ",0) rotate(" + _this.labelRotation + ")");
+            } else {
+              var text = item.select('g text').text(d.value).style('text-anchor', 'middle').attr('dy', d.value < 0 ? '0.71em' : null).style(_this.labelStyle);
+              item.select('g rect').style(_this.labelBgStyle).attr(text.node().getBBox());
+              item.select('g').attr('transform', "translate(0," + (d.value > 0 ? -1 : 1) * defaults_1.dataLabels.labelPadding + ") rotate(" + _this.labelRotation + ")");
+            }
+          };
+          this.beforeDraw = function(container, data, drawingAreaSize) {
+            _this.offset = _this.keyScale.isOrdinal ? (_this.keyScale.getRangeBand() * (1 - (_this.labelOffset[1] - _this.labelOffset[0]))) / 2 : 0;
+          };
         }
-        Object.defineProperty(Columns.prototype, "columnStyle", {
+        Object.defineProperty(XYDataLabel.prototype, "labelStyle", {
           get: function() {
-            return _.defaults(this._columnStyle, defaults_1.column.columnStyle);
+            return _.defaults(this._labelStyle, defaults_1.dataLabels.labelStyle);
           },
           set: function(val) {
-            this._columnStyle = val;
+            this._labelStyle = val;
           },
           enumerable: true,
           configurable: true
         });
-        Columns.prototype.getSelector = function() {
-          return '.wk-chart-column';
+        Object.defineProperty(XYDataLabel.prototype, "labelBgStyle", {
+          get: function() {
+            return _.defaults(this._labelBgStyle, defaults_1.dataLabels.labelBgStyle);
+          },
+          set: function(val) {
+            this._labelBgStyle = val;
+          },
+          enumerable: true,
+          configurable: true
+        });
+        XYDataLabel.prototype.getSelector = function() {
+          return '.wk-chart-label-marker';
         };
-        Columns.prototype.create = function(selection, caller) {
-          selection.append('rect').attr('class', 'wk-chart-column');
+        XYDataLabel.prototype.create = function(selection, caller) {
+          var lg = selection.append('g').attr('class', 'wk-chart-label-marker').append('g');
+          lg.append('rect');
+          lg.append('text');
         };
-        Columns.prototype.update = function(selection, caller) {
-          var leftTopPadding = caller.keyScale.getRangeBand() * caller.padding[0];
-          var rightBottomPadding = caller.keyScale.getRangeBand() * caller.padding[1];
-          if (caller.isVertical) {
-            selection.attr('height', function(d) {
-              return d.added | d.deleted ? 0 : caller.keyScale.getRangeBand() - leftTopPadding - rightBottomPadding;
-            }).attr('width', function(d) {
-              return Math.abs(caller.valFnZero() - d.valPos);
-            }).attr('x', function(d) {
-              return d.value > 0 ? -Math.abs(caller.valFnZero() - d.valPos) : 0;
-            }).attr('y', function(d) {
-              return d.added | d.deleted ? 0 : leftTopPadding;
-            });
-          } else {
-            selection.attr('width', function(d) {
-              return d.added | d.deleted ? 0 : caller.keyScale.getRangeBand() - leftTopPadding - rightBottomPadding;
-            }).attr('height', function(d) {
-              return Math.abs(caller.valFnZero() - d.valPos);
-            }).attr('y', function(d) {
-              return d.value < 0 ? -Math.abs(caller.valFnZero() - d.valPos) : 0;
-            }).attr('x', function(d) {
-              return d.added | d.deleted ? 0 : leftTopPadding;
-            });
-          }
-          selection.style('fill', function(d) {
-            return caller.rowColor || caller.mapColor(d.key);
-          }).style(caller.columnStyle);
+        XYDataLabel.prototype.update = function(selection, caller) {
+          selection.each(function(d) {
+            caller.updateItem(d3.select(this), d);
+          });
         };
-        return Columns;
+        XYDataLabel.prototype.remove = function(selection, caller) {
+          selection.remove();
+        };
+        return XYDataLabel;
       })(xyElement_1.XYElement);
-      exports_1("Columns", Columns);
+      exports_1("XYDataLabel", XYDataLabel);
     }
   };
 });
@@ -18257,9 +18731,11 @@ System.register("app/core/scale.ts", ["npm:d3@3.5.6.js", "npm:lodash@3.10.0.js"]
 });
 
 var __moduleName = "file:///app/core/chart.ts";
-System.register("app/core/chart.ts", ["app/core/scale.ts", "app/core/axis.ts", "app/core/grid.ts", "npm:d3@3.5.6.js", "npm:lodash@3.10.0.js", "app/tools/drawing.ts", "app/tools/resizeSensor.ts", "app/core/defaults.ts", "app/tools/innerSVG.ts"], function(exports_1) {
+System.register("app/core/chart.ts", ["app/core/scale.ts", "app/core/axis.ts", "app/decorators/dataLabels.ts", "app/decorators/dataMarker.ts", "app/core/grid.ts", "npm:d3@3.5.6.js", "npm:lodash@3.10.0.js", "app/tools/drawing.ts", "app/tools/resizeSensor.ts", "app/core/defaults.ts", "app/tools/innerSVG.ts"], function(exports_1) {
   var scale_1,
       axis_1,
+      dataLabels_1,
+      dataMarker_1,
       grid_1,
       d3,
       _,
@@ -18272,6 +18748,10 @@ System.register("app/core/chart.ts", ["app/core/scale.ts", "app/core/axis.ts", "
       scale_1 = _scale_1;
     }, function(_axis_1) {
       axis_1 = _axis_1;
+    }, function(_dataLabels_1) {
+      dataLabels_1 = _dataLabels_1;
+    }, function(_dataMarker_1) {
+      dataMarker_1 = _dataMarker_1;
     }, function(_grid_1) {
       grid_1 = _grid_1;
     }, function(_d3) {
@@ -18451,6 +18931,15 @@ System.register("app/core/chart.ts", ["app/core/scale.ts", "app/core/axis.ts", "
             _this.grids.push(g);
             return g;
           };
+          this.addDataLabels = function(layout) {
+            var l = _this.addLayout(new dataLabels_1.XYDataLabel(layout.valueScale, layout.valueProperty, layout.keyScale, layout.keyProperty, layout.colorScale, layout.isVertical));
+            l.labelOffset = layout.padding;
+            return l;
+          };
+          this.addDataMarkers = function(layout) {
+            var l = _this.addLayout(new dataMarker_1.DataMarker(layout.valueScale, layout.valueProperty, layout.keyScale, layout.keyProperty, layout.colorScale, layout.isVertical));
+            return l;
+          };
           this.addLayout = function(l) {
             _this.layouts.push(l);
             return l;
@@ -18555,12 +19044,15 @@ System.register("app/core/chart.ts", ["app/core/scale.ts", "app/core/axis.ts", "
 });
 
 var __moduleName = "file:///app/app.ts";
-System.register("app/app.ts", ["app/core/chart.ts", "app/core/scale.ts", "app/core/axis.ts", "app/layouts/column.ts", "app/decorators/dataLabels.ts", "app/tools/data-table.ts"], function(exports_1) {
+System.register("app/app.ts", ["app/core/chart.ts", "app/core/scale.ts", "app/core/axis.ts", "app/layouts/line.ts", "app/layouts/area.ts", "app/layouts/column.ts", "app/layouts/donut.ts", "app/decorators/datamarker.ts", "app/tools/data-table.ts"], function(exports_1) {
   var chart_1,
       scale_1,
       axis_1,
+      line_1,
+      area_1,
       column_1,
-      dataLabels_1,
+      donut_1,
+      datamarker_1,
       data_table_1;
   function main(el) {
     var chart = new chart_1.Chart(el, 'This is the chart title', "Subtitle");
@@ -18578,15 +19070,13 @@ System.register("app/app.ts", ["app/core/chart.ts", "app/core/scale.ts", "app/co
     var leftGrid = chart.addGrid(axisLeft);
     var gridBottom = chart.addGrid(axisBottom);
     var column1 = chart.addLayout(new column_1.Columns(yScale, 'y', xScale, 'x', colorScale));
-    column1.padding = [0.1, 0.55];
-    column1.rowColor = 'red';
+    column1.padding = [0.13, 0.52];
+    column1.rowColor = colorScale.map('y');
     var column2 = chart.addLayout(new column_1.Columns(yScale, 'y2', xScale, 'x', colorScale));
-    column2.padding = [0.55, 0.1];
-    column2.rowColor = 'green';
-    var dataLabels1 = chart.addLayout(new dataLabels_1.XYDataLabel(yScale, 'y', xScale, 'x'));
-    dataLabels1.labelOffset = column1.padding;
-    var dataLabels1 = chart.addLayout(new dataLabels_1.XYDataLabel(yScale, 'y2', xScale, 'x'));
-    dataLabels1.labelOffset = column2.padding;
+    column2.padding = [0.52, 0.13];
+    column2.rowColor = colorScale.map('y2');
+    var dataLabels1 = chart.addDataLabels(column1);
+    var dataLabels2 = chart.addDataLabels(column2);
     var data = [{
       x: 'aaaa',
       y: 12,
@@ -18627,6 +19117,108 @@ System.register("app/app.ts", ["app/core/chart.ts", "app/core/scale.ts", "app/co
     document.getElementById('rotation').addEventListener('input', function(ev) {
       rotationHandler(ev);
     });
+    document.getElementById('col').addEventListener('click', function(ev) {
+      chart = new chart_1.Chart(el, 'This is the chart title', "Subtitle");
+      var xScale = chart.addScale('ordinal', ['x']);
+      var yScale = chart.addScale('linear', ['y', 'y2'], scale_1.DomainCalc.extentZero);
+      var colorScale = chart.addScale('category10', []);
+      axisBottom = chart.addAxis(axis_1.Position.bottom, xScale, 'X - Scale');
+      axisLeft = chart.addAxis(axis_1.Position.left, yScale, 'Y - Scale');
+      var leftGrid = chart.addGrid(axisLeft);
+      var gridBottom = chart.addGrid(axisBottom);
+      var column1 = chart.addLayout(new column_1.Columns(yScale, 'y', xScale, 'x', colorScale));
+      column1.padding = [0.13, 0.52];
+      column1.rowColor = colorScale.map('y');
+      var column2 = chart.addLayout(new column_1.Columns(yScale, 'y2', xScale, 'x', colorScale));
+      column2.padding = [0.52, 0.13];
+      column2.rowColor = colorScale.map('y2');
+      var dataLabels1 = chart.addDataLabels(column1);
+      var dataLabels2 = chart.addDataLabels(column2);
+      chart.draw(data);
+    });
+    document.getElementById('bar').addEventListener('click', function(ev) {
+      chart = new chart_1.Chart(el, 'This is the chart title', "Subtitle");
+      var yScale = chart.addScale('ordinal', ['x']);
+      var xScale = chart.addScale('linear', ['y', 'y2'], scale_1.DomainCalc.extentZero);
+      var colorScale = chart.addScale('category10', []);
+      axisTop = chart.addAxis(axis_1.Position.top, xScale, 'X - Scale Top');
+      axisRight = chart.addAxis(axis_1.Position.right, yScale, 'Y - Axis Right');
+      var gridRight = chart.addGrid(axisRight);
+      var gridTop = chart.addGrid(axisTop);
+      var column1 = chart.addLayout(new column_1.Columns(xScale, 'y', yScale, 'x', colorScale, true));
+      column1.padding = [0.13, 0.52];
+      column1.rowColor = colorScale.map('y');
+      var column2 = chart.addLayout(new column_1.Columns(xScale, 'y2', yScale, 'x', colorScale, true));
+      column2.padding = [0.52, 0.13];
+      column2.rowColor = colorScale.map('y2');
+      var dataLabels1 = chart.addDataLabels(column1);
+      var dataLabels2 = chart.addDataLabels(column2);
+      chart.draw(data);
+    });
+    document.getElementById('pie').addEventListener('click', function(ev) {
+      chart = new chart_1.Chart(el, 'This is the chart title', "Subtitle");
+      var xScale = chart.addScale('ordinal', ['x']);
+      var yScale = chart.addScale('linear', ['y', 'y2'], scale_1.DomainCalc.extentZero);
+      var keyColors = chart.addScale('category10', ['x']);
+      var pie = chart.addLayout(new donut_1.Donut(yScale, 'y', xScale, 'x', keyColors));
+      chart.draw(data);
+    });
+    document.getElementById('lineHor').addEventListener('click', function(ev) {
+      chart = new chart_1.Chart(el, 'This is the chart title', "Subtitle");
+      var xScale = chart.addScale('ordinal', ['x']);
+      var yScale = chart.addScale('linear', ['y'], scale_1.DomainCalc.extentZero);
+      var colorScale = chart.addScale('category10', []);
+      var keyColors = chart.addScale('category10', ['x']);
+      axisBottom = chart.addAxis(axis_1.Position.bottom, xScale, 'X - Scale');
+      axisLeft = chart.addAxis(axis_1.Position.left, yScale, 'Y - Scale');
+      var leftGrid = chart.addGrid(axisLeft);
+      var gridBottom = chart.addGrid(axisBottom);
+      var line1 = chart.addLayout(new line_1.Line(yScale, 'y', xScale, 'x', colorScale, false, true));
+      var line1Marker = chart.addLayout(new datamarker_1.DataMarker(yScale, 'y', xScale, 'x', colorScale));
+      chart.draw(data);
+    });
+    document.getElementById('areaHor').addEventListener('click', function(ev) {
+      chart = new chart_1.Chart(el, 'This is the chart title', "Subtitle");
+      var xScale = chart.addScale('ordinal', ['x']);
+      var yScale = chart.addScale('linear', ['y'], scale_1.DomainCalc.extentZero);
+      var colorScale = chart.addScale('category10', []);
+      var keyColors = chart.addScale('category10', ['x']);
+      axisBottom = chart.addAxis(axis_1.Position.bottom, xScale, 'X - Scale');
+      axisLeft = chart.addAxis(axis_1.Position.left, yScale, 'Y - Scale');
+      var leftGrid = chart.addGrid(axisLeft);
+      var gridBottom = chart.addGrid(axisBottom);
+      var area = chart.addLayout(new area_1.Area(yScale, 'y', xScale, 'x', colorScale, false, true));
+      var line1Marker = chart.addLayout(new datamarker_1.DataMarker(yScale, 'y', xScale, 'x', colorScale));
+      chart.draw(data);
+    });
+    document.getElementById('lineVert').addEventListener('click', function(ev) {
+      chart = new chart_1.Chart(el, 'This is the chart title', "Subtitle");
+      var yScale = chart.addScale('ordinal', ['x']);
+      var xScale = chart.addScale('linear', ['y'], scale_1.DomainCalc.extentZero);
+      var colorScale = chart.addScale('category10', []);
+      var keyColors = chart.addScale('category10', ['x']);
+      axisBottom = chart.addAxis(axis_1.Position.bottom, xScale, 'X - Scale');
+      axisLeft = chart.addAxis(axis_1.Position.left, yScale, 'Y - Scale');
+      var leftGrid = chart.addGrid(axisLeft);
+      var gridBottom = chart.addGrid(axisBottom);
+      var line1 = chart.addLayout(new line_1.Line(xScale, 'y', yScale, 'x', colorScale, true, true));
+      var line1Marker = chart.addDataMarkers(line1);
+      chart.draw(data);
+    });
+    document.getElementById('areaVert').addEventListener('click', function(ev) {
+      chart = new chart_1.Chart(el, 'This is the chart title', "Subtitle");
+      var yScale = chart.addScale('ordinal', ['x']);
+      var xScale = chart.addScale('linear', ['y'], scale_1.DomainCalc.extentZero);
+      var colorScale = chart.addScale('category10', []);
+      var keyColors = chart.addScale('category10', ['x']);
+      var axisBottom = chart.addAxis(axis_1.Position.bottom, xScale, 'X - Scale');
+      var axisLeft = chart.addAxis(axis_1.Position.left, yScale, 'Y - Scale');
+      var leftGrid = chart.addGrid(axisLeft);
+      var gridBottom = chart.addGrid(axisBottom);
+      var line1 = chart.addLayout(new area_1.Area(xScale, 'y', yScale, 'x', colorScale, true, true));
+      var line1Marker = chart.addDataMarkers(line1);
+      chart.draw(data);
+    });
   }
   exports_1("main", main);
   return {
@@ -18636,10 +19228,16 @@ System.register("app/app.ts", ["app/core/chart.ts", "app/core/scale.ts", "app/co
       scale_1 = _scale_1;
     }, function(_axis_1) {
       axis_1 = _axis_1;
+    }, function(_line_1) {
+      line_1 = _line_1;
+    }, function(_area_1) {
+      area_1 = _area_1;
     }, function(_column_1) {
       column_1 = _column_1;
-    }, function(_dataLabels_1) {
-      dataLabels_1 = _dataLabels_1;
+    }, function(_donut_1) {
+      donut_1 = _donut_1;
+    }, function(_datamarker_1) {
+      datamarker_1 = _datamarker_1;
     }, function(_data_table_1) {
       data_table_1 = _data_table_1;
     }],

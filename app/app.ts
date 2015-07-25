@@ -91,6 +91,7 @@ export function main(el: HTMLElement): void {
     document.getElementById('col').addEventListener('click', (ev) => {
         chart = new Chart(el, 'This is the chart title', "Subtitle");
         var xScale = chart.addScale('ordinal', ['x'])
+        //xScale.isInverted = true
         var yScale = chart.addScale('linear', ['y', 'y2'], DomainCalc.extentZero)
         var colorScale = chart.addScale('category10',[])      
         axisBottom = chart.addAxis(Position.bottom, xScale, 'X - Scale')
@@ -112,6 +113,7 @@ export function main(el: HTMLElement): void {
     document.getElementById('bar').addEventListener('click', (ev) => {
         chart = new Chart(el, 'This is the chart title', "Subtitle");
         var yScale = chart.addScale('ordinal', ['x'])
+        yScale.isInverted = true
         var xScale = chart.addScale('linear', ['y', 'y2'], DomainCalc.extentZero)
         var colorScale = chart.addScale('category10',[])      
         axisTop = chart.addAxis(Position.top, xScale, 'X - Scale Top')
