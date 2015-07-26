@@ -40,7 +40,9 @@ export var column = {
 }
 
 export var pie = {
-	pieStyle: {opacity: 0.4}
+	pieStyle: {opacity: 0.4},
+	labelStyle: emptyStyle,
+	labelBgStyle: {fill:'none', stroke:'lightblue'}
 }
 
 export var markers = {

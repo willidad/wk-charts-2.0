@@ -59,7 +59,7 @@ export function main(el: HTMLElement): void {
     //dataLabels2.labelRotation = 0
     //dataLabels1.labelRotation = 0
 
-    var data = [{x:'aaaa', y:12, y2:24},{x:'bbb', y:13.87620, y2:3.123456},{x:'Äaaaaaa', y:18, y2:11},{x:'ddd', y:3, y2:9},{x:'eeee', y:-7, y2:-15}]
+    var data = [{x:'aaaa', x1:1, y:12, y2:24},{x:'bbb', x1:2, y:13.87620, y2:3.123456},{x:'Äaaaaaa', x1:3, y:18, y2:11},{x:'ddd', x1:4, y:3, y2:9},{x:'eeee', x1:5, y:-7, y2:-15}]
     chart.draw(data)
     
     new DataTable('#data-table', data ,(data) => {
@@ -74,7 +74,7 @@ export function main(el: HTMLElement): void {
         axisRight.tickRotation = r
         axisTop.tickRotation = r
         //dataLabels2.labelRotation = r
-        dataLabels1.labelRotation = r
+        //dataLabels1.labelRotation = r
         chart.draw()
     }
     
@@ -138,6 +138,7 @@ export function main(el: HTMLElement): void {
         var yScale = chart.addScale('linear', ['y', 'y2'], DomainCalc.extentZero)  
         var keyColors = chart.addScale('category10', ['x'])
         var pie = chart.addLayout(new Donut(yScale, 'y', xScale, 'x', keyColors))
+        chart.addDataLabels(pie)
         
         chart.draw(data)
     })
@@ -145,7 +146,7 @@ export function main(el: HTMLElement): void {
     document.getElementById('lineHor').addEventListener('click', (ev) => {
         chart = new Chart(el, 'This is the chart title', "Subtitle");
     
-        var xScale = chart.addScale('ordinal', ['x'])
+        var xScale = chart.addScale('linear', ['x1'], DomainCalc.extent)
         var yScale = chart.addScale('linear', ['y'], DomainCalc.extentZero)
         var colorScale = chart.addScale('category10',[])
         var keyColors = chart.addScale('category10', ['x'])
@@ -156,8 +157,8 @@ export function main(el: HTMLElement): void {
         var leftGrid = chart.addGrid(axisLeft)
         var gridBottom = chart.addGrid(axisBottom)
         
-        var line1 = chart.addLayout(new Line(yScale,'y',xScale,'x', colorScale, false, true))
-        var line1Marker = chart.addLayout(new DataMarker(yScale,'y',xScale,'x', colorScale))
+        var line1 = chart.addLayout(new Line(yScale,'y',xScale,'x1', colorScale, false, true))
+        var line1Marker = chart.addLayout(new DataMarker(yScale,'y',xScale,'x1', colorScale))
         
         chart.draw(data)
 

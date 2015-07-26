@@ -7,6 +7,7 @@ import { XYElement } from './../baseLayouts/XYElement'
 import { XYDataLabel } from './../decorators/dataLabels'
 import { DataMarker } from './../decorators/dataMarker'
 import { Columns } from './../layouts/column'
+import { Pie } from './../layouts/pie'
 import { Line } from './../layouts/line'
 import { Area } from './../layouts/area'
 import { Grid } from './grid'
@@ -258,12 +259,17 @@ export class Chart {
 		return g
 	}
 	
-	public addDataLabels = (layout:Columns):XYDataLabel => {
-		var l = this.addLayout(new XYDataLabel(layout.valueScale, layout.valueProperty, layout.keyScale, layout.keyProperty, layout.colorScale, layout.isVertical))
-		l.labelOffset = layout.padding
-		return l
+	public addDataLabels = (layout:Columns | Pie):Layout => {
+		if (layout instanceof Columns) {
+			var l = this.addLayout(new XYDataLabel(layout.valueScale, layout.valueProperty, layout.keyScale, layout.keyProperty, layout.colorScale, layout.isVertical))
+			l.labelOffset = layout.padding
+			return l
+		} else if (layout instanceof Pie) {
+			layout.dataLabels = true
+			return layout
+		}
 	}
-	public addDataMarkers = (layout:Line | Area):DataMarker => {
+	public addDataMarkers = (layout:Line | Area):Layout => {
 		var l = this.addLayout(new DataMarker(layout.valueScale, layout.valueProperty, layout.keyScale, layout.keyProperty, layout.colorScale, layout.isVertical))
 		return l
 	}
