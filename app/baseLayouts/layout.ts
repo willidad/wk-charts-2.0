@@ -86,7 +86,7 @@ export class Layout {
 		this.diffSeq = this.differ(this._prevKeyValues,this._keyValues)
 	}
 	
-	private getKeyPos = (key, range, rangeIdx, interv):number => {
+	private calcKeyPos = (key, range, rangeIdx, interv):number => {
 		if (this.keyScale.isOrdinal) {
 			return rangeIdx < range.length ? range[rangeIdx] : range[range.length-1] + interv
 		} else {
@@ -105,7 +105,7 @@ export class Layout {
 			var key = point[1]
 			var val = this._prevValues[key] || this._values[key]
 			seq.push({
-				keyPos: this.getKeyPos(key, range, rangeIdx, interv), //rangeIdx < range.length ? range[rangeIdx] : range[range.length-1] + interv,
+				keyPos: this.calcKeyPos(key, range, rangeIdx, interv), //rangeIdx < range.length ? range[rangeIdx] : range[range.length-1] + interv,
 				key: key,
 				valPos: this.mapVal(val),
 				value: val,
@@ -127,7 +127,7 @@ export class Layout {
 			var key = point[1]
 			var val = this._values[key] || this._prevValues[key]
 			seq.push({
-				keyPos: this.getKeyPos(key, range, rangeIdx, interv), 
+				keyPos: this.calcKeyPos(key, range, rangeIdx, interv), 
 				key: key,
 				valPos: this.mapVal(val),
 				value: val,

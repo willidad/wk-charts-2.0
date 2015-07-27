@@ -45,16 +45,8 @@ export class Pie extends Layout {
 			var i = d3.interpolate(this._current, l);
 		  	this._current = i(0);
 		  	return function(t) {
-		    	return `translate(${labelArc.centroid(i(t))})`;
+		    	return `translate(${labelArc.centroid(i(t))[0] - ((i(t).startAngle + i(t).endAngle) / 2 > Math.PI ? i(t).textWidth : 0)}, ${labelArc.centroid(i(t))[1]})`;
 		  };
-		}
-		
-		function textPosTween (txt) {
-			var i = d3.interpolate(this._current, txt)
-			return function (t) {
-				var d = i(t)
-				return (d.startAngle + d.endAngle) / 2 < Math.PI ? 'start' : 'end'
-			}
 		}
 		
 		var segments = pie(data)
@@ -84,26 +76,27 @@ export class Pie extends Layout {
 				.each(function(d) { this._current = d; })
 			le.append('rect').style(this.labelBgStyle)
 			le.append('text').style(this.labelStyle)
-			var text = labels.select('text').each(function(d) { this._current = d; })
+			
+			labels.each(function(d) {
+				var text = d3.select(this).select('text')
+					.text(d.data.value)
+					.attr('dy', '0.35')
+					.style('text-anchor', 'start')
+				var textSize = text.node().getBBox();
+				d.textWidth = textSize.width
+				var bg = d3.select(this).select('rect')
+					.style('fill', 'none')
+					.attr(textSize)	
+			})
 			
 			if (animate) {
 				labels.transition().duration(duration)
 					.attrTween('transform', labelTween)
 					.style('opacity', (d) => d.data.added || d.data.deleted ? 0 : 1)				
 			} else {
-				labels.attr('transform', (d) => `translate(${labelArc.centroid(d)})`)
+				labels.attr('transform', (d) => `translate(${labelArc.centroid(d)[0] - ((d.startAngle + d.endAngle) / 2 > Math.PI ? d.textWidth : 0)}, ${labelArc.centroid(d)[1]})`)
 					.style('opacity', (d) => d.data.added || d.data.deleted ? 0 : 1)
 			}
-			
-			labels.each(function(d) {
-				var text = d3.select(this).select('text')
-					.text(d.data.value)
-					.attr('dy', '0.35')
-					.style('text-anchor', 'middle')
-				var bg = d3.select(this).select('rect')
-					.style('fill', 'none')
-					.attr(text.node().getBBox())	
-			})
 			labels.exit().remove()	
 				
 		}
