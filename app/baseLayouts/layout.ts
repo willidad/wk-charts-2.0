@@ -13,12 +13,12 @@ export class Layout {
 	protected _duration:number = duration
 	
 	private differ = Diff({compress:false, unique:true})
-	private diffSeq:any[]
+	protected diffSeq:any[]
 	
-	private _keyValues:any[] = []
-	private _prevKeyValues:any[] = []
-	private _values:{} = {}
-	private _prevValues:{} = {}
+	protected _keyValues:any[] = []
+	protected _prevKeyValues:any[] = []
+	protected _values:{} = {}
+	protected _prevValues:{} = {}
 	
 	
 	constructor(public valueScale:Scale, public valueProperty:string, public keyScale:Scale, public keyProperty:string, public colorScale?:Scale, public isVertical?:boolean) {
@@ -86,7 +86,7 @@ export class Layout {
 		this.diffSeq = this.differ(this._prevKeyValues,this._keyValues)
 	}
 	
-	private calcKeyPos = (key, range, rangeIdx, interv):number => {
+	protected calcKeyPos = (key, range, rangeIdx, interv):number => {
 		if (this.keyScale.isOrdinal) {
 			return rangeIdx < range.length ? range[rangeIdx] : range[range.length-1] + interv
 		} else {
@@ -94,52 +94,15 @@ export class Layout {
 		}
 	}
 	
-	private startPos = ():Point[] => {
-		var range = this.keyScale.getRange()
-		var interv = range.length > 1 ? Math.abs(range[1] - range[0]) : undefined //TODO something more meainingful
-		var seq:Point[] = []
-		var rangeIdx = 0
-		var targetPos
-		for (var point of this.diffSeq) {
-			var op = point[0]
-			var key = point[1]
-			var val = this._prevValues[key] || this._values[key]
-			seq.push({
-				keyPos: this.calcKeyPos(key, range, rangeIdx, interv), //rangeIdx < range.length ? range[rangeIdx] : range[range.length-1] + interv,
-				key: key,
-				valPos: this.mapVal(val),
-				value: val,
-				added: op === '+'
-			})
-			if (op !== '+') rangeIdx++
-		}
-		console.log('startPos', seq)
-		return seq
+	protected startPos = ():Point[] => {
+		return
 	}
 	
-	private endPos = ():Point[] => {
-		var range = this.keyScale.getRange()
-		var interv = range.length > 1 ? Math.abs(range[1] - range[0]) : undefined //TODO something more meainingful
-		var seq:Point[] = []
-		var rangeIdx = 0
-		for (var point of this.diffSeq) {
-			var op = point[0]
-			var key = point[1]
-			var val = this._values[key] || this._prevValues[key]
-			seq.push({
-				keyPos: this.calcKeyPos(key, range, rangeIdx, interv), 
-				key: key,
-				valPos: this.mapVal(val),
-				value: val,
-				deleted: op === '-'
-			})
-			if (op !== '-') rangeIdx++	
-		}
-		console.log('endPos', seq)
-		return seq
+	protected endPos = ():Point[] => {
+		return
 	}
 	
-	private cleanPos = (data):Point[] => {
+	protected cleanPos = (data):Point[] => {
 		var range = this.keyScale.getRange()
 		var seq:Point[] = []
 		var rangeIdx = 0
@@ -153,17 +116,7 @@ export class Layout {
 		}
 		console.log('cleanPos', seq)
 		return seq
-	}
-	
-	protected cleanSequence = (data):Point[] => {
-		var seq:Point[] = []
-		var pred = undefined
-		for (var d of data) {
-			seq.push({key: this.key(d), value:this.val(d), keyPos:this.keyFn(d), valPos:this.valFn(d)})
-		}
-		return seq
-	}
-	
+	}	
 	
 	//override functions
 	public targetContainer = 'wk-chart-layout-area';
@@ -240,6 +193,7 @@ export class Layout {
 		//console.log('endPos', endData)
 		this.beforeDraw(l, endData, drawingAreaSize)
 		this.drawLayout(l, endData, drawingAreaSize, true, () => {
+			console.log('callback called')
 			this.drawEnd(container, data, drawingAreaSize)
 		})
 		this.afterDraw(l, endData, drawingAreaSize)
@@ -254,7 +208,6 @@ export class Layout {
 		}
 
 		var cleanData = this.cleanPos(data)
-		//console.log('cleanPos', cleanData)
 		this.beforeDraw(l, cleanData, drawingAreaSize)
 		this.drawLayout(l, cleanData, drawingAreaSize)
 		this.afterDraw(l, cleanData, drawingAreaSize)

@@ -1,10 +1,7 @@
 import { Style } from './../core/interfaces'
-import { Scale } from './../core/scale'
 import { XYElement } from './../baseLayouts/xyElement'
-import * as d3 from 'd3'
-import * as _ from 'lodash'
-import * as drawing from './../tools/drawing'
 import { column as defaults } from './../core/defaults'
+import * as _ from 'lodash'
 
 export class Columns extends XYElement {
       

@@ -1,13 +1,13 @@
 import { IMargins } from './../core/interfaces'
 import { Style, Point } from './../core/interfaces'
-import { Layout } from './layout'
+import { ElementLayout } from './elementLayout'
 import { Scale } from './../core/scale'
 import * as d3 from 'd3'
 import * as _ from 'lodash'
 import * as drawing from './../tools/drawing'
 import {markers as markerDefaults, duration} from './../core/defaults'
 
-export class XYElement extends Layout {
+export class XYElement extends ElementLayout {
 	
 	// override functions used to create, update and remove the positioned element. 
 	
@@ -17,7 +17,7 @@ export class XYElement extends Layout {
 	protected remove(selection:d3.Selection<any>, caller:XYElement) {}
 	
 	//--------------------------------------------------------------------------------
-	
+
 	protected offset:number = 0; 
 	protected fadeInOut:boolean = false;
 	

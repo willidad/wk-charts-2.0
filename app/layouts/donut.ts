@@ -1,11 +1,4 @@
-import { Layout } from './../baseLayouts/layout'
-
-import * as d3 from 'd3'
-import * as _ from 'lodash'
-
-import { Style } from './../core/interfaces'
 import { Pie } from './pie'
-import { pie as pieDefaults} from './../core/defaults'
 
 export class Donut extends Pie {
 	

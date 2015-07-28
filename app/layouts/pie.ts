@@ -1,12 +1,10 @@
-import { Layout } from './../baseLayouts/layout'
-
+import { ElementLayout } from './../baseLayouts/elementLayout'
+import { Style } from './../core/interfaces'
+import { pie as pieDefaults, duration} from './../core/defaults'
 import * as d3 from 'd3'
 import * as _ from 'lodash'
 
-import { Style } from './../core/interfaces'
-import { pie as pieDefaults, duration} from './../core/defaults'
-
-export class Pie extends Layout {
+export class Pie extends ElementLayout {
 	
 	private _pieStyle:Style = {};
 	private _dataLabelStyle:Style = {};
@@ -25,7 +23,7 @@ export class Pie extends Layout {
 	set labelBgStyle(val:Style) { this._labelBgStyle = val; }
 	get labelBgStyle():Style { return <Style>_.defaults(this._labelBgStyle, pieDefaults.labelBgStyle)}
 	
-	public drawLayout = (container, data, drawingAreaSize, animate?) => {
+	public drawLayout = (container, data, drawingAreaSize, animate?, cbDone?) => {
 		this.radius = Math.min(drawingAreaSize.width, drawingAreaSize.height) / 2 * (this.dataLabels ? 0.85 : 1)
 		var arc = d3.svg.arc().outerRadius(this.radius).innerRadius(this.innerRadius)
 		var labelArc = d3.svg.arc().outerRadius(this.radius * 1.1).innerRadius(this.radius * 1.1)
@@ -49,6 +47,12 @@ export class Pie extends Layout {
 		  };
 		}
 		
+		function removeDeleted(d) {
+			if (d.data.deleted) {
+				d3.select(<any>this).remove()  //this gets called from d3 with its context ('this'). Type checker gets confused without forced type
+			}
+		}
+		
 		var segments = pie(data)
 		var path = container.selectAll('path')
 			.data(segments, (d) => d.data.key) 
@@ -57,7 +61,9 @@ export class Pie extends Layout {
 			.append('path').each(function(d) { this._current = d; })
 			
 		if (animate) {
-			path.transition().duration(duration).attrTween('d', arcTween)
+			path.transition().duration(duration)
+				.attrTween('d', arcTween)
+				.each('end', removeDeleted)	
 		} else {
 			path.attr('d', arc)
 		}
@@ -92,7 +98,8 @@ export class Pie extends Layout {
 			if (animate) {
 				labels.transition().duration(duration)
 					.attrTween('transform', labelTween)
-					.style('opacity', (d) => d.data.added || d.data.deleted ? 0 : 1)				
+					.style('opacity', (d) => d.data.added || d.data.deleted ? 0 : 1)
+					.each('end', removeDeleted)				
 			} else {
 				labels.attr('transform', (d) => `translate(${labelArc.centroid(d)[0] - ((d.startAngle + d.endAngle) / 2 > Math.PI ? d.textWidth : 0)}, ${labelArc.centroid(d)[1]})`)
 					.style('opacity', (d) => d.data.added || d.data.deleted ? 0 : 1)

@@ -159,6 +159,7 @@ export function main(el: HTMLElement): void {
         
         var line1 = chart.addLayout(new Line(yScale,'y',xScale,'x1', colorScale, false, true))
         var line1Marker = chart.addLayout(new DataMarker(yScale,'y',xScale,'x1', colorScale))
+        line1.spline = false
         
         chart.draw(data)
 
