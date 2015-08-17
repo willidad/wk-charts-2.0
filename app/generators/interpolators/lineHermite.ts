@@ -101,7 +101,7 @@ export class Hermite implements IInterpolator {
       //console.log ('split', this._segs[segIdx], split[0], split[1])
     }
     	
-    public insertAtPoint(x:number) {
+    public insertAtPoint(val:number) {
     	// find the segment that contains the insert point
       var i = 0,
           seg, 
@@ -113,44 +113,44 @@ export class Hermite implements IInterpolator {
           lastSeg = this._segs[this._segs.length - 1],
           firstSeg = this._segs[0]
       
-      if (x <= firstSeg[0][0]) {
+      if (val <= firstSeg[0][0]) {
         this.splitSegAt(0,0)
-      } else if (x > lastSeg[3][0]) {
+      } else if (val > lastSeg[3][0]) {
         this.splitSegAt(this._segs.length - 1, 1)  
       } else {
         while (++i < this._segs.length) {
           seg = this._segs[i]
-          if (seg[0][0] < x && x <= seg[3][0]) break 
+          if (seg[0][0] < val && val <= seg[3][0]) break 
         }
         // point is inside segs[i]
-        var roots = bezier.intersect(x, seg.map(function(p) { return p[0] }))  
+        var roots = bezier.intersect(val, seg.map(function(p) { return p[0] }))  
         if (roots.length > 1 && roots[0] !== roots[1]) {
-          throw `Error: computeIntersection: x=${x} has more than one root ${roots} with line. ` + seg
+          throw `Error: computeIntersection: x=${val} has more than one root ${roots} with line. ` + seg
         }
         this.splitSegAt(i,roots[0])
       }
     }
     
-    public insertAtPointReverse(x:number) {
+    public insertAtPointReverse(val:number) {
     	// find the segment that contains the insert point
       var i = this._segs.length,
           seg, 
           lastSeg = this._segs[0],
           firstSeg = this._segs[this._segs.length - 1]
       
-      if (x <= firstSeg[3][0]) {
+      if (val <= firstSeg[3][0]) {
         this.splitSegAt(this._segs.length - 1,1)
-      } else if (x > lastSeg[0][0]) {
+      } else if (val > lastSeg[0][0]) {
         this.splitSegAt(0, 0)  
       } else {
         while (--i >= 0) {
           seg = this._segs[i]
-          if (seg[3][0] < x && x <= seg[0][0]) break 
+          if (seg[3][0] < val && val <= seg[0][0]) break 
         }
         // point is inside segs[i]
-        var roots = bezier.intersect(x, seg.map(function(p) { return p[0] })) 
+        var roots = bezier.intersect(val, seg.map(function(p) { return p[0] })) 
         if (roots.length > 1 && roots[0] !== roots[1]) {
-          throw `Error: computeIntersection: x=${x} has more than one root ${roots} with line. ` + seg
+          throw `Error: computeIntersection: val=${val} has more than one root ${roots} with line. ` + seg
         }
         this.splitSegAt(i,roots[0])
       }

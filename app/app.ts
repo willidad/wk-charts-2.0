@@ -35,29 +35,8 @@ export function main(el: HTMLElement): void {
     //gridRight.lineStyle = {stroke:'blue', opacity:0.7}
     var gridBottom = chart.addGrid(axisBottom)
     
-    var line1 = chart.addLayout(new Line(yScale,'y',xScale,'x', colorScale, false, true))
-    //var area1 = chart.addLayout(new Area(yScale,'y',xScale,'x', colorScale, null, true))
-    //var line1Marker = chart.addLayout(new DataMarker(yScale,'y',xScale,'x', colorScale))
+    var line1 = chart.addLayout(new Line(xScale,'x', yScale,'y',colorScale, false, true))
 
-    //var line2 = chart.addLayout(new Line(y2Scale,'y2',x2Scale,'x', colorScale, true, true))
-    //var area2 = chart.addLayout(new Area(y2Scale,'y2',x2Scale,'x', colorScale, true, true))
-    //var areaMarker = chart.addLayout(new DataMarker(y2Scale,'y2',x2Scale,'x', colorScale, true))
-
-    //var column1 = chart.addLayout(new Columns(yScale,'y',xScale,'x', colorScale))
-    //column1.padding = [0.13,0.52]
-    //column1.rowColor = colorScale.map('y')
-    //var column2 = chart.addLayout(new Columns(yScale,'y2',xScale,'x', colorScale))
-    //column2.padding = [0.52,0.13]
-    //column2.rowColor = colorScale.map('y2')
-    //var column2 = chart.addLayout(new Columns(y2Scale,'y2',x2Scale,'x', colorScale, true))
-    //column1.columnStyle = {opacity: 0.3}
-    //column2.columnStyle = {opacity: 0.3}
-    //var pie = chart.addLayout(new Donut(yScale, 'y', xScale, 'x', keyColors))
-
-    //var dataLabels1 = chart.addDataLabels(column1) 
-    //var dataLabels2 = chart.addDataLabels(column2)
-    //dataLabels2.labelRotation = 0
-    //dataLabels1.labelRotation = 0
 
     var data = [{x:'aaaa', x1:1, y:12, y2:24},{x:'bbb', x1:2, y:13.87620, y2:3.123456},{x:'Äaaaaaa', x1:3, y:15, y2:11},{x:'ddd', x1:4, y:3, y2:9},{x:'eeee', x1:5, y:-7, y2:-15}]
     chart.draw(data)
@@ -98,10 +77,10 @@ export function main(el: HTMLElement): void {
         axisLeft = chart.addAxis(Position.left, yScale, 'Y - Scale')  
         var leftGrid = chart.addGrid(axisLeft)
         var gridBottom = chart.addGrid(axisBottom)
-        var column1 = chart.addLayout(new Columns(yScale,'y',xScale,'x', colorScale))
+        var column1 = chart.addLayout(new Columns(xScale,'x', yScale,'y', colorScale))
         column1.padding = [0.13,0.52]
         column1.rowColor = colorScale.map('y')
-        var column2 = chart.addLayout(new Columns(yScale,'y2',xScale,'x', colorScale))
+        var column2 = chart.addLayout(new Columns(xScale,'x', yScale,'y2',colorScale))
         column2.padding = [0.52,0.13]
         column2.rowColor = colorScale.map('y2') 
         var dataLabels1 = chart.addDataLabels(column1) 
@@ -120,10 +99,10 @@ export function main(el: HTMLElement): void {
         axisRight = chart.addAxis(Position.right, yScale, 'Y - Axis Right')
         var gridRight = chart.addGrid(axisRight)
         var gridTop = chart.addGrid(axisTop)
-        var column1 = chart.addLayout(new Columns(xScale,'y',yScale,'x', colorScale,true))
+        var column1 = chart.addLayout(new Columns(yScale,'x', xScale,'y',colorScale,true))
         column1.padding = [0.13,0.52]
         column1.rowColor = colorScale.map('y')
-        var column2 = chart.addLayout(new Columns(xScale,'y2',yScale,'x', colorScale, true))
+        var column2 = chart.addLayout(new Columns(yScale,'x', xScale,'y2',colorScale, true))
         column2.padding = [0.52,0.13]
         column2.rowColor = colorScale.map('y2') 
         var dataLabels1 = chart.addDataLabels(column1) 
@@ -137,7 +116,7 @@ export function main(el: HTMLElement): void {
         var xScale = chart.addScale('ordinal', ['x']) 
         var yScale = chart.addScale('linear', ['y', 'y2'], DomainCalc.extentZero)  
         var keyColors = chart.addScale('category10', ['x'])
-        var pie = chart.addLayout(new Donut(yScale, 'y', xScale, 'x', keyColors))
+        var pie = chart.addLayout(new Donut(xScale, 'x', yScale, 'y', keyColors))
         chart.addDataLabels(pie)
         
         chart.draw(data)
@@ -157,7 +136,7 @@ export function main(el: HTMLElement): void {
         var leftGrid = chart.addGrid(axisLeft)
         var gridBottom = chart.addGrid(axisBottom)
         
-        var line1 = chart.addLayout(new Line(yScale,'y',xScale,'x1', colorScale, false, true))
+        var line1 = chart.addLayout(new Line(xScale,'x1', yScale,'y',colorScale, false, true))
         //var line1Marker = chart.addLayout(new DataMarker(yScale,'y',xScale,'x1', colorScale))
         line1.spline = false
         
@@ -179,8 +158,8 @@ export function main(el: HTMLElement): void {
         var leftGrid = chart.addGrid(axisLeft)
         var gridBottom = chart.addGrid(axisBottom)
         
-        var area = chart.addLayout(new Area(yScale,'y',xScale,'x1', colorScale, false, false))
-        var line1Marker = chart.addLayout(new DataMarker(yScale,'y',xScale,'x1', colorScale))
+        var area = chart.addLayout(new Area(xScale,'x1', yScale,'y',null,colorScale, false, true))
+        var line1Marker = chart.addLayout(new DataMarker(xScale,'x1', yScale,'y',colorScale))
         
         chart.draw(data)
 
@@ -200,7 +179,7 @@ export function main(el: HTMLElement): void {
         var leftGrid = chart.addGrid(axisLeft)
         var gridBottom = chart.addGrid(axisBottom)
         
-        var line1 = chart.addLayout(new Line(xScale,'y',yScale,'x', colorScale, true, true))
+        var line1 = chart.addLayout(new Line(yScale,'x', xScale,'y',colorScale, true, true))
         var line1Marker = chart.addDataMarkers(line1)
         
         chart.draw(data)
@@ -219,7 +198,7 @@ export function main(el: HTMLElement): void {
         var leftGrid = chart.addGrid(axisLeft)
         var gridBottom = chart.addGrid(axisBottom)
         
-        var line1 = chart.addLayout(new Area(xScale,'y',yScale,'x', colorScale, true, true))
+        var line1 = chart.addLayout(new Area(yScale,'x', xScale,'y',null, colorScale, true, true))
         var line1Marker = chart.addDataMarkers(line1)
         
         chart.draw(data)

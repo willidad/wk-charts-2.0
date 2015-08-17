@@ -12,13 +12,13 @@ export class Linear implements IInterpolator {
 		this._data = data
 	}
 		
-	public insertAtPoint(x:number, reverse?:boolean) {
+	public insertAtPoint(key:number, reverse?:boolean) {
 		// find insertion point
 		var i = -1,
 			deltaX, deltaY, deltaYins, deltaXIns;
 			
 		while (++i < this._data.length){
-			if (x <= this._data[i][0]) break
+			if (key <= this._data[i][0]) break
 		}
 		// insert Point
 		if (i === 0) {
@@ -31,35 +31,35 @@ export class Linear implements IInterpolator {
 			// insert in between, interpolate y from surrounding two points
 			deltaX = Math.abs(this._data[i][0] - this._data[i-1][0])
 			deltaY = this._data[i][1] - this._data[i - 1][1]
-			deltaXIns = Math.abs(x - this._data[i-1][0])
-			deltaYins = Math.abs(this._data[i][0] - x) / deltaX * deltaY
-			this._data.splice(i, 0 , [x, this._data[i - 1][1] + deltaXIns / deltaX * deltaY])
+			deltaXIns = Math.abs(key - this._data[i-1][0])
+			deltaYins = Math.abs(this._data[i][0] - key) / deltaX * deltaY
+			this._data.splice(i, 0 , [key, this._data[i - 1][1] + deltaXIns / deltaX * deltaY])
 		}	
 	}
 	
-	public insertAtPointReverse(x:number, reverse?:boolean) {
+	public insertAtPointReverse(key:number, reverse?:boolean) {
 		// find insertion point
 		var i = this._data.length,
 			deltaX, deltaY, deltaYins, deltaXIns;
 			
 
 		// insert Point
-		if (x > this._data[0][0]) {
+		if (key > this._data[0][0]) {
 			// insert first point as animation start point
 			this._data.unshift(this._data[0]) 
-		} else if (x < this._data[this._data.length-1][0]) {
+		} else if (key < this._data[this._data.length-1][0]) {
 			// insert last point as animation start point
 			this._data.push(this._data[this._data.length-1])
 		} else {
 			while (--i >= 0){
-				if (x <= this._data[i][0]) break
+				if (key <= this._data[i][0]) break
 			}
 			// insert in between, interpolate y from surrounding two points
 			deltaX = Math.abs(this._data[i][0] - this._data[i+1][0])
 			deltaY = this._data[i][1] - this._data[i + 1][1]
-			deltaXIns = Math.abs(x - this._data[i+1][0])
-			deltaYins = Math.abs(this._data[i][0] - x) / deltaX * deltaY
-			this._data.splice(i+1, 0 , [x, this._data[i + 1][1] + deltaXIns / deltaX * deltaY])
+			deltaXIns = Math.abs(key - this._data[i+1][0])
+			deltaYins = Math.abs(this._data[i][0] - key) / deltaX * deltaY
+			this._data.splice(i+1, 0 , [key, this._data[i + 1][1] + deltaXIns / deltaX * deltaY])
 		}
 	}
 	

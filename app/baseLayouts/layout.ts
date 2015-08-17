@@ -10,51 +10,60 @@ export class Layout {
 	
 	private static cnt:number = 0
 	protected _id:number
+	protected layoutG
 	protected _duration:number = duration
 	
 	private differ = Diff({compress:false, unique:true})
 	protected diffSeq:any[]
 	
+	protected _data:any[]
+	protected _prevData:any[]
 	protected _keyValues:any[] = []
 	protected _prevKeyValues:any[] = []
 	protected _values:{} = {}
 	protected _prevValues:{} = {}
 	
 	
-	constructor(public valueScale:Scale, public valueProperty:string, public keyScale:Scale, public keyProperty:string, public colorScale?:Scale, public isVertical?:boolean) {
+	constructor(
+		public keyScale:Scale, 
+		public keyProperty:string, 
+		public valueScale:Scale, 
+		public valueProperty:string, 
+		public colorScale?:Scale, 
+		public isVertical?:boolean) {
 		Layout.cnt += 1;
 		this._id = Layout.cnt;
 	}
 	
-	public valFn = (val):number => {
-		return this.valueScale.map(val[this.valueProperty])
+	protected valFn = (val):number => {
+		return this.valueScale.map(typeof val === 'object' ? val[this.valueProperty] : val)
 	}
 	
-	public valFnZero = ():number => {
+	protected valFnZero = ():number => {
 		return this.valueScale.map(0)
 	}
 	
-	public mapVal = (val):number => {
+	protected mapVal = (val):number => {
 		return this.valueScale.map(val)
 	}
 	
-	public val = (val):any => {
+	protected val = (val):any => {
 		return val[this.valueProperty]
 	}
 	
-	public keyFn = (val):number => {
-		return this.keyScale.map(val[this.keyProperty])
+	protected keyFn = (val):number => {
+		return this.keyScale.map(typeof val === 'object' ? val[this.keyProperty] : val)
 	}
 	
-	public mapKey = (val):number => {
+	protected mapKey = (val):number => {
 		return this.keyScale.map(val)
 	}
 	
-	public key = (val):any => {
+	protected key = (val):any => {
 		return val[this.keyProperty]
 	}
 	
-	public propertyColor = ():string => {
+	protected propertyColor = ():string => {
 		if (this.colorScale) {
 			return this.colorScale.map(this.valueProperty)
 		} else {
@@ -62,11 +71,11 @@ export class Layout {
 		}
 	}
 	
-	public mapColor = (val):any => {
+	protected mapColor = (val):any => {
 		return this.colorScale.map(val)
 	}	
 	
-	public colorFn = (val):any => {
+	protected colorFn = (val):any => {
 		if (this.colorScale) {
 			return this.colorScale.map(val[this.keyProperty])
 		} else {
@@ -74,7 +83,7 @@ export class Layout {
 		}
 	}
 	
-	private diffData = (data) => {
+	private _diffData = (data) => {
 		this._prevKeyValues = this._keyValues
 		this._prevValues = this._values
 		this._keyValues = []
@@ -122,9 +131,9 @@ export class Layout {
 	public targetContainer = 'wk-chart-layout-area';
 	public needsPadding:boolean = false
 	
-	public drawLayout = (container, data, drawingAreaSize?, animate?:boolean, cbAnimationDone?) => {} 
-	public beforeDraw = (container, data, drawingAreaSize?) => {}
-	public afterDraw = (container, data, drawingAreaSize?) => {}
+	public drawLayout = (data, drawingAreaSize?, animate?:boolean, cbAnimationDone?) => {} 
+	public beforeDraw = (data, drawingAreaSize?) => {}
+	public afterDraw = (data, drawingAreaSize?) => {}
 	
 	
 	public getPadding = (container, data, drawingAreaSize):IMargins => {
@@ -141,8 +150,8 @@ export class Layout {
 		
 		var cleanData = this.cleanPos(data)
 		
-		this.beforeDraw(l, cleanData, drawingAreaSize)
-		this.drawLayout(l, cleanData, drawingAreaSize)
+		this.beforeDraw(cleanData, drawingAreaSize)
+		this.drawLayout(cleanData, drawingAreaSize)
 
 		// measure the size of the label container
 		var box = l.node().getBBox()
@@ -158,58 +167,48 @@ export class Layout {
 	
 	//-------------------------------------------------------------------------------
 	
-	public setupLayout() {}
-	
-	public prepeareData(data) {
-		this.diffData(data)
-		console.log('diff result', this.diffSeq)
+	public setupLayout(container) {
+		var layoutArea = container.select(`.${this.targetContainer}`)
+		this.layoutG = layoutArea.select(`.wk-layout-${this._id}`)
+		if (this.layoutG.empty()) {
+			this.layoutG = layoutArea.append('g').attr('class', `wk-layout-${this._id}` )
+		}
 	}
 	
-	public drawStart = (container, data, drawingAreaSize) => {
-		var l = container.select(`.wk-layout-${this._id}`)
-		if (l.empty()) {
-			l = container.append('g').attr('class', `wk-layout-${this._id}` )
-		}
+	public prepeareData(data:any[], prevData:any[]) {
+		this._diffData(data)
+		this._data = data
+		this._prevData = prevData
+	}
+	
+	public drawStart = (data, drawingAreaSize) => {
 		var startData = this.startPos()
 		//console.log('startPos', startData)
-		this.beforeDraw(l, startData, drawingAreaSize)
-		this.drawLayout(l, startData, drawingAreaSize, false)
-		this.afterDraw(l, startData, drawingAreaSize)
+		this.beforeDraw(startData, drawingAreaSize)
+		this.drawLayout(startData, drawingAreaSize, false)
+		this.afterDraw(startData, drawingAreaSize)
 	}
 	
 	public updateDomains = (data) => {
 		this.keyScale.setDomain(data)
 		this.valueScale.setDomain(data)
 	}
-		
 	
-	public drawAnimation = (container, data, drawingAreaSize) => {
-		var l = container.select(`.wk-layout-${this._id}`)
-		if (l.empty()) {
-			l = container.append('g').attr('class', `wk-layout-${this._id}` )
-		}
-		
+	public drawAnimation = (data, drawingAreaSize) => {		
 		var endData = this.endPos()
 		//console.log('endPos', endData)
-		this.beforeDraw(l, endData, drawingAreaSize)
-		this.drawLayout(l, endData, drawingAreaSize, true, () => {
+		this.beforeDraw(endData, drawingAreaSize)
+		this.drawLayout(endData, drawingAreaSize, true, () => {
 			console.log('callback called')
-			this.drawEnd(container, data, drawingAreaSize)
+			this.drawEnd(data, drawingAreaSize)
 		})
-		this.afterDraw(l, endData, drawingAreaSize)
+		this.afterDraw(endData, drawingAreaSize)
 	}
 	
-	
-		
-	public drawEnd = (container, data, drawingAreaSize?) => {	
-		var l = container.select(`.wk-layout-${this._id}`)
-		if (l.empty()) {
-			l = container.append('g').attr('class', `wk-layout-${this._id}` )
-		}
-
+	public drawEnd = (data, drawingAreaSize?) => {	
 		var cleanData = this.cleanPos(data)
-		this.beforeDraw(l, cleanData, drawingAreaSize)
-		this.drawLayout(l, cleanData, drawingAreaSize)
-		this.afterDraw(l, cleanData, drawingAreaSize)
+		this.beforeDraw(cleanData, drawingAreaSize)
+		this.drawLayout(cleanData, drawingAreaSize)
+		this.afterDraw(cleanData, drawingAreaSize)
 	}
 }

@@ -4,7 +4,7 @@ export type Points = Point[]
 export interface IInterpolator {
 	path(tension:number):string;
 	data(points:Points):void
-	insertAtPoint(x:number, reverse?:boolean):void
+	insertAtPoint(val:number, reverse?:boolean):void
 	insertAtIdx(i:number, nbr:number, reverse?:boolean):void
 }
 

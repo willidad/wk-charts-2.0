@@ -21,8 +21,14 @@ export class XYElement extends ElementLayout {
 	protected offset:number = 0; 
 	protected fadeInOut:boolean = false;
 	
-	constructor(public valueScale:Scale, public valueProperty:string, public keyScale:Scale, public keyProperty:string, public colorScale?:Scale, public isVertical:boolean = false) {
-		super(valueScale, valueProperty, keyScale, keyProperty, colorScale)
+	constructor(
+		public keyScale:Scale, 
+		public keyProperty:string, 
+		public valueScale:Scale, 
+		public valueProperty:string, 
+		public colorScale?:Scale, 
+		public isVertical:boolean = false) {
+		super(keyScale, keyProperty, valueScale, valueProperty, colorScale)
 	}
 	
 	private removeDeleted(d) {
@@ -43,9 +49,9 @@ export class XYElement extends ElementLayout {
 		if (fade) sel.style('opacity',(d:Point) => d.added || d.deleted ? 0 : 1)
 	}
 	
-	public drawLayout = (container, data, drawingAreaSize?, animate?, cbAnimationEnd?) => {
+	public drawLayout = (data, drawingAreaSize?, animate?, cbAnimationEnd?) => {
 				
-		var items = container.selectAll(this.getSelector()).data(data, (d:Point) => d.key)
+		var items = this.layoutG.selectAll(this.getSelector()).data(data, (d:Point) => d.key)
 		var enter = items.enter()
 			.call(this.create, this)
 				

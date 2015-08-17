@@ -58,6 +58,8 @@ export class Chart {
 	
 	private _newData:boolean = false;
 	private _initialDraw:boolean = true;
+	private _data: any[]
+	private _oldData:any[]
 	
 	private _titleStyle = {};
 	private _titleBgStyle = {};
@@ -97,13 +99,13 @@ export class Chart {
 	
 	private measureAxis = () => {
 		for (var axis of this.axis) {
-			this._layoutMargins[Position[axis.orientation]] += axis.getNeededSpace(this.d3Sel('.wk-chart-container'), this.data)
+			this._layoutMargins[Position[axis.orientation]] += axis.getNeededSpace(this.d3Sel('.wk-chart-container'), this._data)
 		}
 	}
 	
 	private drawAxis = (animate:boolean) => {
 		this.axis.forEach((axis) => {
-			axis.draw(this.d3Sel('.wk-chart-container'), this.data, this._drawingAreaSize, this._ranges, animate)
+			axis.draw(this.d3Sel('.wk-chart-container'), this._data, this._drawingAreaSize, this._ranges, animate)
 		})
 	}
 	
@@ -134,37 +136,37 @@ export class Chart {
 	
 	private prepeareData = () => {
 		this.layouts.forEach((layout:Layout) => {
-			layout.prepeareData(this.data)
+			layout.prepeareData(this._data, this._oldData)
 		})
 	}
 	
 	private setupLayouts = () => {	
 		this.layouts.forEach((layout:Layout) => {
-			layout.setupLayout()
+			layout.setupLayout(this._d3Container)
 		})
 	}
 	
 	private drawAnimation = () => {	
 		this.layouts.forEach((layout:Layout) => {
-			layout.drawAnimation(this.d3Sel(`.${layout.targetContainer}`), this.data, this._drawingAreaSize)
+			layout.drawAnimation(this._data, this._drawingAreaSize)
 		})
 	}
 	
 	private drawStartLayouts = () => {	
 		this.layouts.forEach((layout:Layout) => {
-			layout.drawStart(this.d3Sel(`.${layout.targetContainer}`), this.data, this._drawingAreaSize)
+			layout.drawStart(this._data, this._drawingAreaSize)
 		})
 	}
 	
 	private drawEndLayouts = () => {
 		this.layouts.forEach((layout:Layout) => {
-			layout.drawEnd(this.d3Sel(`.${layout.targetContainer}`), this.data, this._drawingAreaSize)
+			layout.drawEnd(this._data, this._drawingAreaSize)
 		})
 	}
 	
 	private updateDomains = () => {	
 		this.layouts.forEach((layout:Layout) => {
-			layout.updateDomains(this.data)
+			layout.updateDomains(this._data)
 		})
 	}
 	
@@ -172,7 +174,7 @@ export class Chart {
 		this._layoutPadding = {top:0, bottom:0, left:0, right:0}
 		for (var layout of this.layouts) {
 			if (layout.needsPadding) {
-				var padding = layout.getPadding(this.d3Sel(`.${layout.targetContainer}`),this.data, this._drawingAreaSize)
+				var padding = layout.getPadding(this.d3Sel(`.${layout.targetContainer}`),this._data, this._drawingAreaSize)
 				this._layoutPadding.top = Math.max(padding.top, this._layoutPadding.top)
 				this._layoutPadding.bottom = Math.max(padding.bottom, this._layoutPadding.bottom)
 				this._layoutPadding.left = Math.max(padding.left, this._layoutPadding.left)
@@ -261,7 +263,7 @@ export class Chart {
 	
 	public addDataLabels = (layout:Columns | Pie):Layout => {
 		if (layout instanceof Columns) {
-			var l = this.addLayout(new XYDataLabel(layout.valueScale, layout.valueProperty, layout.keyScale, layout.keyProperty, layout.colorScale, layout.isVertical))
+			var l = this.addLayout(new XYDataLabel(layout.keyScale, layout.keyProperty, layout.valueScale, layout.valueProperty, layout.colorScale, layout.isVertical))
 			l.labelOffset = layout.padding
 			return l
 		} else if (layout instanceof Pie) {
@@ -270,7 +272,7 @@ export class Chart {
 		}
 	}
 	public addDataMarkers = (layout:Line | Area):Layout => {
-		var l = this.addLayout(new DataMarker(layout.valueScale, layout.valueProperty, layout.keyScale, layout.keyProperty, layout.colorScale, layout.isVertical))
+		var l = this.addLayout(new DataMarker(layout.keyScale, layout.keyProperty, layout.valueScale, layout.valueProperty, layout.colorScale, layout.isVertical))
 		return l
 	}
 	
@@ -278,13 +280,11 @@ export class Chart {
 		this.layouts.push(l)
 		return l
 	}
- 
-
-	public data: any;
 	
 	public draw = (data?:any) => {
 		if (data && data.length > 0) {
-			this.data = data;
+			this._oldData = this._data
+			this._data = _.cloneDeep(data);
 			this._newData = true
 		} else {
 			this._newData = false
@@ -300,7 +300,7 @@ export class Chart {
 		if (this._newData && !this._initialDraw) {
 			//this.drawStartLayouts()
 			for (var layout of this.layouts) {
-				layout.drawStart(this.d3Sel(`.${layout.targetContainer}`), this.data, this._drawingAreaSize)
+				layout.drawStart(this._data, this._drawingAreaSize)
 			}
 		}
 		

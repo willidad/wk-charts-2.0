@@ -1,8 +1,10 @@
-type Accessor = (v:any) => number
+
 
 import { Point, Points} from './interpolators/interpolator'
 import { Linear} from './interpolators/lineLinear'
 import { Hermite } from './interpolators/lineHermite'
+
+export type Accessor = (v:any) => number
 
 export class Generator {
 	
@@ -10,13 +12,8 @@ export class Generator {
 	protected _interpolatorY: Hermite | Linear
 	protected _data:any[] = []
 	protected _dataMapped:[number, number][]
-
-	protected _x = undefined
-	protected _y = undefined
 	
-	constructor(spline:boolean = false, public x:string | Accessor = 'x', public y:string | Accessor = 'y') {	
-		this._x = typeof x === 'string' ? function(val:any):number { return val[this.x]} : x
-		this._y = typeof y === 'string' ? function(val:any):number { return val[this.y]} : y
+	constructor(spline:boolean = false, public key?:Accessor, public val?:Accessor) {	
 		this.spline = spline
 	}
 	

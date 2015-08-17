@@ -17,37 +17,37 @@ export class PathLayout extends Layout {
 	public needsPadding:boolean = false
 	
 	protected startPath = () => {
-		this.pathGenerator.data = this._prevKeyValues.map((k) => { return {x:this.mapKey(k), y:this.mapVal(this._prevValues[k])} });
+		this.pathGenerator.data = this._prevData//.map((k) => { return {x:this.mapKey(k), y:this.mapVal(this._prevValues[k])} });
 		// extract added keys and key position from diff
 		var i = -1
 		while (++i < this.diffSeq.length) {
 			var op:string = this.diffSeq[i][0]
 			var key:string = this.diffSeq[i][1]
-			if (op === '+') this.pathGenerator.XInsertPointAt(this.mapKey(key)) //TODO: will not work for ordinal scales
+			if (op === '+') this.pathGenerator.XInsertPointAt(key) //TODO: will not work for ordinal scales
 		}
 		return this.pathGenerator.path
 	}
 	
 	protected endPath = () => {
-		this.pathGenerator.data = this._keyValues.map((k) => { return {x:this.mapKey(k), y:this.mapVal(this._values[k])} });
+		this.pathGenerator.data = this._data//.map((k) => { return {x:this.mapKey(k), y:this.mapVal(this._values[k])} });
 		// extract added keys and key position from diff
 		var i = -1
 		while (++i < this.diffSeq.length) {
 			var op = this.diffSeq[i][0]
 			var key = this.diffSeq[i][1]
-			if (op === '-') this.pathGenerator.XInsertPointAt(this.mapKey(key)) // TODO: will not work for ordinal scales
+			if (op === '-') this.pathGenerator.XInsertPointAt(key) // TODO: will not work for ordinal scales
 		}
 		return this.pathGenerator.path
 	}
 	
 	protected cleanPath = () => {
-		this.pathGenerator.data = this._keyValues.map((k) => { return {x:this.mapKey(k), y:this.mapVal(this._values[k])} });
+		this.pathGenerator.data = this._data//.map((k) => { return {x:this.mapKey(k), y:this.mapVal(this._values[k])} });
 		return this.pathGenerator.path
 	}
 	
-	public drawLayout = (container, data, drawingAreaSize?, animate?:boolean, cbAnimationDone?) => {} 
-	public beforeDraw = (container, data, drawingAreaSize?) => {}
-	public afterDraw = (container, data, drawingAreaSize?) => {}
+	public drawLayout = (data, drawingAreaSize?, animate?:boolean, cbAnimationDone?) => {} 
+	public beforeDraw = (data, drawingAreaSize?) => {}
+	public afterDraw = (data, drawingAreaSize?) => {}
 	
 	//-------------------------------------------------------------------------------
 	
