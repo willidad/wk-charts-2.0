@@ -121,7 +121,7 @@ export class Chart {
 	private positionLayout = (animate:boolean) => {
 		var cntr = this.d3Sel('.wk-chart-container')
 		if (animate) {
-			console.log('animated Position')
+			//console.log('animated Position')
 			cntr.transition().duration(duration).attr('transform', `translate(${this._layoutMargins.left}, ${this._layoutMargins.top})`)
 			this._d3Container.selectAll('.wk-chart-bottom').transition().duration(duration).attr('transform', `translate(0,${this._drawingAreaSize.height})`)
 			this._d3Container.selectAll('.wk-chart-right').transition().duration(duration).attr('transform', `translate(${this._drawingAreaSize.width})`)
@@ -283,14 +283,14 @@ export class Chart {
 	public data: any;
 	
 	public draw = (data?:any) => {
-		if (data) {
+		if (data && data.length > 0) {
 			this.data = data;
 			this._newData = true
 		} else {
 			this._newData = false
 		}
 		
-		console.log("draw called")
+		//console.log("draw called")
 		
 		// diff key data to prepeare animation
 		
@@ -298,7 +298,10 @@ export class Chart {
 		this.prepeareData()
 		
 		if (this._newData && !this._initialDraw) {
-			this.drawStartLayouts()
+			//this.drawStartLayouts()
+			for (var layout of this.layouts) {
+				layout.drawStart(this.d3Sel(`.${layout.targetContainer}`), this.data, this._drawingAreaSize)
+			}
 		}
 		
 		this._containerSize = this._d3Container.select('.wk-chart-svg').node().getBoundingClientRect(); // get the outer bounds of teh drawing area
@@ -306,17 +309,11 @@ export class Chart {
 		this.measureTitles(); // create the title elements and reserver space for them. Titles are not removed after measuring
 		this.measureAxis()
 		this.sizeLayoutArea() //measure space requirements for axis and compute layout size
-		//this.positionLayout(false) // finally position the layout container
-		
-
-		// draw container content
 		
 		this.drawTitles()
 		this.updateDomains()
-		//this.getLayoutPadding() // if needed draw the layout and measure if it fits into the drawing area
-		this.sizeRange() //add padding to the range values
 		if (this._initialDraw || !this._newData) {
-			console.log('initial draw')
+			//console.log('initial draw')
 			this.positionLayout(false) // finally position the layout container
 			this.getLayoutPadding() // if needed draw the layout and measure if it fits into the drawing area
 			this.sizeRange() //add padding to the range values
@@ -331,7 +328,7 @@ export class Chart {
 			this.positionLayout(true)
 			this.drawGrids(true)
 			this.drawAnimation() 
-			console.log('animated draw')
+			//console.log('animated draw')
 		}
 		
 		this._initialDraw = false

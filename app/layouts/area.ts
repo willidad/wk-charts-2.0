@@ -11,6 +11,7 @@ export class Area extends XYPath implements XYPathLayout {
 	private _areaStyle:Style = {}
 	public colorProp = 'fill'
 	public splineType = 'cardinal'
+	protected pathStyle = this.areaStyle
 	
 	public pathGenerator = () => {
 		
@@ -34,7 +35,5 @@ export class Area extends XYPath implements XYPathLayout {
 	set areaStyle(val:Style) { this._areaStyle = val; }
 	get areaStyle():Style { return <Style>_.defaults(this._areaStyle, defaults.areaStyle)}
 	
-	public afterDraw = (container, data, drawingAreaSize) => {
-		this.path.style(this.areaStyle)
-	}
+	
 }

@@ -26,15 +26,15 @@ export class Layout {
 		this._id = Layout.cnt;
 	}
 	
-	public valFn = (val):any => {
+	public valFn = (val):number => {
 		return this.valueScale.map(val[this.valueProperty])
 	}
 	
-	public valFnZero = ():any => {
+	public valFnZero = ():number => {
 		return this.valueScale.map(0)
 	}
 	
-	public mapVal = (val):any => {
+	public mapVal = (val):number => {
 		return this.valueScale.map(val)
 	}
 	
@@ -42,11 +42,11 @@ export class Layout {
 		return val[this.valueProperty]
 	}
 	
-	public keyFn = (val):any => {
+	public keyFn = (val):number => {
 		return this.keyScale.map(val[this.keyProperty])
 	}
 	
-	public mapKey = (val):any => {
+	public mapKey = (val):number => {
 		return this.keyScale.map(val)
 	}
 	
@@ -114,7 +114,7 @@ export class Layout {
 				value: this.val(point)
 			})
 		}
-		console.log('cleanPos', seq)
+		//console.log('cleanPos', seq)
 		return seq
 	}	
 	
@@ -162,7 +162,7 @@ export class Layout {
 	
 	public prepeareData(data) {
 		this.diffData(data)
-		//console.log('diff result', this.diffSeq)
+		console.log('diff result', this.diffSeq)
 	}
 	
 	public drawStart = (container, data, drawingAreaSize) => {
