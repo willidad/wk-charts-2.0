@@ -17,6 +17,8 @@ export class Generator {
 		this.spline = spline
 	}
 	
+	public keyOffset:number = 0
+	
 	get spline():boolean {
 		return this._spline
 	}

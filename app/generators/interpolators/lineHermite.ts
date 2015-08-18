@@ -191,7 +191,7 @@ export class Hermite implements IInterpolator {
      * after the data point. To insert at the beginning of the curve (i.e. befor data point 0) specify -1 as the number. 
      */
     
-    public insertAtIdx(i:number, nbr:number) {
+    public insertAtIdx(i:number) {
       //console.log ('indexAt:',i,nbr, this._segs.length, this._segs)
       var j = -1, split, pos, at
     	if (i < 0) {
@@ -204,12 +204,10 @@ export class Hermite implements IInterpolator {
         pos = i
         at = 0.5
       }
-      while (++j < nbr) {
-        this.splitSegAt(pos, at)
-      }
+      this.splitSegAt(pos, at)
     }
     
-    public insertAtIdxReverse(i:number, nbr:number) {
+    public insertAtIdxReverse(i:number) {
       //console.log ('reverse:',i,nbr, this._segs.length, this._segs)
       var j = -1, split, pos, at
     	if (i < 0) {
@@ -222,8 +220,6 @@ export class Hermite implements IInterpolator {
         pos = this._segs.length - i - 1
         at = 0.5
       }
-      while (++j < nbr) {
-        this.splitSegAt(pos, at)
-      }
+      this.splitSegAt(pos, at)
     }
 }

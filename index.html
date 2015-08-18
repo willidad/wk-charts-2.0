@@ -23,6 +23,11 @@
         <button id="lineVert">Line Chart Vertical</button>
         <button id="areaVert">Area Chart Vertical</button>
     </div>
+    <div>
+        <label>Use Spline</label><input type="checkbox", id="useSpline" checked><br/>
+        <label>Use 0-base for Area</label><input type="checkbox", id="use0Base" checked><br/>
+        <label>Use Ordinal Keys</label><input type="checkbox", id="useOrdKeys">
+    </div>
     
     <script>
         System.import('app/app.ts').then(function(m) {

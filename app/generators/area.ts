@@ -22,11 +22,11 @@ export class Area extends Generator{
 	set data(val:any[]) {
 		this._data = val
 		this._dataMapped = this._data.map((d:any):[number,number] => {
-			return this.isVertical ? [this.val(d), this.key(d)] : [this.key(d), this.val(d)]
+			return this.isVertical ? [this.val(d), this.key(d) + this.keyOffset] : [this.key(d) + this.keyOffset, this.val(d)]
 		})
 		if (this.val0) {
 			this._dataMappedY0 = this._data.map((d:any):[number,number] => {
-				return this.isVertical ? [this.val0(d), this.key(d)] : [this.key(d), this.val0(d)]
+				return this.isVertical ? [this.val0(d), this.key(d) + this.keyOffset] : [this.key(d) + this.keyOffset, this.val0(d)]
 			})
 		} else {
 			// y0 is not specified, use y start and end values
@@ -44,8 +44,8 @@ export class Area extends Generator{
 	}
 	
 	public insertPointAt(key:number) {
-		this._interpolatorY.insertAtPoint(this.key(key))
-		this._interpolatorY0.insertAtPointReverse(this.key(key))
+		this._interpolatorY.insertAtPoint(this.key(key) + this.keyOffset)
+		this._interpolatorY0.insertAtPointReverse(this.key(key) + this.keyOffset)
 	}
 	
 	public insertPointsAtIdx(idx: number, nbr:number) {

@@ -5,6 +5,6 @@ export interface IInterpolator {
 	path(tension:number):string;
 	data(points:Points):void
 	insertAtPoint(val:number, reverse?:boolean):void
-	insertAtIdx(i:number, nbr:number, reverse?:boolean):void
+	insertAtIdx(i:number):void
 }
 

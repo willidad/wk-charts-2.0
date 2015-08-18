@@ -17,30 +17,47 @@ export class PathLayout extends Layout {
 	public needsPadding:boolean = false
 	
 	protected startPath = () => {
+		this.pathGenerator.keyOffset = this.keyScale.isOrdinal ? this.keyScale.getRangeBand() / 2 : 0
 		this.pathGenerator.data = this._prevData//.map((k) => { return {x:this.mapKey(k), y:this.mapVal(this._prevValues[k])} });
 		// extract added keys and key position from diff
+		var ptIdx = -1
 		var i = -1
 		while (++i < this.diffSeq.length) {
 			var op:string = this.diffSeq[i][0]
 			var key:string = this.diffSeq[i][1]
-			if (op === '+') this.pathGenerator.insertPointAt(key) //TODO: will not work for ordinal scales
+			if (op === '+') {
+				if (this.keyScale.isOrdinal) {
+					this.pathGenerator.insertPointsAtIdx(ptIdx,1)
+				} else {
+					this.pathGenerator.insertPointAt(key) //TODO: will not work for ordinal scales
+				}
+			} else ptIdx++
 		}
 		return this.pathGenerator.path
 	}
 	
 	protected endPath = () => {
+		this.pathGenerator.keyOffset = this.keyScale.isOrdinal ? this.keyScale.getRangeBand() / 2 : 0
 		this.pathGenerator.data = this._data//.map((k) => { return {x:this.mapKey(k), y:this.mapVal(this._values[k])} });
 		// extract added keys and key position from diff
+		var ptIdx = -1
 		var i = -1
 		while (++i < this.diffSeq.length) {
 			var op = this.diffSeq[i][0]
 			var key = this.diffSeq[i][1]
-			if (op === '-') this.pathGenerator.insertPointAt(key) // TODO: will not work for ordinal scales
+			if (op === '-') {
+				if (this.keyScale.isOrdinal) {
+					this.pathGenerator.insertPointsAtIdx(ptIdx,1)
+				} else {
+					this.pathGenerator.insertPointAt(key) //TODO: will not work for ordinal scales
+				}
+			} else ptIdx++
 		}
 		return this.pathGenerator.path
 	}
 	
 	protected cleanPath = () => {
+		this.pathGenerator.keyOffset = this.keyScale.isOrdinal ? this.keyScale.getRangeBand() / 2 : 0
 		this.pathGenerator.data = this._data//.map((k) => { return {x:this.mapKey(k), y:this.mapVal(this._values[k])} });
 		return this.pathGenerator.path
 	}

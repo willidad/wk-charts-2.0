@@ -12,7 +12,7 @@ export class Line extends Generator {
 	set data(val:any[]) {
 		this._data = val
 		this._dataMapped = this._data.map((d:any):[number,number] => {
-			return this.isVertical ? [this.val(d), this.key(d)] : [this.key(d), this.val(d)]
+			return this.isVertical ? [this.val(d), this.key(d) + this.keyOffset] : [this.key(d) + this.keyOffset, this.val(d)]
 		})		
 		this._interpolatorY.data(this._dataMapped)
 	}
@@ -22,10 +22,10 @@ export class Line extends Generator {
 	}
 	
 	public insertPointAt(key:any) {
-		this._interpolatorY.insertAtPoint(this.key(key))
+		this._interpolatorY.insertAtPoint(this.key(key)  + this.keyOffset)
 	}
 	
 	public insertPointsAtIdx(idx: number, nbr:number) {
-		this._interpolatorY.insertAtIdx(idx, nbr)
+		this._interpolatorY.insertAtIdx(idx)
 	}
 }
