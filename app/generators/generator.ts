@@ -13,7 +13,7 @@ export class Generator {
 	protected _data:any[] = []
 	protected _dataMapped:[number, number][]
 	
-	constructor(spline:boolean = false, public key?:Accessor, public val?:Accessor) {	
+	constructor(spline:boolean = false, protected key?:Accessor, protected val?:Accessor, protected isVertical:boolean = false) {	
 		this.spline = spline
 	}
 	
@@ -36,15 +36,11 @@ export class Generator {
 		return
 	}
 	
-	public XInsertPointAt(x:number) {
+	public insertPointAt(x:number) {
 		//override
 	}
 	
-	public XInsertPointsAtIdx(idx: number, nbr:number) {
+	public insertPointsAtIdx(idx: number, nbr:number) {
 		//override
-	}
-	
-	public insertPointsAt(idx: number, points:Point[]) {
-		
 	}
 }

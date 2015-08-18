@@ -23,7 +23,7 @@ export class Pie extends ElementLayout {
 	set labelBgStyle(val:Style) { this._labelBgStyle = val; }
 	get labelBgStyle():Style { return <Style>_.defaults(this._labelBgStyle, pieDefaults.labelBgStyle)}
 	
-	public drawLayout = (container, data, drawingAreaSize, animate?, cbDone?) => {
+	public drawLayout = (data, drawingAreaSize, animate?, cbDone?) => {
 		this.radius = Math.min(drawingAreaSize.width, drawingAreaSize.height) / 2 * (this.dataLabels ? 0.85 : 1)
 		var arc = d3.svg.arc().outerRadius(this.radius).innerRadius(this.innerRadius)
 		var labelArc = d3.svg.arc().outerRadius(this.radius * 1.1).innerRadius(this.radius * 1.1)
@@ -54,7 +54,7 @@ export class Pie extends ElementLayout {
 		}
 		
 		var segments = pie(data)
-		var path = container.selectAll('path')
+		var path = this.layoutG.selectAll('path')
 			.data(segments, (d) => d.data.key) 
 		
 		path.enter()
@@ -75,7 +75,7 @@ export class Pie extends ElementLayout {
 		path.exit().remove()
 		
 		if (this.dataLabels) {
-			var labels = container.selectAll('.wk-chart-data-label')
+			var labels = this.layoutG.selectAll('.wk-chart-data-label')
 				.data(segments, (d) => d.data.key)
 			var le = labels.enter().append('g').attr('class', 'wk-chart-data-label')
 				.style('opacity', 0)
@@ -108,7 +108,7 @@ export class Pie extends ElementLayout {
 				
 		}
 		
-		container.attr('transform', `translate(${drawingAreaSize.width / 2}, ${drawingAreaSize.height / 2})`)
+		this.layoutG.attr('transform', `translate(${drawingAreaSize.width / 2}, ${drawingAreaSize.height / 2})`)
 	}
 	
 }

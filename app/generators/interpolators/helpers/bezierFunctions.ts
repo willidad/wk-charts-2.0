@@ -105,6 +105,7 @@ export function intersect(at:number, points:number[]){
       d = bezierCoeff[3] - at 
       
   var roots:ComplexNumber[]
+  if (a < 1e-12) a = 0
   
   if (a !== 0) {
     roots = solveCubic(a,b,c,d)
@@ -113,8 +114,8 @@ export function intersect(at:number, points:number[]){
   } else {
     roots = solveLinear(c,d)
   }
-  
- return roots.filter(inRange).map(realOnly)
+  var r = roots.filter(inRange).map(realOnly)
+ return r
 } 
 
 function bezierFn(t, points):number {
@@ -146,78 +147,53 @@ export function computePoint(t, points):[number, number] {
   return [bezierFn(t, points.map(function(p){ return p[0] })), bezierFn(t, points.map(function(p){ return p[1] }))]
 }
 
-export function splitSegment(points:[number, number][], t0:number):[number, number][][] {
+export function splitSegment(points:[number, number][], t0:number) {
     // split a segment into two at t0 while preserving the shape of the original segment.
     
-    if (points.length === 4) return splitCubic(points,t0)
-    if (points.length === 3) return splitQuad(points,t0)
-}
-
-function splitCubic(p:[number, number][], z:number):[number, number][][] {
-  
-  // formula from http://pomax.github.io/bezierinfo/
-    var zM1 = z - 1;
-    var zPow2 = z * z
-    var zPow3 = zPow2 * z
-    var zM1Pow2 = zM1 * zM1
-    var zM1Pow3 = zM1Pow2 * zM1
+    var n = points.length - 1; // number of control points
+    var b = [];		   	   // coefficients as in De Casteljau's algorithm
+    var left = [];		   // first curve resulting control points
+    var right = [];		   // second curve resulting control points
+    var t1 = 1 - t0;
     
-    var pLeft = []
-    pLeft[0] = p[0]  //P1
-    pLeft[1] = [
-        z*p[1][0] - zM1*p[0][0],  // z⋅P2−(z−1)⋅P1
-        z*p[1][1] - zM1*p[0][1]
-      ]
-    pLeft[2] = [
-      zPow2*p[2][0] - 2*z*zM1*p[1][0] + zM1Pow2*p[0][0], //  z^2⋅P3−2⋅z⋅(z−1)⋅P2+(z−1)^2⋅P1 
-      zPow2*p[2][1] - 2*z*zM1*p[1][1] + zM1Pow2*p[0][1]
-    ]
-    pLeft[3] = [
-      zPow3*p[3][0] - 3*zPow2*zM1*p[2][0] + 3*z*zM1Pow2*p[1][0] - zM1Pow3*p[0][0], // z^3⋅P4−3⋅z^2⋅(z−1)⋅P3+3⋅z⋅(z−1)^2⋅P2−(z−1)^3⋅P1
-      zPow3*p[3][1] - 3*zPow2*zM1*p[2][1] + 3*z*zM1Pow2*p[1][1] - zM1Pow3*p[0][1]
-    ]
+    // multiply point with scalar factor
+    var pf = function(p, f) {
+        var res = [];
+        for(var i = 0; i < p.length; i++) {
+            res.push(f * p[i]);
+        }
+        return res;
+    };
+    // add points as vectors
+    var pp = function(p1, p2) {
+        var res = [];
+        for(var i = 0; i < Math.min(p1.length, p2.length); i++) {
+            res.push(p1[i] + p2[i]);
+        }
+        return res;
+    };
     
-    var pRight = []
-    pRight[0] = pLeft[3]
-    pRight[1] = [
-      zPow2*p[3][0] - 2*z*zM1*p[2][0] + zM1Pow2*p[1][0], // z^2⋅P4−2⋅z⋅(z−1)⋅P3+(z−1)^2⋅P2
-      zPow2*p[3][1] - 2*z*zM1*p[2][1] + zM1Pow2*p[1][1]
-    ]
-    pRight[2] = [
-      z*p[3][0] - zM1*p[2][0],  // z⋅P4−(z−1)⋅P3
-      z*p[3][1] - zM1*p[2][1]
-    ]
-    pRight[3] = p[3]
+    // set original coefficients: b[i][0] = points[i]
+    for(var i = 0; i <= n; i++) {
+        //points[i] = (typeof points[i] == "object") ? points[i] : [points[i]];
+        b.push([ points[i] ]);
+    }
+    // get all coefficients
+    for(var j = 1; j <= n; j++) {
+        for(var i = 0; i <= (n-j); i++) {
+            b[i].push( pp(
+                    pf(b[i][j-1], t1),
+                    pf(b[i+1][j-1], t0)
+            ));
+        }
+    }
+    // set result: res1 & res2
+    for(var j = 0; j <= n; j++) {
+        left.push(b[0][j]);
+        right.push(b[j][n-j]);
+    }
     
-    return [pLeft, pRight]
-}
-
-function splitQuad(p:[number, number][], z:number):[number, number][][] { 
-  
-  // formula from http://pomax.github.io/bezierinfo/
-    var zM1 = z - 1;
-    var zPow2 = z * z
-    var zM1Pow2 = zM1 * zM1
-    var pLeft = []
-    pLeft[0] = p[0]
-    pLeft[1] = [
-        z*p[1][0] - zM1*p[0][0],  // z⋅P2−(z−1)⋅P1
-        z*p[1][1] - zM1*p[0][1]
-      ]
-    pLeft[2] = [
-      zPow2*p[2][0] - 2*z*zM1*p[1][0] + zM1Pow2*p[0][0], //  z^2⋅P3−2⋅z⋅(z−1)⋅P2+(z−1)^2⋅P1 
-      zPow2*p[2][1] - 2*z*zM1*p[1][1] + zM1Pow2*p[0][1]
-    ]
-    
-    var pRight = []
-    pRight[0] = pLeft[0]
-    pRight[1] = [
-      z*p[2][0] - zM1*p[1][0],  // z⋅P4−(z−1)⋅P3
-      z*p[2][0] - zM1*p[1][0]
-    ]
-    pRight[2] = p[2]
-    
-    return [pLeft, pRight]
+    return [left, right]
 }
 
 export function quadToCubic(p0:[number,number], cp:[number,number],p1:[number,number]):[number,number][] {

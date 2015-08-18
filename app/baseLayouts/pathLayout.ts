@@ -23,7 +23,7 @@ export class PathLayout extends Layout {
 		while (++i < this.diffSeq.length) {
 			var op:string = this.diffSeq[i][0]
 			var key:string = this.diffSeq[i][1]
-			if (op === '+') this.pathGenerator.XInsertPointAt(key) //TODO: will not work for ordinal scales
+			if (op === '+') this.pathGenerator.insertPointAt(key) //TODO: will not work for ordinal scales
 		}
 		return this.pathGenerator.path
 	}
@@ -35,7 +35,7 @@ export class PathLayout extends Layout {
 		while (++i < this.diffSeq.length) {
 			var op = this.diffSeq[i][0]
 			var key = this.diffSeq[i][1]
-			if (op === '-') this.pathGenerator.XInsertPointAt(key) // TODO: will not work for ordinal scales
+			if (op === '-') this.pathGenerator.insertPointAt(key) // TODO: will not work for ordinal scales
 		}
 		return this.pathGenerator.path
 	}

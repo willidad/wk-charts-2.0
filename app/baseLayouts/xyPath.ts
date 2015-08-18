@@ -28,7 +28,7 @@ export class XYPath extends PathLayout {
 	protected pathStyle:Style = {}
 	
 	public drawStart = (data, drawingAreaSize) => {
-		console.log ('drawStart')
+		//console.log ('drawStart')
 		if (!this.path) this.path = this.layoutG.append('path')
 		this.path.attr('d', this.startPath)
 			.style(this.pathStyle)
@@ -39,7 +39,7 @@ export class XYPath extends PathLayout {
 	}
 	
 	public drawAnimation = (data, drawingAreaSize) => {
-		console.log ('drawAnimation')
+		//console.log ('drawAnimation')
 		if (!this.path) this.path = this.layoutG.append('path')
 		this.path.transition().duration(this._duration).attr('d', this.endPath())
 		
@@ -49,7 +49,7 @@ export class XYPath extends PathLayout {
 	}
 	
 	public drawEnd = (data, drawingAreaSize) => {
-		console.log ('drawEnd')
+		//console.log ('drawEnd')
 		if (!this.path) this.path = this.layoutG.append('path')
 		this.path.attr('d', this.cleanPath)
 			.style(this.pathStyle)

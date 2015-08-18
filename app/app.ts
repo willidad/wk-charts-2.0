@@ -38,7 +38,7 @@ export function main(el: HTMLElement): void {
     var line1 = chart.addLayout(new Line(xScale,'x', yScale,'y',colorScale, false, true))
 
 
-    var data = [{x:'aaaa', x1:1, y:12, y2:24},{x:'bbb', x1:2, y:13.87620, y2:3.123456},{x:'Äaaaaaa', x1:3, y:15, y2:11},{x:'ddd', x1:4, y:3, y2:9},{x:'eeee', x1:5, y:-7, y2:-15}]
+    var data = [{x:'aaaa', x1:1, y:12, y2:10.5},{x:'bbb', x1:2, y:13.87620, y2:3.123456},{x:'Äaaaaaa', x1:3, y:15, y2:11},{x:'ddd', x1:4, y:3, y2:-9},{x:'eeee', x1:5, y:-7, y2:-15}]
     chart.draw(data)
     
     new DataTable('#data-table', data ,(data) => {
@@ -148,7 +148,7 @@ export function main(el: HTMLElement): void {
         chart = new Chart(el, 'This is the chart title', "Subtitle");
     
         var xScale = chart.addScale('linear', ['x1'], DomainCalc.extent)
-        var yScale = chart.addScale('linear', ['y'], DomainCalc.extentZero)
+        var yScale = chart.addScale('linear', ['y', 'y2'], DomainCalc.extentZero)
         var colorScale = chart.addScale('category10',[])
         var keyColors = chart.addScale('category10', ['x'])
         
@@ -158,17 +158,16 @@ export function main(el: HTMLElement): void {
         var leftGrid = chart.addGrid(axisLeft)
         var gridBottom = chart.addGrid(axisBottom)
         
-        var area = chart.addLayout(new Area(xScale,'x1', yScale,'y',null,colorScale, false, true))
+        var area = chart.addLayout(new Area(xScale,'x1', yScale,'y','y2',colorScale, false, true))
         var line1Marker = chart.addLayout(new DataMarker(xScale,'x1', yScale,'y',colorScale))
         
         chart.draw(data)
-
     })
     
     document.getElementById('lineVert').addEventListener('click', (ev) => {
         chart = new Chart(el, 'This is the chart title', "Subtitle");
     
-        var yScale = chart.addScale('ordinal', ['x'])
+        var yScale = chart.addScale('linear', ['x1'], DomainCalc.extent)
         var xScale = chart.addScale('linear', ['y'], DomainCalc.extentZero)
         var colorScale = chart.addScale('category10',[])
         var keyColors = chart.addScale('category10', ['x'])
@@ -179,8 +178,8 @@ export function main(el: HTMLElement): void {
         var leftGrid = chart.addGrid(axisLeft)
         var gridBottom = chart.addGrid(axisBottom)
         
-        var line1 = chart.addLayout(new Line(yScale,'x', xScale,'y',colorScale, true, true))
-        var line1Marker = chart.addDataMarkers(line1)
+        var line1 = chart.addLayout(new Line(yScale,'x1', xScale,'y',colorScale, true, true))
+        //var line1Marker = chart.addDataMarkers(line1)
         
         chart.draw(data)
 
@@ -189,8 +188,8 @@ export function main(el: HTMLElement): void {
     document.getElementById('areaVert').addEventListener('click', (ev) => {
         chart = new Chart(el, 'This is the chart title', "Subtitle");
     
-        var yScale = chart.addScale('ordinal', ['x'])
-        var xScale = chart.addScale('linear', ['y'], DomainCalc.extentZero)
+        var yScale = chart.addScale('linear', ['x1'], DomainCalc.extent)
+        var xScale = chart.addScale('linear', ['y','y2'], DomainCalc.extentZero)
         var colorScale = chart.addScale('category10',[])
         var keyColors = chart.addScale('category10', ['x']) 
         var axisBottom = chart.addAxis(Position.bottom, xScale, 'X - Scale')
@@ -198,7 +197,7 @@ export function main(el: HTMLElement): void {
         var leftGrid = chart.addGrid(axisLeft)
         var gridBottom = chart.addGrid(axisBottom)
         
-        var line1 = chart.addLayout(new Area(yScale,'x', xScale,'y',null, colorScale, true, true))
+        var line1 = chart.addLayout(new Area(yScale,'x1', xScale,'y','y2', colorScale, true, true))
         var line1Marker = chart.addDataMarkers(line1)
         
         chart.draw(data)

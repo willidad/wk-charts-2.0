@@ -14,7 +14,7 @@ export class Line extends XYPath {
 	
 	protected pathStyle:Style = <Style>_.defaults({fill:'none'},this.lineStyle)
 
-	protected pathGenerator = new LineGenerator(this.spline, this.keyFn, this.valFn)
+	protected pathGenerator = new LineGenerator(this.spline, this.keyFn, this.valFn, this.isVertical)
 	
 	set lineStyle(val:Style) { this._lineStyle = val; }
 	get lineStyle():Style { return <Style>_.defaults(this._lineStyle, defaults.lineStyle)}		

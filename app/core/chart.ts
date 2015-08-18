@@ -325,7 +325,6 @@ export class Chart {
 			this.getLayoutPadding() // if needed draw the layout and measure if it fits into the drawing area
 			this.sizeRange() //add padding to the range values
 			this.drawAxis(true)
-			this.positionLayout(true)
 			this.drawGrids(true)
 			this.drawAnimation() 
 			//console.log('animated draw')

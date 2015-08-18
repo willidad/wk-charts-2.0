@@ -1,6 +1,9 @@
 import { Point, Points, IInterpolator} from './interpolator'
 
 export class Linear implements IInterpolator {
+	
+	constructor(private isVertical:boolean) {}
+
 
 	private _data:Points
 
@@ -11,63 +14,75 @@ export class Linear implements IInterpolator {
 	public data(data:Points) {
 		this._data = data
 	}
+	
+	private insertBetween(key, low, high) {
+			var deltaKey, deltaVal, deltaValIns, deltaKeyIns;
+			console.log (low, high, key, this._data)
+			deltaKey = Math.abs(this._data[high][k] - this._data[low][k])
+			deltaVal = this._data[high][v] - this._data[low][v]
+			deltaKeyIns = Math.abs(key - this._data[low][k])
+			deltaValIns = Math.abs(this._data[low][k] - key) / deltaKey * deltaVal
+			this._data.splice(low, 0 , [key, this._data[low][v] + deltaKeyIns / deltaKey * deltaVal])
+		}
 		
-	public insertAtPoint(key:number, reverse?:boolean) {
+	public insertAtPoint(key:number) {
 		// find insertion point
-		var i = -1,
-			deltaX, deltaY, deltaYins, deltaXIns;
-			
-		while (++i < this._data.length){
-			if (key <= this._data[i][0]) break
-		}
-		// insert Point
-		if (i === 0) {
-			// insert first point as animation start point
-			this._data.unshift(this._data[0]) 
-		} else if (i === this._data.length) {
-			// insert last point as animation start point
-			this._data.push(this._data[i-1])
-		} else {
-			// insert in between, interpolate y from surrounding two points
-			deltaX = Math.abs(this._data[i][0] - this._data[i-1][0])
-			deltaY = this._data[i][1] - this._data[i - 1][1]
-			deltaXIns = Math.abs(key - this._data[i-1][0])
-			deltaYins = Math.abs(this._data[i][0] - key) / deltaX * deltaY
-			this._data.splice(i, 0 , [key, this._data[i - 1][1] + deltaXIns / deltaX * deltaY])
-		}	
-	}
-	
-	public insertAtPointReverse(key:number, reverse?:boolean) {
-		// find insertion point
-		var i = this._data.length,
-			deltaX, deltaY, deltaYins, deltaXIns;
-			
-
-		// insert Point
-		if (key > this._data[0][0]) {
-			// insert first point as animation start point
-			this._data.unshift(this._data[0]) 
-		} else if (key < this._data[this._data.length-1][0]) {
-			// insert last point as animation start point
-			this._data.push(this._data[this._data.length-1])
-		} else {
-			while (--i >= 0){
-				if (key <= this._data[i][0]) break
+		var k = this.isVertical ? 1 : 0	
+		var v = this.isVertical ? 0 : 1
+		var iLow, iHigh, deltaKey, deltaVal, deltaValIns, deltaKeyIns
+		
+		if (this._data[0][k] > this._data[this._data.length-1][k]) {
+			// test boundaries
+			if (key > this._data[0][k]) this._data.unshift(this._data[0])
+			else if (key < this._data[this._data.length-1][k]) this._data.push(this._data[this._data.length-1])
+			else {
+				iHigh = 0 // points to larger value
+				iLow = 1 // points to smaller value
+				while (iLow < this._data.length) {
+					if (this._data[iHigh][k] >= key &&  key >= this._data[iLow][k]) break
+					iHigh++
+					iLow++
+				}
+				deltaKey = Math.abs(this._data[iHigh][k] - this._data[iLow][k])
+				deltaVal = this._data[iHigh][v] - this._data[iLow][v]
+				deltaKeyIns = Math.abs(key - this._data[iLow][k])
+				deltaValIns = Math.abs(this._data[iLow][k] - key) / deltaKey * deltaVal
+				var insPt:[number,number] = [0,0]
+				insPt[k] = key
+				insPt[v] = this._data[iLow][v] + deltaKeyIns / deltaKey * deltaVal
+				this._data.splice(iLow, 0 , insPt)
 			}
-			// insert in between, interpolate y from surrounding two points
-			deltaX = Math.abs(this._data[i][0] - this._data[i+1][0])
-			deltaY = this._data[i][1] - this._data[i + 1][1]
-			deltaXIns = Math.abs(key - this._data[i+1][0])
-			deltaYins = Math.abs(this._data[i][0] - key) / deltaX * deltaY
-			this._data.splice(i+1, 0 , [key, this._data[i + 1][1] + deltaXIns / deltaX * deltaY])
+		} else {
+			if (key < this._data[0][k]) this._data.unshift(this._data[0])
+			else if (key > this._data[this._data.length-1][k]) this._data.push(this._data[this._data.length-1])
+			else {
+				iHigh = 1 // points to larger value
+				iLow = 0 // points to smaller value
+				while (iHigh < this._data.length) {
+					if (this._data[iHigh][k] >= key &&  key >= this._data[iLow][k]) break
+					iHigh++
+					iLow++
+				}
+				console.log (iLow, iHigh, key, this._data)
+				deltaKey = Math.abs(this._data[iHigh][k] - this._data[iLow][k])
+				deltaVal = this._data[iHigh][v] - this._data[iLow][v]
+				deltaKeyIns = Math.abs(key - this._data[iLow][k])
+				deltaValIns = Math.abs(this._data[iLow][k] - key) / deltaKey * deltaVal
+				var insPt:[number,number] = [0,0]
+				insPt[k] = key
+				insPt[v] = this._data[iLow][v] + deltaKeyIns / deltaKey * deltaVal
+				this._data.splice(iHigh, 0 , insPt)
+			}
 		}
 	}
 	
+	public insertAtPointReverse = this.insertAtPoint 
 	
 	public insertAtIdx(i:number, nbr:number, reverse?:boolean) {
 		
-		var deltaX, deltaY, deltaYIns, deltaXIns, startX, startY;
-			
+		var deltaKey, deltaVal, deltaValIns, deltaKeyIns, startKey, startVal;
+		var k = this.isVertical ? 1 : 0	
+		var v = this.isVertical ? 0 : 1
 		if (i < 0) {
 			// insert first point as animation start point
 			var j = nbr
@@ -78,19 +93,20 @@ export class Linear implements IInterpolator {
 			while (--j >= 0) this._data.push(last)
 		} else {
 			j = nbr + 1
-			deltaX = Math.abs(this._data[i + 1][0] - this._data[i][0])
-			deltaY = this._data[i+1][1] - this._data[i][1]
-			deltaXIns = deltaX / j
-			deltaYIns = deltaY / j
-			startX = this._data[i][0];
-			startY = this._data[i][1]
-			while (--j > 0) this._data.splice(i,0, [startX + j * deltaXIns, startY + j * deltaYIns])
+			deltaKey = Math.abs(this._data[i + 1][k] - this._data[i][k])
+			deltaVal = this._data[i+1][v] - this._data[i][v]
+			deltaKeyIns = deltaKey / j
+			deltaValIns = deltaVal / j
+			startKey = this._data[i][k];
+			startVal = this._data[i][v]
+			while (--j > 0) this._data.splice(i,0, [startKey + j * deltaKeyIns, startVal + j * deltaValIns])
 		}	
 	}
 	
 	public insertAtIdxReverse(i:number, nbr:number, reverse?:boolean) {
-		var deltaX, deltaY, deltaYIns, deltaXIns, startX, startY;
-			
+		var deltaKey, deltaVal, deltaValIns, deltaKeyIns, startKey, startVal;
+		var k = this.isVertical ? 1 : 0	
+		var v = this.isVertical ? 0 : 1	
 		if (i < 0) {
 			// insert first point as animation start point
 			var j = nbr
@@ -101,13 +117,13 @@ export class Linear implements IInterpolator {
 		} else {
 			var i1 = this._data.length - i -1
 			j = nbr + 1
-			deltaX = Math.abs(this._data[i1- 1][0] - this._data[i1][0])
-			deltaY = this._data[i1 - 1][1] - this._data[i1][1]
-			deltaXIns = deltaX / j
-			deltaYIns = deltaY / j
-			startX = this._data[i1][0];
-			startY = this._data[i1][1]
-			while (--j > 0) this._data.splice(i1,0, [startX + j * deltaXIns, startY + j * deltaYIns])
+			deltaKey = Math.abs(this._data[i1- 1][k] - this._data[i1][k])
+			deltaVal = this._data[i1 - 1][v] - this._data[i1][v]
+			deltaKeyIns = deltaKey / j
+			deltaValIns = deltaVal / j
+			startKey = this._data[i1][k];
+			startVal = this._data[i1][v]
+			while (--j > 0) this._data.splice(i1,0, [startKey + j * deltaKeyIns, startVal + j * deltaValIns])
 		}	
 	}
 }
