@@ -18,9 +18,10 @@ function lineCardinalTangents(points, tension):Point[] {
 /**
  * creates a list of segments from the data points and the computed tangents. Th first and the last segment, 
  * which have only one computed tangent value (and thus are naturally a quadratic curve) are extended to a cubic curve
- * to allow a single case for the intersection and bsplit algorithms. This is certainly not performace optimized
+ * to allow a single case for the intersect and split algorithms. 
  */
- //TODO: Revist math for intersect and bsplit to elegantly deal with quadratic and cubic segments
+ 
+ //TODO: implement quadratic for begin / end segments
 
 function segments(points:Point[], tangents:Point[]):ControlPoints[] {
   var p0:Point = points[0], 
