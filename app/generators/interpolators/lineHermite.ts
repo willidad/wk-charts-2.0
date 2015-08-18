@@ -66,9 +66,7 @@ function segments(points:Point[], tangents:Point[]):ControlPoints[] {
 
 export class Hermite implements IInterpolator {
   
-    constructor(private isVertical:boolean) {
-      
-    }
+    constructor(private isVertical:boolean) {}
     
     private _segs:ControlPoints[] 
     private _tangents:Points
@@ -159,37 +157,6 @@ export class Hermite implements IInterpolator {
     }
     
     public insertAtPointReverse = this.insertAtPoint
-    /*
-    public insertAtPointReverse(val:number) {
-    	// find the segment that contains the insert point
-      var i = this._segs.length,
-          seg, 
-          lastSeg = this._segs[0],
-          firstSeg = this._segs[this._segs.length - 1]
-      var k = this.isVertical ? 1 : 0
-      
-      if (val <= firstSeg[3][k]) {
-        this.splitSegAt(this._segs.length - 1,1)
-      } else if (val > lastSeg[0][k]) {
-        this.splitSegAt(0, 0)  
-      } else {
-        while (--i >= 0) {
-          seg = this._segs[i]
-          if (seg[3][k] < val && val <= seg[0][k]) break 
-        }
-        // point is inside segs[i]
-        var roots = bezier.intersect(val, seg.map(function(p) { return p[k] })) 
-        if (roots.length > 1 && roots[0] !== roots[1]) {
-          throw `Error: computeIntersection: val=${val} has more than one root ${roots} with line. ` + seg
-        }
-        this.splitSegAt(i,roots[0])
-      }
-    }*/
-    
-    /**
-     * inserts 'nbr' data points at the position specific by the data point at index I. Data points are inserted 
-     * after the data point. To insert at the beginning of the curve (i.e. befor data point 0) specify -1 as the number. 
-     */
     
     public insertAtIdx(i:number) {
       //console.log ('indexAt:',i,nbr, this._segs.length, this._segs)
