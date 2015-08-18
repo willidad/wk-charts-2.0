@@ -70,7 +70,7 @@ export class Linear implements IInterpolator {
 	
 	public insertAtIdx(i:number) {
 		
-		var deltaKey, deltaVal, deltaValIns, deltaKeyIns, startKey, startVal;
+		var startKey, startVal;
 		var k = this.isVertical ? 1 : 0	
 		var v = this.isVertical ? 0 : 1
 		if (i < 0) {
@@ -87,7 +87,7 @@ export class Linear implements IInterpolator {
 	}
 	
 	public insertAtIdxReverse(i:number) {
-		var deltaKey, deltaVal, deltaValIns, deltaKeyIns, startKey, startVal;
+		var startKey, startVal;
 		var k = this.isVertical ? 1 : 0	
 		var v = this.isVertical ? 0 : 1	
 		if (i < 0) {
