@@ -49,7 +49,7 @@ export class Area extends Generator{
 	}
 	
 	public insertPointsAtIdx(idx: number, nbr:number) {
-		this._interpolatorY.insertAtIdx(idx, nbr)
-		this._interpolatorY0.insertAtIdxReverse(idx, nbr)
+		this._interpolatorY.insertAtIdx(idx)
+		this._interpolatorY0.insertAtIdxReverse(idx)
 	}
 }

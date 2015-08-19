@@ -1,3 +1,6 @@
+type Point = [number, number]
+type Segment = [Point, Point, Point, Point]
+
 class ComplexNumber  {
   constructor(public real: number, public i:number = 0) {}
 }
@@ -143,17 +146,17 @@ function bezierFn(t, points):number {
   return val
 }
 	
-export function computePoint(t, points):[number, number] {
+export function computePoint(t, points):Point {
   return [bezierFn(t, points.map(function(p){ return p[0] })), bezierFn(t, points.map(function(p){ return p[1] }))]
 }
 
-export function splitSegment(points:[number, number][], t0:number) {
+export function splitSegment(points:[number, number][], t0:number):[Segment, Segment] {
     // split a segment into two at t0 while preserving the shape of the original segment.
     
     var n = points.length - 1; // number of control points
     var b = [];		   	   // coefficients as in De Casteljau's algorithm
-    var left = [];		   // first curve resulting control points
-    var right = [];		   // second curve resulting control points
+    var left:Segment = [];		   // first curve resulting control points
+    var right:Segment = [];		   // second curve resulting control points
     var t1 = 1 - t0;
     
     // multiply point with scalar factor
@@ -196,8 +199,9 @@ export function splitSegment(points:[number, number][], t0:number) {
     return [left, right]
 }
 
-export function quadToCubic(p0:[number,number], cp:[number,number],p1:[number,number]):[number,number][] {
-    var cp0 = [p0[0] + (cp[0] - p0[0])*2/3, p0[1] + (cp[1] - p0[1])*2/3],
-        cp1 = [p1[0] + (cp[0] - p1[0])*2/3, p1[1] + (cp[1] - p1[1])*2/3]
+export function quadToCubic(p0:[number,number], cp:[number,number],p1:[number,number]):Segment{
+    var cp0:[number,number] = [p0[0] + (cp[0] - p0[0])*2/3, p0[1] + (cp[1] - p0[1])*2/3],
+        cp1:[number,number] = [p1[0] + (cp[0] - p1[0])*2/3, p1[1] + (cp[1] - p1[1])*2/3]
     return [p0, cp0, cp1, p1]
 }
+
