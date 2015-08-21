@@ -1,12 +1,12 @@
-import { IMargins, Point } from './../core/interfaces'
+//import { IMargins, Point } from './../core/interfaces'
 import { Layout } from './layout'
-import { Scale } from './../core/scale'
-import { Generator } from './../generators/generator'
-import * as d3 from 'd3'
-import * as _ from 'lodash'
-import * as drawing from './../tools/drawing'
-import { Diff } from './../tools/array-diff'
-import { chart as chartDefaults ,axis as axisDefaults, duration} from './../core/defaults'
+//import { Scale } from './../core/scale'
+//import { Generator } from './../generators/generator'
+//import * as d3 from 'd3'
+//import * as _ from 'lodash'
+//import * as drawing from './../tools/drawing'
+//import { Diff } from './../tools/array-diff'
+//import { chart as chartDefaults ,axis as axisDefaults, duration} from './../core/defaults'
 
 export class PathLayout extends Layout {
 	
@@ -16,9 +16,9 @@ export class PathLayout extends Layout {
 	public targetContainer = 'wk-chart-layout-area';
 	public needsPadding:boolean = false
 	
-	protected startPath = () => {
+	protected startPath:string = () => {
 		this.pathGenerator.keyOffset = this.keyScale.isOrdinal ? this.keyScale.getRangeBand() / 2 : 0
-		this.pathGenerator.data = this._prevData//.map((k) => { return {x:this.mapKey(k), y:this.mapVal(this._prevValues[k])} });
+		this.pathGenerator.data = this._prevData
 		// extract added keys and key position from diff
 		var ptIdx = -1
 		var i = -1
@@ -27,18 +27,18 @@ export class PathLayout extends Layout {
 			var key:string = this.diffSeq[i][1]
 			if (op === '+') {
 				if (this.keyScale.isOrdinal) {
-					this.pathGenerator.insertPointsAtIdx(ptIdx,1)
+					this.pathGenerator.insertPointAtIdx(ptIdx)
 				} else {
-					this.pathGenerator.insertPointAt(key) //TODO: will not work for ordinal scales
+					this.pathGenerator.insertPointAt(key)
 				}
 			} else ptIdx++
 		}
 		return this.pathGenerator.path
 	}
 	
-	protected endPath = () => {
+	protected endPath = ():string => {
 		this.pathGenerator.keyOffset = this.keyScale.isOrdinal ? this.keyScale.getRangeBand() / 2 : 0
-		this.pathGenerator.data = this._data//.map((k) => { return {x:this.mapKey(k), y:this.mapVal(this._values[k])} });
+		this.pathGenerator.data = this._data
 		// extract added keys and key position from diff
 		var ptIdx = -1
 		var i = -1
@@ -47,24 +47,20 @@ export class PathLayout extends Layout {
 			var key = this.diffSeq[i][1]
 			if (op === '-') {
 				if (this.keyScale.isOrdinal) {
-					this.pathGenerator.insertPointsAtIdx(ptIdx,1)
+					this.pathGenerator.insertPointAtIdx(ptIdx)
 				} else {
-					this.pathGenerator.insertPointAt(key) //TODO: will not work for ordinal scales
+					this.pathGenerator.insertPointAt(key)
 				}
 			} else ptIdx++
 		}
 		return this.pathGenerator.path
 	}
 	
-	protected cleanPath = () => {
+	protected cleanPath = ():string => {
 		this.pathGenerator.keyOffset = this.keyScale.isOrdinal ? this.keyScale.getRangeBand() / 2 : 0
-		this.pathGenerator.data = this._data//.map((k) => { return {x:this.mapKey(k), y:this.mapVal(this._values[k])} });
+		this.pathGenerator.data = this._data
 		return this.pathGenerator.path
 	}
-	
-	public drawLayout = (data, drawingAreaSize?, animate?:boolean, cbAnimationDone?) => {} 
-	public beforeDraw = (data, drawingAreaSize?) => {}
-	public afterDraw = (data, drawingAreaSize?) => {}
 	
 	//-------------------------------------------------------------------------------
 	

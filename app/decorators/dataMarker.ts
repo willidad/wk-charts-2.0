@@ -25,7 +25,7 @@ export class DataMarker extends XYElement {
 			.attr('r', 5)
 	}
 	protected update(selection:d3.Selection<any>, caller:XYElement) {
-		selection.style('fill', (d) =>caller.propertyColor())
+		selection.style('fill', (d) => caller.propertyColor())
 	}
 	protected remove(selection:d3.Selection<any>, caller:XYElement) {
 	}

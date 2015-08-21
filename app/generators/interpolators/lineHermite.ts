@@ -80,7 +80,7 @@ export class Hermite implements IInterpolator {
      // TODO: investigate performance impact of using only C command (as opposed to S command) and ajust algorithm if there is an
      // perfomance improvement
      
-    public path(tension:number = 0.7):string {
+    public path():string {
         var path:string
         path = `${this._segs[0][0].join()}C`
         path += this._segs.map(function(s) { return [s[1], s[2], s[3]].join()}).join('C')
@@ -127,12 +127,12 @@ export class Hermite implements IInterpolator {
             if (seg[0][k] > val && val >= seg[3][k]) break 
           }
           // point is inside segs[i]
-          console.log ('inverse', i,val,seg)
+          //console.log ('inverse', i,val,seg)
           var roots = bezier.intersect(val, seg.map(function(p) { return p[k] }))  
           if (roots.length > 1 && roots[0] !== roots[1]) {
             throw `Error: computeIntersection: x=${val} has more than one root ${roots} with line. ` + seg
           }
-          console.log('roots', roots)
+          //console.log('roots', roots)
           this.splitSegAt(i,roots[0])
         }
       } else {
@@ -146,12 +146,12 @@ export class Hermite implements IInterpolator {
             if (seg[0][k] < val && val <= seg[3][k]) break 
           }
           // point is inside segs[i]
-          console.log ('normal', i,val,seg)
+          //console.log ('normal', i,val,seg)
           var roots = bezier.intersect(val, seg.map(function(p) { return p[k] }))  
           if (roots.length > 1 && roots[0] !== roots[1]) {
             throw `Error: computeIntersection: x=${val} has more than one root ${roots} with line. ` + seg
           }
-          console.log('roots', roots)
+          //console.log('roots', roots)
           this.splitSegAt(i,roots[0])
         }
       }

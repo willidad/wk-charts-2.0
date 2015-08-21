@@ -59,6 +59,10 @@ export class Layout {
 		return this.keyScale.map(val)
 	}
 	
+	protected mapKeyIdx = (idx:number) => {
+		return this.keyScale.mapIdx(idx)
+	}
+	
 	protected key = (val):any => {
 		return val[this.keyProperty]
 	}

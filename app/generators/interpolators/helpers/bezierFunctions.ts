@@ -18,14 +18,14 @@ function solveLinear(a:number, b:number):ComplexNumber[] {
 }
 
 
-function solveQadratic(a:number,b:number,c:number):ComplexNumber[] {
-  var discrim = Math.sqrt(b*b -4*a*c)
+function solveQuadratic(a:number,b:number,c:number):ComplexNumber[] {
+  var discrim = b*b -4*a*c
   if (discrim < 0) {
-    var r1 = new ComplexNumber(-b/(2*a), discrim/(2*a))
-    var r1 = new ComplexNumber(-b/(2*a), -discrim/(2*a))
+    var r1 = new ComplexNumber(-b/(2*a), Math.sqrt(-discrim)/(2*a))
+    var r1 = new ComplexNumber(-b/(2*a), -Math.sqrt(-discrim)/(2*a))
   } else {
-    var r1 = new ComplexNumber((-b + discrim) / (2 * a))
-    var r2 = new ComplexNumber((-b - discrim) / (2 * a))
+    var r1 = new ComplexNumber((-b + Math.sqrt(discrim)) / (2 * a))
+    var r2 = new ComplexNumber((-b - Math.sqrt(discrim)) / (2 * a))
   }
   return [r1, r2]
 }
@@ -113,7 +113,7 @@ export function intersect(at:number, points:number[]){
   if (a !== 0) {
     roots = solveCubic(a,b,c,d)
   } else if (b !== 0) {
-    roots = solveQadratic(b,c,d)
+    roots = solveQuadratic(b,c,d)
   } else {
     roots = solveLinear(c,d)
   }

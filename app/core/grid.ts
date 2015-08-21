@@ -18,23 +18,23 @@ export class Grid {
 	get lineStyle():Style { return <Style>_.defaults(this._lineStyle, defaults.lineStyle)}
 	
 	private addGridLine(ranges) {
-			var _self = this
-			var orient = this._axis.orientation
-			return function (d) {
-				var tick = d3.select(this)
-				var gridLine = tick.select('.wk-chart-gridline')
-				if (gridLine.empty()) {
-					gridLine = tick.append('line').attr('class', 'wk-chart-gridLine')
-				}
-				switch (orient) {
-					case Position.left: gridLine.attr('x1', ranges.x[0]).attr('x2', ranges.x[1]); break
-					case Position.right: gridLine.attr('x1', -ranges.x[0]).attr('x2', -ranges.x[1]); break
-					case Position.top: gridLine.attr('y1', ranges.y[0]).attr('y2', ranges.y[1]); break
-					case Position.bottom: gridLine.attr('y1', -ranges.y[0]).attr('y2', -ranges.y[1]); break
-				}
-				gridLine.style(_self.lineStyle)
+		var _self = this
+		var orient = this._axis.orientation
+		return function (d) {
+			var tick = d3.select(this)
+			var gridLine = tick.select('.wk-chart-gridline')
+			if (gridLine.empty()) {
+				gridLine = tick.append('line').attr('class', 'wk-chart-gridLine')
 			}
+			switch (orient) {
+				case Position.left: gridLine.attr('x1', ranges.x[0]).attr('x2', ranges.x[1]); break
+				case Position.right: gridLine.attr('x1', -ranges.x[0]).attr('x2', -ranges.x[1]); break
+				case Position.top: gridLine.attr('y1', ranges.y[0]).attr('y2', ranges.y[1]); break
+				case Position.bottom: gridLine.attr('y1', -ranges.y[0]).attr('y2', -ranges.y[1]); break
+			}
+			gridLine.style(_self.lineStyle)
 		}
+	}
 	
 	public draw = (container, ranges, animate) => {
 			

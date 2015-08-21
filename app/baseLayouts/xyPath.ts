@@ -1,18 +1,9 @@
 
-import { Style , XYPathLayout, AreaSize, Point } from './../core/interfaces'
+import { Style } from './../core/interfaces'
 import { Scale } from './../core/scale'
 import { PathLayout } from './../baseLayouts/pathlayout'
-import * as d3 from 'd3'
-import * as _ from 'lodash'
-import * as drawing from './../tools/drawing'
-import { line as defaults } from './../core/defaults'
 
 export class XYPath extends PathLayout {
-	
-	protected path:d3.Selection<any>;
-	protected offset:number = 0
-	protected colorProp:string = 'stroke'
-	
 	
 	constructor(
 		public keyScale:Scale, 
@@ -25,9 +16,26 @@ export class XYPath extends PathLayout {
 		super(keyScale,keyProperty, valueScale,valueProperty, colorScale)
 	}
 	
+	/**
+	 * called at end of animation to remove animation target points of removed data points. 
+	 */	
+	private cleanup = () => {
+		var endPath = this.cleanPath();
+		var path = this.path
+		return function() {
+			console.log ('path cleanup')
+			path.attr('d', endPath)
+		}
+	}
+	
+	protected path:d3.Selection<any>;
+	protected offset:number = 0
+	protected colorProp:string = 'stroke'
 	protected pathStyle:Style = {}
 	
-	public drawStart = (data, drawingAreaSize) => {
+	// exposed drawing utility functions 
+	
+	public drawStart = () => {
 		//console.log ('drawStart')
 		if (!this.path) this.path = this.layoutG.append('path')
 		this.path.attr('d', this.startPath)
@@ -38,27 +46,26 @@ export class XYPath extends PathLayout {
 		}
 	}
 	
-	public drawAnimation = (data, drawingAreaSize) => {
+	public drawAnimation = () => {
 		//console.log ('drawAnimation')
 		if (!this.path) this.path = this.layoutG.append('path')
-		this.path.transition().duration(this._duration).attr('d', this.endPath())
+		this.path.transition().duration(this._duration)
+			.attr('d', this.endPath())
+			.each('end', this.cleanup()) //clean up animation targets for deleted data points after animation is done
 		
 		if (this.colorScale) {
 			this.path.style(this.colorProp, this.propertyColor())
 		}		
 	}
 	
-	public drawEnd = (data, drawingAreaSize) => {
+	public drawEnd = () => {
 		//console.log ('drawEnd')
 		if (!this.path) this.path = this.layoutG.append('path')
-		this.path.attr('d', this.cleanPath)
+		this.path.attr('d', this.cleanPath())
 			.style(this.pathStyle)
 		
 		if (this.colorScale) {
 			this.path.style(this.colorProp, this.propertyColor())
-		}
-		
-		this.afterDraw(data, drawingAreaSize)
-		
+		}		
 	}
 }

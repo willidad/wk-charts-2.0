@@ -5,16 +5,16 @@ import * as _ from 'lodash'
 
 export class Columns extends XYElement {
       
-      private _columnStyle:Style = {}
-      private _columnSize;
-      public padding:[number,number] = [0,0]
-      public rowColor = undefined
+	private _columnStyle:Style = {}
+	private _columnSize;
+	public padding:[number,number] = [0,0]
+	public rowColor = undefined
 
       
-      set columnStyle(val:Style) { this._columnStyle = val; }
+	set columnStyle(val:Style) { this._columnStyle = val; }
 	get columnStyle():Style { return <Style>_.defaults(this._columnStyle, defaults.columnStyle) }
       
-      protected getSelector():string { return '.wk-chart-column' }
+	protected getSelector():string { return '.wk-chart-column' }
       
 	protected create(selection:d3.Selection<any>, caller:Columns) {
             selection.append('rect').attr('class', 'wk-chart-column')

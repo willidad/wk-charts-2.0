@@ -1,17 +1,19 @@
+import { Point, Points, IInterpolator} from './interpolators/interpolator'
 import { Linear} from './interpolators/lineLinear'
 import { Hermite } from './interpolators/lineHermite'
 import { Accessor, Generator } from './generator'
 
 export class Area extends Generator{
 	
-	constructor(spline:boolean, key:Accessor, val:Accessor , public val0?:Accessor, isVertical?:boolean) {	
+	constructor(spline:boolean, public key:Accessor, public val:Accessor , public val0?:Accessor, isVertical?:boolean) {	
 		super(spline, key, val, isVertical)
 
 		this.spline = spline || false
 	}
 	
-	private _interpolatorY0: Hermite | Linear
-	private _dataMappedY0:[number, number][]
+	private _interpolatorY0: IInterpolator
+	private _dataMapped:Points
+	private _dataMappedY0:Points
 
 	set spline(val:boolean) {
 		this._spline = val
@@ -48,7 +50,7 @@ export class Area extends Generator{
 		this._interpolatorY0.insertAtPointReverse(this.key(key) + this.keyOffset)
 	}
 	
-	public insertPointsAtIdx(idx: number, nbr:number) {
+	public insertPointAtIdx(idx: number) {
 		this._interpolatorY.insertAtIdx(idx)
 		this._interpolatorY0.insertAtIdxReverse(idx)
 	}

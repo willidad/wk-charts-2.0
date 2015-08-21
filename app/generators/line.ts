@@ -1,8 +1,11 @@
 import { Linear} from './interpolators/lineLinear'
 import { Hermite } from './interpolators/lineHermite'
 import { Generator } from './generator'
+import { Point, Points} from './interpolators/interpolator'
 
 export class Line extends Generator {
+	
+	private _dataMapped:Points;
 	
 	set spline(val:boolean) {
 		this._spline = val
@@ -25,7 +28,7 @@ export class Line extends Generator {
 		this._interpolatorY.insertAtPoint(this.key(key)  + this.keyOffset)
 	}
 	
-	public insertPointsAtIdx(idx: number, nbr:number) {
+	public insertPointAtIdx(idx: number) {
 		this._interpolatorY.insertAtIdx(idx)
 	}
 }

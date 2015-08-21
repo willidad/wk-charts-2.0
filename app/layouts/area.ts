@@ -9,6 +9,8 @@ import { area as defaults } from './../core/defaults'
 
 export class Area extends XYPath {
 	
+	public needsPadding = true;
+	
 	private _areaStyle:Style = {}
 	
 	protected pathStyle = this.areaStyle
