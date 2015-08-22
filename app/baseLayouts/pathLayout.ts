@@ -1,12 +1,5 @@
-//import { IMargins, Point } from './../core/interfaces'
 import { Layout } from './layout'
-//import { Scale } from './../core/scale'
-//import { Generator } from './../generators/generator'
-//import * as d3 from 'd3'
-//import * as _ from 'lodash'
-//import * as drawing from './../tools/drawing'
-//import { Diff } from './../tools/array-diff'
-//import { chart as chartDefaults ,axis as axisDefaults, duration} from './../core/defaults'
+
 
 export class PathLayout extends Layout {
 	
@@ -16,7 +9,7 @@ export class PathLayout extends Layout {
 	public targetContainer = 'wk-chart-layout-area';
 	public needsPadding:boolean = false
 	
-	protected startPath:string = () => {
+	protected startPath = () => {
 		this.pathGenerator.keyOffset = this.keyScale.isOrdinal ? this.keyScale.getRangeBand() / 2 : 0
 		this.pathGenerator.data = this._prevData
 		// extract added keys and key position from diff

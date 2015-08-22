@@ -56,4 +56,4 @@ export var dataLabels = {
 	labelBgStyle: {fill:'none', stroke:'lightblue'}
 }
 
-export const duration = 500
+export const duration = 3000

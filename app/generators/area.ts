@@ -1,57 +1,89 @@
+import { Layout } from './../baselayouts/layout'
+import { Scale } from './../core/scale'
 import { Point, Points, IInterpolator} from './interpolators/interpolator'
 import { Linear} from './interpolators/lineLinear'
 import { Hermite } from './interpolators/lineHermite'
-import { Accessor, Generator } from './generator'
 
-export class Area extends Generator{
+export class Area extends Layout {
 	
-	constructor(spline:boolean, public key:Accessor, public val:Accessor , public val0?:Accessor, isVertical?:boolean) {	
-		super(spline, key, val, isVertical)
-
-		this.spline = spline || false
+	constructor(
+		
+		keyScale:Scale, 
+		keyProperty:string, 
+		valueScale:Scale, 
+		valueProperty:string, 
+		public value0Property?:string,
+		colorScale?:Scale, 
+		isVertical?:boolean,
+		spline?:boolean) {
+		
+		super(keyScale, keyProperty, valueScale, valueProperty, colorScale, isVertical)
+		this.spline = spline
 	}
 	
+	private _interpolatorY: IInterpolator
 	private _interpolatorY0: IInterpolator
 	private _dataMapped:Points
 	private _dataMappedY0:Points
+	private _path:d3Selection
+	private _spline;boolean
+	
+	private val0Fn(val?):number  {
+		return this.value0Property ? this.valueScale.map(val[this.value0Property]) : this.valueScale.map(0)
+	}
 
 	set spline(val:boolean) {
 		this._spline = val
 		this._interpolatorY = val ? new Hermite(this.isVertical) : new Linear(this.isVertical)
-		this._interpolatorY0 = this.val0 && val ? new Hermite(this.isVertical) : new Linear(this.isVertical)
+		this._interpolatorY0 = this.val0Fn && val ? new Hermite(this.isVertical) : new Linear(this.isVertical)
 	}
 
 	set data(val:any[]) {
-		this._data = val
-		this._dataMapped = this._data.map((d:any):[number,number] => {
-			return this.isVertical ? [this.val(d), this.key(d) + this.keyOffset] : [this.key(d) + this.keyOffset, this.val(d)]
+		this._dataMapped = val.map((d:any):[number,number] => {
+			return this.isVertical ? [this.valFn(d), this.keyFn(d) + this.keyOffset] : [this.keyFn(d) + this.keyOffset, this.valFn(d)]
 		})
-		if (this.val0) {
-			this._dataMappedY0 = this._data.map((d:any):[number,number] => {
-				return this.isVertical ? [this.val0(d), this.key(d) + this.keyOffset] : [this.key(d) + this.keyOffset, this.val0(d)]
+		if (this.val0Fn) {
+			this._dataMappedY0 = val.map((d:any):[number,number] => {
+				return this.isVertical ? [this.val0Fn(d), this.keyFn(d) + this.keyOffset] : [this.keyFn(d) + this.keyOffset, this.val0Fn(d)]
 			})
 		} else {
 			// y0 is not specified, use y start and end values
 			this._dataMappedY0 = this.isVertical ? 
-				[[this.val0(0), this._dataMapped[0][1]], [this.val0(0), this._dataMapped[this._dataMapped.length - 1][1]]] : 
-				[[this._dataMapped[0][0],this.val0(0)], [this._dataMapped[this._dataMapped.length - 1][0],this.val0(0)]]
+				[[this.val0Fn(0), this._dataMapped[0][1]], [this.val0Fn(0), this._dataMapped[this._dataMapped.length - 1][1]]] : 
+				[[this._dataMapped[0][0],this.val0Fn(0)], [this._dataMapped[this._dataMapped.length - 1][0],this.val0Fn(0)]]
 		}
 		
 		this._interpolatorY.data(this._dataMapped)
 		this._interpolatorY0.data(this._dataMappedY0.reverse())
 	}
 	
-	get path():string {
-		return 'M' + this._interpolatorY.path() + 'L' + this._interpolatorY0.path() + 'Z'
+	public insertPointAt(key:number) {
+		this._interpolatorY.insertAtPoint(this.keyFn(key) + this.keyOffset)
+		this._interpolatorY0.insertAtPointReverse(this.keyFn(key) + this.keyOffset)
 	}
 	
-	public insertPointAt(key:number) {
-		this._interpolatorY.insertAtPoint(this.key(key) + this.keyOffset)
-		this._interpolatorY0.insertAtPointReverse(this.key(key) + this.keyOffset)
+	protected removePointAt(key:any) {
+		this.insertPointAt(key)
 	}
 	
 	public insertPointAtIdx(idx: number) {
 		this._interpolatorY.insertAtIdx(idx)
 		this._interpolatorY0.insertAtIdxReverse(idx)
+	}
+	
+	protected removePointAtIdx(idx:number) {
+		this.insertPointAtIdx(idx)
+	}
+	
+	protected draw(transition:boolean) {
+		if (!this._path) this._path = this._layoutG.append('path')
+
+		var s = transition ? this._path.transition().duration(this._duration) : this._path
+		s.attr('d', `M${this._interpolatorY.path()}L${this._interpolatorY0.path()}Z`)
+
+		if (this.colorScale) {
+			this._path.style('fill', this.propertyColor())
+		}
+		
 	}
 }

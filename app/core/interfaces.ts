@@ -19,8 +19,11 @@ export interface AreaSize {
 
 export interface IGenerator {
 	data:any[]
+	keyOffset:number
 	insertPointAtIdx(idx:number, val:any):void
+	insertPointAt(key:any):void
 	removePointAtIdx(idx:number, val:any):void
+	removePointAt(key:any):void
 	draw(transition:boolean):void
 }
 

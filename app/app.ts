@@ -3,9 +3,9 @@
 import { Chart } from './core/chart';
 import { DomainCalc , Scale } from './core/scale';
 import { Position, Axis } from './core/axis';
-import { Line } from './layouts/line'
-import { Area } from './layouts/area'
-import { Columns } from './layouts/column'
+import { Line } from './generators/line'
+import { Area } from './generators/area'
+import { Column } from './generators/column'
 import { Pie } from './layouts/pie'
 import { Donut } from './layouts/donut'
 import { Grid } from './core/grid'
@@ -41,11 +41,11 @@ export function main(el: HTMLElement): void {
     //gridRight.lineStyle = {stroke:'blue', opacity:0.7}
     var gridBottom = chart.addGrid(axisBottom)
     
-    var line1 = chart.addLayout(new Line(xScale,'x', yScale,'y',colorScale, false, useSpline))
+    //var line1 = chart.addLayout(new Line(xScale,'x', yScale,'y',colorScale, false, useSpline))
 
 
     var data = [{x:'aaaa', x1:1, y:12, y2:10.5},{x:'bbb', x1:2, y:13.87620, y2:3.123456},{x:'Äaaaaaa', x1:3, y:15, y2:11},{x:'ddd', x1:4, y:3, y2:-9},{x:'eeee', x1:5, y:-7, y2:-15}]
-    chart.draw(data)
+    //chart.draw(data)
     
     new DataTable('#data-table', data ,(data) => {
         //console.log('change', data)
@@ -95,14 +95,14 @@ export function main(el: HTMLElement): void {
         axisLeft = chart.addAxis(Position.left, yScale, 'Y - Scale')  
         var leftGrid = chart.addGrid(axisLeft)
         var gridBottom = chart.addGrid(axisBottom)
-        var column1 = chart.addLayout(new Columns(xScale,'x', yScale,'y', colorScale))
+        var column1 = chart.addLayout(new Column(xScale,'x', yScale,'y', colorScale))
         column1.padding = [0.13,0.52]
         column1.rowColor = colorScale.map('y')
-        var column2 = chart.addLayout(new Columns(xScale,'x', yScale,'y2',colorScale))
+        var column2 = chart.addLayout(new Column(xScale,'x', yScale,'y2',colorScale))
         column2.padding = [0.52,0.13]
         column2.rowColor = colorScale.map('y2') 
-        var dataLabels1 = chart.addDataLabels(column1) 
-        var dataLabels2 = chart.addDataLabels(column2)
+        //var dataLabels1 = chart.addDataLabels(column1) 
+        //var dataLabels2 = chart.addDataLabels(column2)
         
         chart.draw(data)
     })
@@ -117,14 +117,14 @@ export function main(el: HTMLElement): void {
         axisRight = chart.addAxis(Position.right, yScale, 'Y - Axis Right')
         var gridRight = chart.addGrid(axisRight)
         var gridTop = chart.addGrid(axisTop)
-        var column1 = chart.addLayout(new Columns(yScale,'x', xScale,'y',colorScale,true))
+        var column1 = chart.addLayout(new Column(yScale,'x', xScale,'y',colorScale,true))
         column1.padding = [0.13,0.52]
         column1.rowColor = colorScale.map('y')
-        var column2 = chart.addLayout(new Columns(yScale,'x', xScale,'y2',colorScale, true))
+        var column2 = chart.addLayout(new Column(yScale,'x', xScale,'y2',colorScale, true))
         column2.padding = [0.52,0.13]
         column2.rowColor = colorScale.map('y2') 
-        var dataLabels1 = chart.addDataLabels(column1) 
-        var dataLabels2 = chart.addDataLabels(column2)
+        //var dataLabels1 = chart.addDataLabels(column1) 
+        //var dataLabels2 = chart.addDataLabels(column2)
         
         chart.draw(data)
     })
@@ -156,7 +156,6 @@ export function main(el: HTMLElement): void {
         
         var line1 = chart.addLayout(new Line(xScale, useOrdKeys ? 'x' : 'x1', yScale,'y',colorScale, false, useSpline))
         //var line1Marker = chart.addLayout(new DataMarker(yScale,'y',xScale,'x1', colorScale))
-        line1.spline = false
         
         chart.draw(data)
 

@@ -6,10 +6,10 @@ import { Layout}  from './../baseLayouts/layout'
 import { XYElement } from './../baseLayouts/XYElement'
 import { XYDataLabel } from './../decorators/dataLabels'
 import { DataMarker } from './../decorators/dataMarker'
-import { Columns } from './../layouts/column'
+import { Column } from './../generators/column'
 import { Pie } from './../layouts/pie'
-import { Line } from './../layouts/line'
-import { Area } from './../layouts/area'
+import { Line } from './../generators/line'
+import { Area } from './../generators/area'
 import { Grid } from './grid'
 import * as d3 from 'd3'
 import * as _ from 'lodash'
@@ -136,7 +136,7 @@ export class Chart {
 	
 	private prepeareData = () => {
 		this.layouts.forEach((layout:Layout) => {
-			layout.prepeareData(this._data, this._oldData)
+			layout.prepeareData(this._data)
 		})
 	}
 	
@@ -146,21 +146,15 @@ export class Chart {
 		})
 	}
 	
-	private drawAnimation = () => {	
+	private drawEnd = (animate:boolean) => {	
 		this.layouts.forEach((layout:Layout) => {
-			layout.drawAnimation(this._data, this._drawingAreaSize)
+			layout.drawEnd(this._data,animate)
 		})
 	}
 	
 	private drawStartLayouts = () => {	
 		this.layouts.forEach((layout:Layout) => {
-			layout.drawStart(this._data, this._drawingAreaSize)
-		})
-	}
-	
-	private drawEndLayouts = () => {
-		this.layouts.forEach((layout:Layout) => {
-			layout.drawEnd(this._data, this._drawingAreaSize)
+			layout.drawStart(this._oldData)
 		})
 	}
 	
@@ -300,7 +294,7 @@ export class Chart {
 		if (this._newData && !this._initialDraw) {
 			//this.drawStartLayouts()
 			for (var layout of this.layouts) {
-				layout.drawStart(this._data, this._drawingAreaSize)
+				layout.drawStart(this._oldData)
 			}
 		}
 		
@@ -319,14 +313,14 @@ export class Chart {
 			this.sizeRange() //add padding to the range values
 			this.drawAxis(false)
 			this.drawGrids(false)
-			this.drawEndLayouts()
+			this.drawEnd(false)
 		} else {
 			this.positionLayout(true) // finally position the layout container
 			this.getLayoutPadding() // if needed draw the layout and measure if it fits into the drawing area
 			this.sizeRange() //add padding to the range values
 			this.drawAxis(true)
 			this.drawGrids(true)
-			this.drawAnimation() 
+			this.drawEnd(true) 
 			//console.log('animated draw')
 		}
 		

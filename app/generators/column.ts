@@ -2,12 +2,13 @@ import { IGenerator } from './../core/interfaces'
 import { Layout } from './../baseLayouts/layout'
 import { Point, Points} from './interpolators/interpolator'
 import { column as defaults } from './../core/defaults'
+import * as _ from 'lodash'
 
 type Box = {x:number, y:number, height:number, width:number, fill:string, style:Style, remove?:boolean }
 type d3Selection = d3.Selection<any>
 type Style = { [key:string]: string }
 
-export class Column extends Layout implements IGenerator{
+export class Column extends Layout {
 	
 	private _columnStyle:Style = {}
 	private _columnSize;
@@ -34,17 +35,17 @@ export class Column extends Layout implements IGenerator{
 			.style( function(d:Box):Style { return d.style } )
 	}
 	
-	private createElem(container:d3Selection):d3Selection {
-		return container.append('rect').attr('class', this.selector)
+	private createElem(container:d3Selection, key:string):d3Selection {
+		return this.elemMap[key] = container.append('rect').attr('class', this.selector)
 	}
 	
 	private mapData(idx: number, v, insert?:boolean, remove?:boolean):Box {
 		if (this.isVertical) {
 			return {
-					x: this.mapKeyIdx(idx) + this.leftTopPadding,
-					y: this.valFn(v) < 0 ? -Math.abs(this.valFnZero() - this.valFn(v)) : this.valFn(v),
-					height: insert || remove ? 0 : this.keyScale.getRangeBand(),
-					width: Math.abs(this.valFnZero() - this.valFn(v)),
+					y: this.mapKeyIdx(idx) + this.keyScale.getRangeBand() * (insert || remove ? 0 : this.padding[0]),
+					x: this.val(v) < 0 ? this.valFn(v) : this.valFnZero(),
+					height: insert || remove ? 0 : this.keyScale.getRangeBand() * (1 - this.padding[0] - this.padding[1]),
+					width: Math.abs(this.valFn(v) - this.valFnZero()),
 					fill: this.rowColor || this.colorFn(v),
 					style:this.columnStyle,
 					remove: remove
@@ -52,9 +53,9 @@ export class Column extends Layout implements IGenerator{
 			
 		} else {
 			return {
-					y: this.mapKeyIdx(idx) + this.leftTopPadding,
-					x: this.valFn(v) < 0 ? -Math.abs(this.valFnZero() - this.valFn(v)) : this.valFn(v),
-					width: insert || remove ? 0 : this.keyScale.getRangeBand(),
+					x: this.mapKeyIdx(idx) + this.keyScale.getRangeBand() * (insert || remove ? 0 : this.padding[0]),
+					y: this.val(v) < 0 ? this.valFnZero() : this.valFn(v),
+					width: insert || remove ? 0 : this.keyScale.getRangeBand() * (1 - this.padding[0] - this.padding[1]),
 					height: Math.abs(this.valFnZero() - this.valFn(v)),
 					fill: this.rowColor || this.colorFn(v),
 					style:this.columnStyle,
@@ -63,30 +64,25 @@ export class Column extends Layout implements IGenerator{
 		}
 	}
 	
-	set data(data:any[]) {
-		this._data = data
+	set data(val:any[]) {
 		var elem:d3Selection
-		for (var i = 0; i < this._data.length; i++) {
-			var v = this._data[i]
-			elem = this.elemMap[this.key(v)]
-			elem.datum( this.mapData(i, v) )
+		for (var i = 0; i < val.length; i++) {
+			var v = val[i]
+			elem = this.elemMap[this.key(v)] || this.createElem(this._layoutG, this.key(v))
+			if (elem) elem.datum( this.mapData(i, v) )
 		}
 	}
-	get data():any[] {
-		return this._data
+	
+	protected insertPointAtIdx(idx: number, val:any) {
+		var elem:d3Selection = this.createElem(this._layoutG, this.key(val))
+		elem.datum(this.mapData(idx + 1, val, true))
 	}
 	
-	public insertPointAtIdx(idx: number, val:any) {
-		var elem:d3Selection = this.createElem(this.layoutG)
-		this.elemMap[this.key(val)] = elem;
-		elem.datum(this.mapData(val, true))
-	}
-	
-	public removePointAtIdx(idx:number, val:any) {
-		this.elemMap[this.key(val)].datum(this.mapData(val, false, true))
+	protected removePointAtIdx(idx:number, val:any) {
+		this.elemMap[this.key(val)].datum(this.mapData(idx + 1, val, false, true))
 	}	
 	
-	public draw(transition:boolean) {
+	protected draw(transition:boolean) {
 		for (var key in this.elemMap) {
 			if (transition) {
 				this.elemMap[key].transition().duration(this._duration)

@@ -3,7 +3,7 @@ export type Points = Point[]
 export type Accessor = (v:any) => number
 
 export interface IInterpolator {
-	path():string;
+	path():string
 	data(points:Points):void
 	insertAtPoint(val:number):void
 	insertAtPointReverse?(val:number):void

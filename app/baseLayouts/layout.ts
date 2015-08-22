@@ -1,28 +1,21 @@
-import { IMargins, Point } from './../core/interfaces'
 import { Scale } from './../core/scale'
 import * as d3 from 'd3'
 import * as _ from 'lodash'
 import * as drawing from './../tools/drawing'
-import { Diff } from './../tools/array-diff'
+import { Data } from './../core/data'
 import { chart as chartDefaults ,axis as axisDefaults, duration} from './../core/defaults'
+import { IGenerator } from './../core/interfaces'
+
 
 export class Layout {
 	
 	private static cnt:number = 0
 	protected _id:number
-	protected layoutG
+	protected _layoutG
 	protected _duration:number = duration
 	
-	private differ = Diff({compress:false, unique:true})
+	protected dataMgr:Data 
 	protected diffSeq:any[]
-	
-	protected _data:any[]
-	protected _prevData:any[]
-	protected _keyValues:any[] = []
-	protected _prevKeyValues:any[] = []
-	protected _values:{} = {}
-	protected _prevValues:{} = {}
-	
 	
 	constructor(
 		public keyScale:Scale, 
@@ -33,6 +26,7 @@ export class Layout {
 		public isVertical?:boolean) {
 		Layout.cnt += 1;
 		this._id = Layout.cnt;
+		this.dataMgr = new Data(this.key)
 	}
 	
 	protected valFn = (val):number => {
@@ -64,6 +58,7 @@ export class Layout {
 	}
 	
 	protected key = (val):any => {
+		if (!val) debugger
 		return val[this.keyProperty]
 	}
 	
@@ -86,60 +81,11 @@ export class Layout {
 			return null
 		}
 	}
-	
-	private _diffData = (data) => {
-		this._prevKeyValues = this._keyValues
-		this._prevValues = this._values
-		this._keyValues = []
-		this._values = {}
-		for (var d of data) {
-			this._keyValues.push(this.key(d))
-			this._values[this.key(d)] = this.val(d)
-		}
-		this.diffSeq = this.differ(this._prevKeyValues,this._keyValues)
-	}
-	
-	protected calcKeyPos = (key, range, rangeIdx, interv):number => {
-		if (this.keyScale.isOrdinal) {
-			return rangeIdx < range.length ? range[rangeIdx] : range[range.length-1] + interv
-		} else {
-			return this.mapKey(key)
-		}
-	}
-	
-	protected startPos = ():Point[] => {
-		return
-	}
-	
-	protected endPos = ():Point[] => {
-		return
-	}
-	
-	protected cleanPos = (data):Point[] => {
-		var range = this.keyScale.getRange()
-		var seq:Point[] = []
-		var rangeIdx = 0
-		for (var point of data) {			
-			seq.push({
-				keyPos: this.keyFn(point),
-				key: this.key(point),
-				valPos: this.valFn(point),
-				value: this.val(point)
-			})
-		}
-		//console.log('cleanPos', seq)
-		return seq
-	}	
-	
+
 	//override functions
 	public targetContainer = 'wk-chart-layout-area';
 	public needsPadding:boolean = false
-	
-	public drawLayout = (data, drawingAreaSize?, animate?:boolean, cbAnimationDone?) => {} 
-	public beforeDraw = (data, drawingAreaSize?) => {}
-	public afterDraw = (data, drawingAreaSize?) => {}
-	
-	
+		
 	public getPadding = (container, data, drawingAreaSize):IMargins => {
 		var padding:IMargins = {top:0, bottom:0, left:0, right:0}
 		this.keyScale.setDomain(data)
@@ -173,24 +119,14 @@ export class Layout {
 	
 	public setupLayout(container) {
 		var layoutArea = container.select(`.${this.targetContainer}`)
-		this.layoutG = layoutArea.select(`.wk-layout-${this._id}`)
-		if (this.layoutG.empty()) {
-			this.layoutG = layoutArea.append('g').attr('class', `wk-layout-${this._id}` )
+		this._layoutG = layoutArea.select(`.wk-layout-${this._id}`)
+		if (this._layoutG.empty()) {
+			this._layoutG = layoutArea.append('g').attr('class', `wk-layout-${this._id}` )
 		}
 	}
 	
-	public prepeareData(data:any[], prevData:any[]) {
-		this._diffData(data)
-		this._data = data
-		this._prevData = prevData
-	}
-	
-	public drawStart = (data, drawingAreaSize) => {
-		var startData = this.startPos()
-		//console.log('startPos', startData)
-		this.beforeDraw(startData, drawingAreaSize)
-		this.drawLayout(startData, drawingAreaSize, false)
-		this.afterDraw(startData, drawingAreaSize)
+	public prepeareData(data:any[]) {
+		this.dataMgr.data = data
 	}
 	
 	public updateDomains = (data) => {
@@ -198,21 +134,55 @@ export class Layout {
 		this.valueScale.setDomain(data)
 	}
 	
-	public drawAnimation = (data, drawingAreaSize) => {		
-		var endData = this.endPos()
-		//console.log('endPos', endData)
-		this.beforeDraw(endData, drawingAreaSize)
-		this.drawLayout(endData, drawingAreaSize, true, () => {
-			console.log('callback called')
-			this.drawEnd(data, drawingAreaSize)
-		})
-		this.afterDraw(endData, drawingAreaSize)
+	
+	public drawStart = (data:any[]) => {
+		this.keyOffset = this.keyScale.isOrdinal ? this.keyScale.getRangeBand() / 2 : 0
+		this.data = data
+		// extract added keys and key position from diff
+		var ptIdx = -1
+		var i = -1
+		while (++i < this.dataMgr.diffSequence.length) {
+			var op:string = this.dataMgr.diffSequence[i][0]
+			var key:string = this.dataMgr.diffSequence[i][1]
+			if (op === '+') {
+				if (this.keyScale.isOrdinal) {
+					this.insertPointAtIdx(ptIdx, this.dataMgr.getCurrentVal(key))
+				} else {
+					this.insertPointAt(key)
+				}
+			} else ptIdx++
+		}
+		this.draw(false)
 	}
 	
-	public drawEnd = (data, drawingAreaSize?) => {	
-		var cleanData = this.cleanPos(data)
-		this.beforeDraw(cleanData, drawingAreaSize)
-		this.drawLayout(cleanData, drawingAreaSize)
-		this.afterDraw(cleanData, drawingAreaSize)
+	public drawEnd = (data:any[], animate:boolean) => {
+		this.keyOffset = this.keyScale.isOrdinal ? this.keyScale.getRangeBand() / 2 : 0
+		this.data = data
+		// extract added keys and key position from diff
+		var ptIdx = -1
+		var i = -1
+		while (++i < this.dataMgr.diffSequence.length) {
+			var op = this.dataMgr.diffSequence[i][0]
+			var key = this.dataMgr.diffSequence[i][1]
+			if (op === '-') {
+				if (this.keyScale.isOrdinal) {
+					this.removePointAtIdx(ptIdx, this.dataMgr.getPrevVal(key))
+				} else {
+					this.removePointAt(key)
+				}
+			} else ptIdx++
+		}
+		this.draw(animate)
 	}
+	
+	//override
+	
+	protected keyOffset
+	
+	set data(val:any[]) {}
+	protected insertPointAtIdx(idx:number, val:any):void {}
+	protected insertPointAt(key:any):void {}
+	protected removePointAtIdx(idx:number, val:any):void {}
+	protected removePointAt(key:any):void {}
+	protected draw(transition:boolean):void {}
 }

@@ -96,7 +96,7 @@ export class Scale {
 			var range = this._d3Scale.range()
 			if (0 <= idx && idx < range.length) return range[idx]
 			if (idx < 0) return range[0]
-			if (idx > range.length) return range[range-length - 1] + this.getRangeBand()
+			if (idx >= range.length) return range[range.length - 1] + this.getRangeBand()
 		}
 	}
 }
