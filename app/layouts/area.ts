@@ -1,11 +1,9 @@
+import { Style, D3Selection } from './../core/interfaces'
 import { Layout } from './../core/layout'
 import { Scale } from './../core/scale'
 import { Point, Points, IInterpolator} from './../interpolators/interpolator'
 import { Linear} from './../interpolators/lineLinear'
 import { Hermite } from './../interpolators/lineHermite'
-
-type d3Selection = d3.Selection<any>
-type Style = { [key:string]: string }
 
 export class Area extends Layout {
 	
@@ -28,7 +26,7 @@ export class Area extends Layout {
 	private _interpolatorY0: IInterpolator
 	private _dataMapped:Points
 	private _dataMappedY0:Points
-	private _path:d3Selection
+	private _path:D3Selection
 	private _spline;boolean
 	
 	private val0Fn(val?):number  {

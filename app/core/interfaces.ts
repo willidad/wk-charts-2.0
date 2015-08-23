@@ -1,5 +1,10 @@
 import * as d3 from 'd3'
 
+export type Point = [number, number]
+export type Points = Point[]
+export type Accessor = (v:any) => number
+export type D3Selection = d3.Selection<any>
+
 export interface Style {
 	[name:string]:any
 }
@@ -27,11 +32,12 @@ export interface IGenerator {
 	draw(transition:boolean):void
 }
 
-export interface Point {
-	key: any;
-	keyPos: number;
-	value: any;
-	valPos: number;
-	added?: boolean;
-	deleted?: boolean
+export interface IInterpolator {
+	path():string
+	data(points:Points):void
+	insertAtPoint(val:number):void
+	insertAtPointReverse?(val:number):void
+	insertAtIdx(i:number):void
+	insertAtIdxReverse?(i:number):void
 }
+

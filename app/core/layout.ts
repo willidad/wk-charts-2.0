@@ -4,8 +4,6 @@ import * as _ from 'lodash'
 import * as drawing from './../tools/drawing'
 import { Data } from './../core/data'
 import { chart as chartDefaults ,axis as axisDefaults, duration} from './../core/defaults'
-import { IGenerator } from './../core/interfaces'
-
 
 export class Layout {
 	

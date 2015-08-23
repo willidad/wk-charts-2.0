@@ -1,4 +1,4 @@
-import { Point, Points, IInterpolator} from './interpolator'
+import { Point, Points, IInterpolator} from './../core/interfaces'
 
 export class Linear implements IInterpolator {
 	

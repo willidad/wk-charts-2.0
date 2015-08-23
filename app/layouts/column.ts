@@ -1,12 +1,11 @@
-import { IGenerator } from './../core/interfaces'
+
+import { Style, D3Selection } from './../core/interfaces'
 import { Layout } from './../core/layout'
 import { Point, Points} from './../interpolators/interpolator'
 import { column as defaults } from './../core/defaults'
 import * as _ from 'lodash'
 
 type Box = {x:number, y:number, height:number, width:number, fill:string, style:Style, remove?:boolean }
-type d3Selection = d3.Selection<any>
-type Style = { [key:string]: string }
 
 export class Column extends Layout {
 	
@@ -21,7 +20,7 @@ export class Column extends Layout {
 	private selector = 'wk-chart-column'
 	
 	private _dataMapped:Box[]
-	private elemMap:{[key:string]:d3Selection} = {}
+	private elemMap:{[key:string]:D3Selection} = {}
 	private leftTopPadding = this.keyScale.getRangeBand() * this.padding[0]
 	private rightBottomPadding = this.keyScale.getRangeBand() * this.padding[1]
 	
@@ -35,7 +34,7 @@ export class Column extends Layout {
 			.style( function(d:Box):Style { return d.style } )
 	}
 	
-	private createElem(container:d3Selection, key:string):d3Selection {
+	private createElem(container:D3Selection, key:string):D3Selection {
 		return this.elemMap[key] = container.append('rect').attr('class', this.selector)
 	}
 	
@@ -65,7 +64,7 @@ export class Column extends Layout {
 	}
 	
 	set data(val:any[]) {
-		var elem:d3Selection
+		var elem:D3Selection
 		for (var i = 0; i < val.length; i++) {
 			var v = val[i]
 			elem = this.elemMap[this.key(v)] || this.createElem(this._layoutG, this.key(v))
@@ -74,7 +73,7 @@ export class Column extends Layout {
 	}
 	
 	protected insertPointAtIdx(idx: number, val:any) {
-		var elem:d3Selection = this.createElem(this._layoutG, this.key(val))
+		var elem:D3Selection = this.createElem(this._layoutG, this.key(val))
 		elem.datum(this.mapData(idx + 1, val, true))
 	}
 	

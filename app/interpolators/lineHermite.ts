@@ -1,4 +1,4 @@
-import { Point, Points, IInterpolator} from './interpolator'
+import { Point, Points, IInterpolator} from './../core/interfaces'
 import  * as bezier from './helpers/bezierFunctions'
 
 export type ControlPoints = [Point, Point, Point, Point]
