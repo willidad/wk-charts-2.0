@@ -1,6 +1,6 @@
 import * as d3 from 'd3'
 
-export type Point = [number, number]
+export type Point = [number, number, boolean]
 export type Points = Point[]
 export type Accessor = (v:any) => number
 export type D3Selection = d3.Selection<any>
@@ -34,10 +34,11 @@ export interface IGenerator {
 
 export interface IInterpolator {
 	path():string
+	getPathPoints():Points
 	data(points:Points):void
 	insertAtPoint(val:number):void
-	insertAtPointReverse?(val:number):void
+	insertAtPointReverse(val:number):void
 	insertAtIdx(i:number):void
-	insertAtIdxReverse?(i:number):void
+	insertAtIdxReverse(i:number):void 
 }
 

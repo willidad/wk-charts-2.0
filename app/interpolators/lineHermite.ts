@@ -26,9 +26,9 @@ function lineCardinalTangents(points, tension):Point[] {
 function segments(points:Point[], tangents:Point[]):ControlPoints[] {
   var p0:Point = points[0], 
       p1:Point = points[1],
-      cp:Point,
-      cp0:Point,
-      cp1:Point,
+      cp:[number, number],
+      cp0:[number, number],
+      cp1:[number, number],
       t0:Point, 
       t1:Point,
       segs:ControlPoints[] = []
@@ -82,10 +82,16 @@ export class Hermite implements IInterpolator {
      
     public path():string {
         var path:string
-        path = `${this._segs[0][0].join()}C`
-        path += this._segs.map(function(s) { return [s[1], s[2], s[3]].join()}).join('C')
+        path = `${this._segs[0][0][0]},${this._segs[0][0][1]}`
+        path += this._segs.map(function(s) { return `C${s[1][0]},${s[1][1]},${s[2][0]},${s[2][1]},${s[3][0]},${s[3][1]}` })
         return path
     }
+	
+	public getPathPoints():any {
+		var p = this._segs.map(function(s):Point { return s[0]})
+		p.push(this._segs[this._segs.length - 1][3])
+		return p
+	}
     
     /**
      * computes the tangents from the data points and creates the list of segment required to interpolate the curve. 
@@ -98,10 +104,18 @@ export class Hermite implements IInterpolator {
     
     // inserts a new point at x into the curve without changing the shape of the curve. 
     
-    private splitSegAt(segIdx, at:number) {
+    private splitSegAt(segIdx, at:number, begin?:boolean, end?:boolean) {
       var split = bezier.splitSegment(this._segs[segIdx], at)
+	  if (begin) {
+		  split[0][0][2] = true
+	  } else if (end) {
+		  split[1][3][2] = true
+	  } else {
+		  split[1][0][2] = true
+	  }
+	  
       this._segs.splice(segIdx ,1, split[0], split[1])
-      //console.log ('split', this._segs[segIdx], split[0], split[1])
+
     }
     	
     public insertAtPoint(val:number) {
@@ -118,9 +132,9 @@ export class Hermite implements IInterpolator {
 
       if (firstSeg[0][k] > lastSeg[3][k]) {
         if (val < lastSeg[3][k]) {
-          this.splitSegAt(this._segs.length - 1, 1) 
+          this.splitSegAt(this._segs.length - 1, 1, false, true) 
         } else if (val >= firstSeg[0][k]) {
-           this.splitSegAt(0,0)
+           this.splitSegAt(0,0, true, false)
         } else {
           while (++i < this._segs.length) {
             seg = this._segs[i]
@@ -137,9 +151,9 @@ export class Hermite implements IInterpolator {
         }
       } else {
         if (val <= firstSeg[0][k]) {
-          this.splitSegAt(0,0)
+          this.splitSegAt(0,0, true, false)
         } else if (val > lastSeg[3][k]) {
-          this.splitSegAt(this._segs.length - 1, 1)  
+          this.splitSegAt(this._segs.length - 1, 1, false, true)  
         } else {
           while (++i < this._segs.length) {
             seg = this._segs[i]
@@ -157,37 +171,31 @@ export class Hermite implements IInterpolator {
       }
     }
     
-    public insertAtPointReverse = this.insertAtPoint
+    public insertAtPointReverse(key:number) {
+		this.insertAtPoint(key)
+	} 
     
     public insertAtIdx(i:number) {
       //console.log ('indexAt:',i,nbr, this._segs.length, this._segs)
-      var j = -1, split, pos, at
-    	if (i < 0) {
-        pos = 0
-        at = 0
-      } else if (i >= this._segs.length - 1) {
-        pos = this._segs.length - 1
-        at = 1 
-      } else { 
-        pos = i
-        at = 0.5
-      }
-      this.splitSegAt(pos, at)
+      	var j = -1, split, pos, at
+		if (i < 0) {
+			this.splitSegAt(0, 0, true)
+      	} else if (i >= this._segs.length - 1) {
+			this.splitSegAt(this._segs.length - 1, 1, false, true)
+      	} else { 
+		  	this.splitSegAt(i, 0.5)
+      	}
     }
     
     public insertAtIdxReverse(i:number) {
       //console.log ('reverse:',i,nbr, this._segs.length, this._segs)
-      var j = -1, split, pos, at
+      	var j = -1, split, pos, at
     	if (i < 0) {
-        pos = this._segs.length - 1
-        at = 1
-      } else if (i >= this._segs.length - 1) {
-        pos = 0
-        at = 0
-      } else {
-        pos = this._segs.length - i - 1
-        at = 0.5
-      }
-      this.splitSegAt(pos, at)
+			this.splitSegAt(this._segs.length - 1, 1, false, true)
+      	} else if (i >= this._segs.length - 1) {
+			this.splitSegAt(0, 0, true, false)
+      	} else {
+		  	this.splitSegAt(this._segs.length - i - 1, 0.5)
+      	}
     }
 }

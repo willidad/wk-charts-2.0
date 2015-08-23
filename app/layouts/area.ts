@@ -16,7 +16,8 @@ export class Area extends Layout {
 		public value0Property?:string,
 		colorScale?:Scale, 
 		isVertical?:boolean,
-		spline?:boolean) {
+		spline?:boolean,
+		public dataMarkers?:boolean) {
 		
 		super(keyScale, keyProperty, valueScale, valueProperty, colorScale, isVertical)
 		this.spline = spline
@@ -26,8 +27,9 @@ export class Area extends Layout {
 	private _interpolatorY0: IInterpolator
 	private _dataMapped:Points
 	private _dataMappedY0:Points
-	private _path:D3Selection
+	private _path
 	private _spline;boolean
+	private _markers
 	
 	private val0Fn(val?):number  {
 		return this.value0Property ? this.valueScale.map(val[this.value0Property]) : this.valueScale.map(0)
@@ -84,6 +86,20 @@ export class Area extends Layout {
 
 		if (this.colorScale) {
 			this._path.style('fill', this.propertyColor())
+		}
+		
+		if (this.dataMarkers) {
+			console.log(this._interpolatorY.getPathPoints().concat(this._interpolatorY0.getPathPoints()))
+			this._markers = this._layoutG.selectAll('.wk-chart-markers').data(this._interpolatorY.getPathPoints().concat(this._interpolatorY0.getPathPoints()), function(d,i) { return i })
+			this._markers.enter().append('circle').attr('class', 'wk-chart-markers')
+			var m = transition ? this._markers.transition().duration(this._duration).each('end', function(d) { if (d[2]) d3.select(this).remove()}) : this._markers
+			m
+				.attr('cx', function(d:Point) { return d[0] })
+				.attr('cy', function(d:Point) { return d[1] })
+				.attr('r', 5)
+				.style('opacity', function(d:Point) { return d[2] ? 0 : 1})
+				.style('fill', this.propertyColor())
+			this._markers.exit().remove()
 		}
 		
 	}

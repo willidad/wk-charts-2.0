@@ -155,7 +155,8 @@ export function main(el: HTMLElement): void {
         var gridBottom = chart.addGrid(axisBottom)
         
         var line1 = chart.addLayout(new Line(xScale, useOrdKeys ? 'x' : 'x1', yScale,'y',colorScale, false, useSpline))
-        var line1Marker = chart.addDataMarkers(line1)
+		line1.dataMarkers = true
+        //var line1Marker = chart.addDataMarkers(line1)
         
         chart.draw(data)
 
@@ -175,7 +176,7 @@ export function main(el: HTMLElement): void {
         var leftGrid = chart.addGrid(axisLeft)
         var gridBottom = chart.addGrid(axisBottom)
         
-        var area = chart.addLayout(new Area(xScale,useOrdKeys ? 'x' : 'x1', yScale,'y', use0Base ? undefined : 'y2',colorScale, false, useSpline))
+        var area = chart.addLayout(new Area(xScale,useOrdKeys ? 'x' : 'x1', yScale,'y', use0Base ? undefined : 'y2',colorScale, false, useSpline, true))
         //var line1Marker = chart.addLayout(new DataMarker(xScale,'x1', yScale,'y',colorScale))
         
         chart.draw(data)
@@ -195,8 +196,8 @@ export function main(el: HTMLElement): void {
         var leftGrid = chart.addGrid(axisLeft)
         var gridBottom = chart.addGrid(axisBottom)
         
-        var line1 = chart.addLayout(new Line(yScale, useOrdKeys ? 'x' : 'x1', xScale,'y',colorScale, true, useSpline))
-        var line1Marker = chart.addDataMarkers(line1)
+        var line1 = chart.addLayout(new Line(yScale, useOrdKeys ? 'x' : 'x1', xScale,'y',colorScale, true, useSpline, true))
+        //var line1Marker = chart.addDataMarkers(line1)
         
         chart.draw(data)
 
@@ -214,7 +215,7 @@ export function main(el: HTMLElement): void {
         var leftGrid = chart.addGrid(axisLeft)
         var gridBottom = chart.addGrid(axisBottom)
         
-        var line1 = chart.addLayout(new Area(yScale,useOrdKeys ? 'x' : 'x1', xScale,'y',use0Base ? undefined : 'y2', colorScale, true, useSpline))
+        var line1 = chart.addLayout(new Area(yScale,useOrdKeys ? 'x' : 'x1', xScale,'y',use0Base ? undefined : 'y2', colorScale, true, useSpline, true))
         //var line1Marker = chart.addDataMarkers(line1)
         
         chart.draw(data)

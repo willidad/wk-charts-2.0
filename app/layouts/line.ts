@@ -1,4 +1,4 @@
-import { Style, D3Selection, IInterpolator, Points } from './../core/interfaces'
+import { Style, D3Selection, IInterpolator, Point, Points } from './../core/interfaces'
 import { Layout } from './../core/layout'
 import { Scale } from './../core/scale'
 import { Linear} from './../interpolators/lineLinear'
@@ -15,16 +15,18 @@ export class Line extends Layout {
 		valueProperty:string, 
 		colorScale?:Scale, 
 		isVertical?:boolean,
-		spline?:boolean) {
+		spline?:boolean,
+		public dataMarkers?:boolean) {
 		
 		super(keyScale, keyProperty, valueScale, valueProperty, colorScale, isVertical)
 		this.spline = spline
 	}
 	
 	private _dataMapped:Points;
-	private _path:D3Selection
+	private _path
 	private _interpolatorY: IInterpolator
 	private _spline:boolean
+	private _markers
 	
 	set spline(val:boolean) {
 		this._spline = val
@@ -32,8 +34,8 @@ export class Line extends Layout {
 	}
 	
 	set data(val:any[]) {
-		this._dataMapped = val.map((d:any):[number,number] => {
-			return this.isVertical ? [this.valFn(d), this.keyFn(d) + this.keyOffset] : [this.keyFn(d) + this.keyOffset, this.valFn(d)]
+		this._dataMapped = val.map((d:any):Point => {
+			return this.isVertical ? [this.valFn(d), this.keyFn(d) + this.keyOffset, false] : [this.keyFn(d) + this.keyOffset, this.valFn(d), false]
 		})		
 		this._interpolatorY.data(this._dataMapped)
 	}
@@ -54,6 +56,10 @@ export class Line extends Layout {
 		this.insertPointAtIdx(idx)
 	}
 	
+	private cleanup() {
+		
+	}
+	
 	protected draw(transition:boolean) {
 		if (!this._path) this._path = this._layoutG.append('path')
 
@@ -62,6 +68,20 @@ export class Line extends Layout {
 
 		if (this.colorScale) {
 			this._path.style('stroke', this.propertyColor()).style('fill','none')
+		}
+		
+		if (this.dataMarkers) {
+			console.log(this._interpolatorY.getPathPoints())
+			this._markers = this._layoutG.selectAll('.wk-chart-markers').data(this._interpolatorY.getPathPoints(), function(d,i) { return i })
+			this._markers.enter().append('circle').attr('class', 'wk-chart-markers')
+			var m = transition ? this._markers.transition().duration(this._duration).each('end', function(d) { if (d[2]) d3.select(this).remove()}) : this._markers
+			m
+				.attr('cx', function(d:Point) { return d[0] })
+				.attr('cy', function(d:Point) { return d[1] })
+				.attr('r', 5)
+				.style('opacity', function(d:Point) { return d[2] ? 0 : 1})
+				.style('fill', this.propertyColor())
+			this._markers.exit().remove()
 		}
 		
 	}
