@@ -27,16 +27,16 @@ System.config({
     "d3": "npm:d3@3.5.6",
     "lodash": "npm:lodash@3.10.1",
     "systemjs-builder": "npm:systemjs-builder@0.12.2",
-    "ts": "github:frankwallis/plugin-typescript@2.0.4",
+    "ts": "github:frankwallis/plugin-typescript@2.0.6",
     "typescript": "npm:typescript@1.5.3",
-    "github:frankwallis/plugin-typescript@2.0.4": {
-      "typescript": "npm:typescript@1.5.3"
+    "github:frankwallis/plugin-typescript@2.0.6": {
+      "typescript": "npm:typescript@1.6.0-dev.20150823"
     },
     "github:jspm/nodelibs-assert@0.1.0": {
       "assert": "npm:assert@1.3.0"
     },
     "github:jspm/nodelibs-buffer@0.1.0": {
-      "buffer": "npm:buffer@3.4.2"
+      "buffer": "npm:buffer@3.4.3"
     },
     "github:jspm/nodelibs-constants@0.1.0": {
       "constants-browserify": "npm:constants-browserify@0.0.1"
@@ -148,7 +148,7 @@ System.config({
       "buffer": "github:jspm/nodelibs-buffer@0.1.0",
       "systemjs-json": "github:systemjs/plugin-json@0.1.0"
     },
-    "npm:buffer@3.4.2": {
+    "npm:buffer@3.4.3": {
       "base64-js": "npm:base64-js@0.0.8",
       "ieee754": "npm:ieee754@1.1.6",
       "is-array": "npm:is-array@1.0.1"
@@ -441,6 +441,15 @@ System.config({
       "vm": "github:jspm/nodelibs-vm@0.1.0"
     },
     "npm:typescript@1.5.3": {
+      "buffer": "github:jspm/nodelibs-buffer@0.1.0",
+      "child_process": "github:jspm/nodelibs-child_process@0.1.0",
+      "fs": "github:jspm/nodelibs-fs@0.1.2",
+      "os": "github:jspm/nodelibs-os@0.1.0",
+      "path": "github:jspm/nodelibs-path@0.1.0",
+      "process": "github:jspm/nodelibs-process@0.1.1",
+      "readline": "github:jspm/nodelibs-readline@0.1.0"
+    },
+    "npm:typescript@1.6.0-dev.20150823": {
       "buffer": "github:jspm/nodelibs-buffer@0.1.0",
       "child_process": "github:jspm/nodelibs-child_process@0.1.0",
       "fs": "github:jspm/nodelibs-fs@0.1.2",

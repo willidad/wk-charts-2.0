@@ -3,9 +3,9 @@
 import { Chart } from './core/chart';
 import { DomainCalc , Scale } from './core/scale';
 import { Position, Axis } from './core/axis';
-import { Line } from './generators/line'
-import { Area } from './generators/area'
-import { Column } from './generators/column'
+import { Line } from './layouts/line'
+import { Area } from './layouts/area'
+import { Column } from './layouts/column'
 import { Pie } from './layouts/pie'
 import { Donut } from './layouts/donut'
 import { Grid } from './core/grid'
@@ -155,7 +155,7 @@ export function main(el: HTMLElement): void {
         var gridBottom = chart.addGrid(axisBottom)
         
         var line1 = chart.addLayout(new Line(xScale, useOrdKeys ? 'x' : 'x1', yScale,'y',colorScale, false, useSpline))
-        //var line1Marker = chart.addLayout(new DataMarker(yScale,'y',xScale,'x1', colorScale))
+        var line1Marker = chart.addDataMarkers(line1)
         
         chart.draw(data)
 
@@ -196,7 +196,7 @@ export function main(el: HTMLElement): void {
         var gridBottom = chart.addGrid(axisBottom)
         
         var line1 = chart.addLayout(new Line(yScale, useOrdKeys ? 'x' : 'x1', xScale,'y',colorScale, true, useSpline))
-        //var line1Marker = chart.addDataMarkers(line1)
+        var line1Marker = chart.addDataMarkers(line1)
         
         chart.draw(data)
 

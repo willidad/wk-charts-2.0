@@ -1,5 +1,4 @@
 import { Style } from './../core/interfaces'
-import { XYElement } from '.././baseLayouts/xyElement'
 import { Scale } from './../core/scale'
 import * as d3 from 'd3'
 import * as _ from 'lodash'

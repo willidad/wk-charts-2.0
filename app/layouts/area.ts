@@ -1,8 +1,11 @@
-import { Layout } from './../baselayouts/layout'
+import { Layout } from './../core/layout'
 import { Scale } from './../core/scale'
-import { Point, Points, IInterpolator} from './interpolators/interpolator'
-import { Linear} from './interpolators/lineLinear'
-import { Hermite } from './interpolators/lineHermite'
+import { Point, Points, IInterpolator} from './../interpolators/interpolator'
+import { Linear} from './../interpolators/lineLinear'
+import { Hermite } from './../interpolators/lineHermite'
+
+type d3Selection = d3.Selection<any>
+type Style = { [key:string]: string }
 
 export class Area extends Layout {
 	

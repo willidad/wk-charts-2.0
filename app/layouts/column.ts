@@ -1,6 +1,6 @@
 import { IGenerator } from './../core/interfaces'
-import { Layout } from './../baseLayouts/layout'
-import { Point, Points} from './interpolators/interpolator'
+import { Layout } from './../core/layout'
+import { Point, Points} from './../interpolators/interpolator'
 import { column as defaults } from './../core/defaults'
 import * as _ from 'lodash'
 

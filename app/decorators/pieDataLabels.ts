@@ -1,4 +1,4 @@
-import { Layout } from './../baseLayouts/layout'
+import { Layout } from './../core/layout'
 
 import * as d3 from 'd3'
 import * as _ from 'lodash'

@@ -2,14 +2,12 @@
 import { Style, IMargins } from './interfaces'
 import { DomainCalc, Scale } from './scale'
 import { Position , Axis } from './axis'
-import { Layout}  from './../baseLayouts/layout'
-import { XYElement } from './../baseLayouts/XYElement'
-import { XYDataLabel } from './../decorators/dataLabels'
+import { Layout}  from './layout'
 import { DataMarker } from './../decorators/dataMarker'
-import { Column } from './../generators/column'
+import { Column } from './../layouts/column'
 import { Pie } from './../layouts/pie'
-import { Line } from './../generators/line'
-import { Area } from './../generators/area'
+import { Line } from './../layouts/line'
+import { Area } from './../layouts/area'
 import { Grid } from './grid'
 import * as d3 from 'd3'
 import * as _ from 'lodash'
@@ -142,7 +140,7 @@ export class Chart {
 	
 	private setupLayouts = () => {	
 		this.layouts.forEach((layout:Layout) => {
-			layout.setupLayout(this._d3Container)
+			layout.setupLayout(this._d3Container, this._drawingAreaSize)
 		})
 	}
 	
@@ -255,8 +253,8 @@ export class Chart {
 		return g
 	}
 	
-	public addDataLabels = (layout:Columns | Pie):Layout => {
-		if (layout instanceof Columns) {
+	public addDataLabels = (layout:Column | Pie):Layout => {
+		if (layout instanceof Column) {
 			var l = this.addLayout(new XYDataLabel(layout.keyScale, layout.keyProperty, layout.valueScale, layout.valueProperty, layout.colorScale, layout.isVertical))
 			l.labelOffset = layout.padding
 			return l

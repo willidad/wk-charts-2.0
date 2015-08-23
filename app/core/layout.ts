@@ -12,6 +12,7 @@ export class Layout {
 	private static cnt:number = 0
 	protected _id:number
 	protected _layoutG
+	protected _drawingAreaSize:{width:number, height:number}
 	protected _duration:number = duration
 	
 	protected dataMgr:Data 
@@ -117,12 +118,13 @@ export class Layout {
 	
 	//-------------------------------------------------------------------------------
 	
-	public setupLayout(container) {
+	public setupLayout(container, drawingAreaSize) {
 		var layoutArea = container.select(`.${this.targetContainer}`)
 		this._layoutG = layoutArea.select(`.wk-layout-${this._id}`)
 		if (this._layoutG.empty()) {
 			this._layoutG = layoutArea.append('g').attr('class', `wk-layout-${this._id}` )
 		}
+		this._drawingAreaSize = drawingAreaSize
 	}
 	
 	public prepeareData(data:any[]) {

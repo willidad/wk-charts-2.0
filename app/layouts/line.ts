@@ -1,19 +1,13 @@
-import { Layout } from './../baselayouts/layout'
+import { Layout } from './../core/layout'
 import { Scale } from './../core/scale'
-import { Linear} from './interpolators/lineLinear'
-import { Hermite } from './interpolators/lineHermite'
-import { Generator } from './generator'
-import { Point, Points, IInterpolator } from './interpolators/interpolator'
+import { Linear} from './../interpolators/lineLinear'
+import { Hermite } from './../interpolators/lineHermite'
+import { Point, Points, IInterpolator } from './../interpolators/interpolator'
 
 type d3Selection = d3.Selection<any>
 type Style = { [key:string]: string }
 
 export class Line extends Layout {
-	
-	private _dataMapped:Points;
-	private _path:d3Selection
-	private _interpolatorY: IInterpolator
-	private _spline:boolean
 	
 	constructor(
 		
@@ -29,6 +23,11 @@ export class Line extends Layout {
 		this.spline = spline
 	}
 	
+	private _dataMapped:Points;
+	private _path:d3Selection
+	private _interpolatorY: IInterpolator
+	private _spline:boolean
+	
 	set spline(val:boolean) {
 		this._spline = val
 		this._interpolatorY = val ? new Hermite(this.isVertical) : new Linear(this.isVertical)
@@ -42,7 +41,7 @@ export class Line extends Layout {
 	}
 	
 	protected insertPointAt(key:any) {
-		this._interpolatorY.insertAtPoint(this.key(key)  + this.keyOffset)
+		this._interpolatorY.insertAtPoint(this.keyFn(key)  + this.keyOffset)
 	}
 	
 	protected removePointAt(key:any) {
@@ -60,7 +59,6 @@ export class Line extends Layout {
 	protected draw(transition:boolean) {
 		if (!this._path) this._path = this._layoutG.append('path')
 
-		
 		var s = transition ? this._path.transition().duration(this._duration) : this._path
 		s.attr('d', `M${this._interpolatorY.path()}`)
 
