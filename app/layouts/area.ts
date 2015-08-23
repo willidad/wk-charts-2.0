@@ -89,7 +89,6 @@ export class Area extends Layout {
 		}
 		
 		if (this.dataMarkers) {
-			console.log(this._interpolatorY.getPathPoints().concat(this._interpolatorY0.getPathPoints()))
 			this._markers = this._layoutG.selectAll('.wk-chart-markers').data(this._interpolatorY.getPathPoints().concat(this._interpolatorY0.getPathPoints()), function(d,i) { return i })
 			this._markers.enter().append('circle').attr('class', 'wk-chart-markers')
 			var m = transition ? this._markers.transition().duration(this._duration).each('end', function(d) { if (d[2]) d3.select(this).remove()}) : this._markers
