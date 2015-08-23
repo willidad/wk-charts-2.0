@@ -53,7 +53,6 @@ export class Linear implements IInterpolator {
 					iHigh++
 					iLow++
 				}
-				console.log (iLow, iHigh, key, this._data)
 				deltaKey = Math.abs(this._data[iHigh][k] - this._data[iLow][k])
 				deltaVal = this._data[iHigh][v] - this._data[iLow][v]
 				deltaKeyIns = Math.abs(key - this._data[iLow][k])
@@ -80,9 +79,9 @@ export class Linear implements IInterpolator {
 			var last = this._data[this._data.length - 1]
 			this._data.push(last)
 		} else {
-			startKey = this._data[i][k];
-			startVal = this._data[i][v]
-			this._data.splice(i,0, this.isVertical ? [startVal, startKey] : [startKey, startVal])
+			startKey = (this._data[i][k] + this._data[i+1][k]) / 2;
+			startVal = (this._data[i][v] + this._data[i+1][v]) / 2;
+			this._data.splice(i+1,0, this.isVertical ? [startVal, startKey] : [startKey, startVal])
 		}	
 	}
 	
@@ -97,8 +96,8 @@ export class Linear implements IInterpolator {
 			this._data.unshift(this._data[0])
 		} else {
 			var i1 = this._data.length - i - 1
-			startKey = this._data[i1][k];
-			startVal = this._data[i1][v]
+			startKey = (this._data[i1][k] + this._data[i1-1][k]) / 2;
+			startVal = (this._data[i1][v] + this._data[i1-1][v]) / 2;
 			this._data.splice(i1,0, this.isVertical ? [startVal, startKey] : [startKey, startVal])
 		}	
 	}
