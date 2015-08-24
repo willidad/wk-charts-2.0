@@ -1,3 +1,4 @@
+import { IMargins } from './interfaces'
 import { Scale } from './../core/scale'
 import { DataMarker } from './../decorators/dataMarker'
 import { DataLabel } from './../decorators/dataLabels'
@@ -6,6 +7,7 @@ import * as _ from 'lodash'
 import * as drawing from './../tools/drawing'
 import { Data } from './../core/data'
 import { chart as chartDefaults ,axis as axisDefaults, duration} from './../core/defaults'
+import * as hlp from './../tools/helpers'
 
 export class Layout {
 	
@@ -20,8 +22,6 @@ export class Layout {
 		this._id = Layout.cnt;
 		this.dataMgr = new Data(this.key)
 	}
-	
-	
 	
 	private static cnt:number = 0
 	protected _id:number
@@ -88,35 +88,24 @@ export class Layout {
 
 	//override functions
 	public targetContainer = 'wk-chart-layout-area';
-	public needsPadding:boolean = false
+	public needsPadding:boolean = true
 	public rowColor:string = undefined
 		
-	public getPadding = (container, data, drawingAreaSize):IMargins => {
-		var padding:IMargins = {top:0, bottom:0, left:0, right:0}
-		this.keyScale.setDomain(data)
+	public getPadding = (container, data, drawingAreaSize):IMargins => { 
+		// draw the layout into a invisible container, measure its bouding box and retur the differences to the supplied drawing area size
+		var padding = {top:0, bottom:0, left:0, right:0}
+		var sizer = container.append('g')
 		this.keyScale.setRange(this.isVertical ? [drawingAreaSize.height, 0] : [0, drawingAreaSize.width])
-		this.valueScale.setDomain(data)
 		this.valueScale.setRange(this.isVertical ? [0, drawingAreaSize.width] : [drawingAreaSize.height, 0])
-		
-		var l = container.select(`.wk-layout-${this._id}-sizer`)
-		if (l.empty()) {
-			l = container.append('g').attr('class', `wk-layout-${this._id}-sizer` )
-		}
-		
-		var cleanData = this.cleanPos(data)
-		
-		this.beforeDraw(cleanData, drawingAreaSize)
-		this.drawLayout(cleanData, drawingAreaSize)
-
-		// measure the size of the label container
-		var box = l.node().getBBox()
-		// determine the additional space requirements
+		this.keyOffset = this.keyScale.isOrdinal ? this.keyScale.getRangeBand() / 2 : 0
+		this.data = data
+		this.draw(sizer,false)
+		var box = sizer.node().getBBox()
+		sizer.remove()
 		padding.left = box.x < 0 ? Math.abs(box.x) : 0
 		padding.top = box.y < 0 ? Math.abs(box.y) : 0
 		padding.bottom = box.y + box.height > drawingAreaSize.height ? Math.abs(drawingAreaSize.height - box.y - box.height) : 0
 		padding.right = box.x + box.width > drawingAreaSize.width ? Math.abs(drawingAreaSize.width - box.x - box.width) : 0
-		//console.log('padding', padding, box, drawingAreaSize)
-		l.remove()
 		return padding
 	}
 	
@@ -129,8 +118,6 @@ export class Layout {
 			this._layoutG = layoutArea.append('g').attr('class', `wk-layout-${this._id}` )
 		}
 		this._drawingAreaSize = drawingAreaSize
-		if (this._dataMarkers) this._dataMarkers.container(container)
-		if (this._dataLabels) this._dataLabels.container(container)
 	}
 	
 	public prepeareData(data:any[]) {
@@ -160,7 +147,7 @@ export class Layout {
 				}
 			} else ptIdx++
 		}
-		this.draw(false)
+		this.draw(this._layoutG, false)
 	}
 	
 	public drawEnd = (data:any[], animate:boolean) => {
@@ -180,7 +167,7 @@ export class Layout {
 				}
 			} else ptIdx++
 		}
-		this.draw(animate)
+		this.draw(this._layoutG, animate)
 	}
 	
 	//override
@@ -192,5 +179,5 @@ export class Layout {
 	protected insertPointAt(key:any):void {}
 	protected removePointAtIdx(idx:number, val:any):void {}
 	protected removePointAt(key:any):void {}
-	protected draw(transition:boolean):void {}
+	protected draw(container, transition:boolean):void {}
 }

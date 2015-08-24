@@ -96,7 +96,7 @@ export class Pie extends Layout {
 		this.insertPointAtIdx(idx, v)
 	}
 	
-	protected draw(transition:boolean) {
+	protected draw(container, transition:boolean) {
 		
 		this.radius = Math.min(this._drawingAreaSize.width, this._drawingAreaSize.height) / 2 * (this.dataLabels ? 0.85 : 1)
 		var arc:any = d3.svg.arc().outerRadius(this.radius).innerRadius(this.innerRadius)
@@ -120,7 +120,7 @@ export class Pie extends Layout {
 		}
 		
 		var segments = pie(this._dataMapped)
-		var path = this._layoutG.selectAll('path')
+		var path = container.selectAll('path')
 			.data(segments, (d) => d.data.key) 
 		
 		path.enter()

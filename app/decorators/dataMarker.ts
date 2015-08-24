@@ -16,12 +16,8 @@ export class DataMarker {
 	set markerStyle(val:Style) { this._markerStyle = val; }
 	get markerStyle():Style { return <Style>_.defaults(this._markerStyle, defaults.markerStyle)}
 	
-	public container(outer:D3Selection) {
-		this._container = outer.select('.wk-chart-marker-area')
-	} 
-	
-	public draw(data:Points, color:String, transition:boolean, duration:number) {
-		this._markers = this._container.selectAll('.wk-chart-markers').data(data, function(d,i) { return i })
+	public draw(container, data:Points, color:String, transition:boolean, duration:number) {
+		this._markers = container.selectAll('.wk-chart-markers').data(data, function(d,i) { return i })
 		this._markers.enter().append('circle').attr('class', 'wk-chart-markers')
 		var m = transition ? this._markers.transition().duration(duration).each('end', function(d) { if (d[2]) d3.select(this).remove()}) : this._markers
 		m

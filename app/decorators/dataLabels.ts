@@ -1,4 +1,4 @@
-import { Points, D3Selection, Style } from './../core/interfaces'
+import { Points, D3Selection, Style, IMargins } from './../core/interfaces'
 import { Scale } from './../core/scale'
 import * as d3 from 'd3'
 import * as _ from 'lodash'
@@ -31,14 +31,8 @@ export class DataLabel {
 	public rotation:number
 	private _labelOffset:[number,number] = [0,0];
 	
-	public container(outer:D3Selection) {
-		if (!this._container) {
-			this._container = outer.select('.wk-chart-label-area').append('g').attr('class', `.wk-chart-labels-${this._id}`)
-		}
-	}
-	
-	public draw(data, transition:boolean, duration:number, isVertical:boolean) {
-		this._labels = this._container.selectAll('.wk-charts-data-label').data(data, function(d, i) { return d.key })
+	public draw(container, data, transition:boolean, duration:number, isVertical:boolean) {
+		this._labels = container.selectAll('.wk-charts-data-label').data(data, function(d, i) { return d.key })
 		
 		var lg = this._labels.enter().append('g').attr('class', 'wk-charts-data-label')
 			.style('opacity', 0)
@@ -61,6 +55,5 @@ export class DataLabel {
 				s.select('rect').style(bgStyle).attr(text.node().getBBox())
 			})
 		this._labels.exit().remove()
- 
 	}
 }

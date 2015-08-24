@@ -13,11 +13,11 @@ import * as d3 from 'd3'
 import * as _ from 'lodash'
 import * as drawing from './../tools/drawing'
 import { ResizeSensor} from './../tools/resizeSensor'
+import * as hlp from './../tools/helpers'
 
 import {chart as chartDefaults, duration} from './defaults'
 
 import './../tools/innerSVG'
-
 
 export class Chart {
 	
@@ -140,7 +140,7 @@ export class Chart {
 	
 	private setupLayouts = () => {	
 		this.layouts.forEach((layout:Layout) => {
-			layout.setupLayout(this._d3Container, this._drawingAreaSize)
+			layout.setupLayout(this._d3Container.select('.wk-chart-container'), this._drawingAreaSize)
 		})
 	}
 	
@@ -164,20 +164,19 @@ export class Chart {
 	
 	private getLayoutPadding = () => {
 		this._layoutPadding = {top:0, bottom:0, left:0, right:0}
+		this.sizeRange()
+		
 		for (var layout of this.layouts) {
 			if (layout.needsPadding) {
-				var padding = layout.getPadding(this.d3Sel(`.${layout.targetContainer}`),this._data, this._drawingAreaSize)
-				this._layoutPadding.top = Math.max(padding.top, this._layoutPadding.top)
-				this._layoutPadding.bottom = Math.max(padding.bottom, this._layoutPadding.bottom)
-				this._layoutPadding.left = Math.max(padding.left, this._layoutPadding.left)
-				this._layoutPadding.right = Math.max(padding.right, this._layoutPadding.right)
+				var padding = layout.getPadding(this._d3Container.select('.wk-chart-container'), this._data, this._drawingAreaSize)
+				this._layoutPadding = hlp.marginMax(this._layoutPadding, padding)
 			}
 		}
 	}
 	
 	private sizeRange = () => {
-		this._ranges.x = [this._layoutPadding.left, this._drawingAreaSize.width - this._layoutPadding.right]
-		this._ranges.y = [this._drawingAreaSize.height-this._layoutPadding.bottom, this._layoutPadding.top]
+		this._ranges.x = [this._layoutPadding.left, this._drawingAreaSize.width - this._layoutPadding.right - this._layoutPadding.right]
+		this._ranges.y = [this._drawingAreaSize.height-this._layoutPadding.bottom, this._layoutPadding.top - this._layoutPadding.bottom]
 	}
 
 	
@@ -251,21 +250,6 @@ export class Chart {
 		var g = new Grid(axis)
 		this.grids.push(g)
 		return g
-	}
-	
-	public addDataLabels = (layout:Column | Pie):Layout => {
-		if (layout instanceof Column) {
-			var l = this.addLayout(new XYDataLabel(layout.keyScale, layout.keyProperty, layout.valueScale, layout.valueProperty, layout.colorScale, layout.isVertical))
-			l.labelOffset = layout.padding
-			return l
-		} else if (layout instanceof Pie) {
-			layout.dataLabels = true
-			return layout
-		}
-	}
-	public addDataMarkers = (layout:Line | Area):Layout => {
-		var l = this.addLayout(new DataMarker(layout.keyScale, layout.keyProperty, layout.valueScale, layout.valueProperty, layout.colorScale, layout.isVertical))
-		return l
 	}
 	
 	public addLayout = <T extends Layout>(l:T):T => { //Todo : implement a factory function as soon as ...rest operator is available

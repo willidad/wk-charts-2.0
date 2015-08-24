@@ -87,8 +87,8 @@ export class Column extends Layout {
 		this.insertPointAtIdx(idx, val)
 	}	
 	
-	protected draw(transition:boolean) {
-		this._columns = this._layoutG.selectAll('.wk-chart-column-bar').data(this._dataMapped, function(d:Box, i) { return i })
+	protected draw(container, transition:boolean) {
+		this._columns = container.selectAll('.wk-chart-column-bar').data(this._dataMapped, function(d:Box, i) { return i })
 		this._columns.enter().append('rect').attr('class','wk-chart-column-bar')
 		var cs = transition ? this._columns.transition().duration(this._duration).each('end', function(d:Box) { if (d.remove) d3.select(this).remove()}) : this._columns
 		cs
@@ -100,7 +100,7 @@ export class Column extends Layout {
 			.style( function(d:Box):Style { return d.style } )
 			
 		if (this._dataLabels) {
-			this._dataLabels.draw(this._dataMapped, transition, this._duration, this.isVertical)
+			this._dataLabels.draw(container, this._dataMapped, transition, this._duration, this.isVertical)
 		}
 	} 
 }

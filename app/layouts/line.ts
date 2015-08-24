@@ -65,8 +65,9 @@ export class Line extends Layout {
 		this.insertPointAtIdx(idx)
 	}
 	
-	protected draw(transition:boolean) {
-		if (!this._path) this._path = this._layoutG.append('path')
+	protected draw(container, transition:boolean) {
+		this._path = container.select('.wk-chart-line')
+		if (this._path.empty()) this._path = container.append('path').attr('class', 'wk-chart-line')
 
 		var s = transition ? this._path.transition().duration(this._duration) : this._path
 		s.attr('d', `M${this._interpolatorY.path()}`)
@@ -78,7 +79,7 @@ export class Line extends Layout {
 		this._path.style(this.lineStyle)
 		
 		if (this._dataMarkers) {
-			this._dataMarkers.draw(this._interpolatorY.getPathPoints(),this.propertyColor(), transition, this._duration)
+			this._dataMarkers.draw(container,this._interpolatorY.getPathPoints(),this.propertyColor(), transition, this._duration)
 		}
 		
 	}

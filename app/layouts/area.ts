@@ -88,8 +88,9 @@ export class Area extends Layout {
 		this.insertPointAtIdx(idx)
 	}
 	
-	protected draw(transition:boolean) {
-		if (!this._path) this._path = this._layoutG.append('path')
+	protected draw(container, transition:boolean) {
+		this._path = container.select('.wk-chart-area')
+		if (this._path.empty()) this._path = container.append('path').attr('class', 'wk-chart-area')
 
 		var s = transition ? this._path.transition().duration(this._duration) : this._path
 		s.attr('d', `M${this._interpolatorY.path()}L${this._interpolatorY0.path()}Z`)
@@ -102,7 +103,7 @@ export class Area extends Layout {
 		if (this._dataMarkers) {
 			var d = this._interpolatorY.getPathPoints()	
 			if (this.val0Fn) d = d.concat(this._interpolatorY0.getPathPoints())		
-			this._dataMarkers.draw(d,this.propertyColor(), transition, this._duration)
+			this._dataMarkers.draw(container, d, this.propertyColor(), transition, this._duration)
 		}
 		
 	}
