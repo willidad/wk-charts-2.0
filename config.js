@@ -28,9 +28,9 @@ System.config({
     "lodash": "npm:lodash@3.10.1",
     "systemjs-builder": "npm:systemjs-builder@0.12.2",
     "ts": "github:frankwallis/plugin-typescript@2.0.6",
-    "typescript": "npm:typescript@1.5.3",
+    "typescript": "npm:typescript@1.6.0-dev.20150824",
     "github:frankwallis/plugin-typescript@2.0.6": {
-      "typescript": "npm:typescript@1.6.0-dev.20150823"
+      "typescript": "npm:typescript@1.6.0-dev.20150824"
     },
     "github:jspm/nodelibs-assert@0.1.0": {
       "assert": "npm:assert@1.3.0"
@@ -440,16 +440,7 @@ System.config({
       "systemjs-json": "github:systemjs/plugin-json@0.1.0",
       "vm": "github:jspm/nodelibs-vm@0.1.0"
     },
-    "npm:typescript@1.5.3": {
-      "buffer": "github:jspm/nodelibs-buffer@0.1.0",
-      "child_process": "github:jspm/nodelibs-child_process@0.1.0",
-      "fs": "github:jspm/nodelibs-fs@0.1.2",
-      "os": "github:jspm/nodelibs-os@0.1.0",
-      "path": "github:jspm/nodelibs-path@0.1.0",
-      "process": "github:jspm/nodelibs-process@0.1.1",
-      "readline": "github:jspm/nodelibs-readline@0.1.0"
-    },
-    "npm:typescript@1.6.0-dev.20150823": {
+    "npm:typescript@1.6.0-dev.20150824": {
       "buffer": "github:jspm/nodelibs-buffer@0.1.0",
       "child_process": "github:jspm/nodelibs-child_process@0.1.0",
       "fs": "github:jspm/nodelibs-fs@0.1.2",

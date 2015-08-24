@@ -56,10 +56,6 @@ export class Line extends Layout {
 		this.insertPointAtIdx(idx)
 	}
 	
-	private cleanup() {
-		
-	}
-	
 	protected draw(transition:boolean) {
 		if (!this._path) this._path = this._layoutG.append('path')
 
