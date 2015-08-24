@@ -60,7 +60,7 @@ export class DataLabel {
 					.attr('dy', isVertical ? '0.35em' : 0)
 				s.select('rect').style(bgStyle).attr(text.node().getBBox())
 			})
-		//this._labels.exit().remove()
+		this._labels.exit().remove()
  
 	}
 }
