@@ -1,5 +1,6 @@
 import { Scale } from './../core/scale'
 import { DataMarker } from './../decorators/dataMarker'
+import { DataLabel } from './../decorators/dataLabels'
 import * as d3 from 'd3'
 import * as _ from 'lodash'
 import * as drawing from './../tools/drawing'
@@ -20,16 +21,17 @@ export class Layout {
 		this.dataMgr = new Data(this.key)
 	}
 	
+	
+	
 	private static cnt:number = 0
 	protected _id:number
 	protected _layoutG
 	protected _drawingAreaSize:{width:number, height:number}
 	protected _duration:number = duration
-	
-	protected _markers = new DataMarker()
-	
 	protected dataMgr:Data 
 	protected diffSeq:any[]
+	protected _dataMarkers:DataMarker
+	protected _dataLabels:DataLabel
 	
 	protected valFn = (val):number => {
 		return this.valueScale.map(typeof val === 'object' ? val[this.valueProperty] : val)
@@ -127,7 +129,8 @@ export class Layout {
 			this._layoutG = layoutArea.append('g').attr('class', `wk-layout-${this._id}` )
 		}
 		this._drawingAreaSize = drawingAreaSize
-		this._markers.container(container)
+		if (this._dataMarkers) this._dataMarkers.container(container)
+		if (this._dataLabels) this._dataLabels.container(container)
 	}
 	
 	public prepeareData(data:any[]) {

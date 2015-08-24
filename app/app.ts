@@ -9,7 +9,7 @@ import { Column } from './layouts/column'
 import { Pie } from './layouts/pie'
 import { Donut } from './layouts/donut'
 import { Grid } from './core/grid'
-import { XYDataLabel } from './decorators/dataLabels'
+import { DataLabel } from './decorators/dataLabels'
 import { DataMarker } from './decorators/datamarker'
 import { DataTable } from './tools/data-table'
 
@@ -101,8 +101,8 @@ export function main(el: HTMLElement): void {
         var column2 = chart.addLayout(new Column(xScale,'x', yScale,'y2',colorScale))
         column2.padding = [0.52,0.13]
         column2.rowColor = colorScale.map('y2') 
-        //var dataLabels1 = chart.addDataLabels(column1) 
-        //var dataLabels2 = chart.addDataLabels(column2)
+        column1.dataLabels = new DataLabel()
+		column2.dataLabels = new DataLabel()
         
         chart.draw(data)
     })
@@ -123,8 +123,8 @@ export function main(el: HTMLElement): void {
         var column2 = chart.addLayout(new Column(yScale,'x', xScale,'y2',colorScale, true))
         column2.padding = [0.52,0.13]
         column2.rowColor = colorScale.map('y2') 
-        //var dataLabels1 = chart.addDataLabels(column1) 
-        //var dataLabels2 = chart.addDataLabels(column2)
+		column1.dataLabels = new DataLabel()
+		column2.dataLabels = new DataLabel()
         
         chart.draw(data)
     })
@@ -155,7 +155,7 @@ export function main(el: HTMLElement): void {
         var gridBottom = chart.addGrid(axisBottom)
         
         var line1 = chart.addLayout(new Line(xScale, useOrdKeys ? 'x' : 'x1', yScale,'y',colorScale, false, useSpline))
-		line1.dataMarkers = true
+		line1.dataMarkers = new DataMarker()
         //var line1Marker = chart.addDataMarkers(line1)
         
         chart.draw(data)
@@ -176,7 +176,7 @@ export function main(el: HTMLElement): void {
         var leftGrid = chart.addGrid(axisLeft)
         var gridBottom = chart.addGrid(axisBottom)
         
-        var area = chart.addLayout(new Area(xScale,useOrdKeys ? 'x' : 'x1', yScale,'y', use0Base ? undefined : 'y2',colorScale, false, useSpline, true))
+        var area = chart.addLayout(new Area(xScale,useOrdKeys ? 'x' : 'x1', yScale,'y', use0Base ? undefined : 'y2',colorScale, false, useSpline, new DataMarker))
         //var line1Marker = chart.addLayout(new DataMarker(xScale,'x1', yScale,'y',colorScale))
         
         chart.draw(data)
@@ -196,8 +196,8 @@ export function main(el: HTMLElement): void {
         var leftGrid = chart.addGrid(axisLeft)
         var gridBottom = chart.addGrid(axisBottom)
         
-        var line1 = chart.addLayout(new Line(yScale, useOrdKeys ? 'x' : 'x1', xScale,'y',colorScale, true, useSpline, true))
-        //var line1Marker = chart.addDataMarkers(line1)
+        var line1 = chart.addLayout(new Line(yScale, useOrdKeys ? 'x' : 'x1', xScale,'y',colorScale, true, useSpline))
+        line1.dataMarkers = new DataMarker()
         
         chart.draw(data)
 
@@ -215,7 +215,7 @@ export function main(el: HTMLElement): void {
         var leftGrid = chart.addGrid(axisLeft)
         var gridBottom = chart.addGrid(axisBottom)
         
-        var line1 = chart.addLayout(new Area(yScale,useOrdKeys ? 'x' : 'x1', xScale,'y',use0Base ? undefined : 'y2', colorScale, true, useSpline, true))
+        var line1 = chart.addLayout(new Area(yScale,useOrdKeys ? 'x' : 'x1', xScale,'y',use0Base ? undefined : 'y2', colorScale, true, useSpline, new DataMarker()))
         //var line1Marker = chart.addDataMarkers(line1)
         
         chart.draw(data)

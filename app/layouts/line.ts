@@ -2,6 +2,7 @@ import * as _ from 'lodash'
 import { Style, D3Selection, IInterpolator, Point, Points } from './../core/interfaces'
 import { Layout } from './../core/layout'
 import { Scale } from './../core/scale'
+import { DataMarker } from './../decorators/dataMarker'
 import { Linear} from './../interpolators/lineLinear'
 import { Hermite } from './../interpolators/lineHermite'
 import { line as defaults } from './../core/defaults'
@@ -17,10 +18,11 @@ export class Line extends Layout {
 		colorScale?:Scale, 
 		isVertical?:boolean,
 		spline?:boolean,
-		public dataMarkers?:boolean) {
+		dataMarkers?:DataMarker) {
 		
 		super(keyScale, keyProperty, valueScale, valueProperty, colorScale, isVertical)
 		this.spline = spline
+		this.dataMarkers = dataMarkers
 	}
 	
 	private _dataMapped:Points;
@@ -31,6 +33,9 @@ export class Line extends Layout {
 	
 	set lineStyle(val:Style) { this._lineStyle = val; }
 	get lineStyle():Style { return <Style>_.defaults(this._lineStyle, defaults.lineStyle) }
+	
+	set dataMarkers(val:DataMarker) { this._dataMarkers = val}
+	get dataMarkers():DataMarker { return this._dataMarkers}
 	
 	set spline(val:boolean) {
 		this._spline = val
@@ -72,8 +77,8 @@ export class Line extends Layout {
 		
 		this._path.style(this.lineStyle)
 		
-		if (this.dataMarkers) {
-			this._markers.draw(this._interpolatorY.getPathPoints(),this.propertyColor(), transition, this._duration)
+		if (this._dataMarkers) {
+			this._dataMarkers.draw(this._interpolatorY.getPathPoints(),this.propertyColor(), transition, this._duration)
 		}
 		
 	}

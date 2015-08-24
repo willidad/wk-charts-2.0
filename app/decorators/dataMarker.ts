@@ -1,11 +1,20 @@
-import { Point, Points, D3Selection} from './../core/interfaces'
-import { markers } from './../core/defaults'
+import * as _ from 'lodash'
+import { Point, Points, D3Selection, Style} from './../core/interfaces'
+import { markers as defaults } from './../core/defaults'
 
 
 export class DataMarker {
 	
 	private _markers
 	private _container 
+	private _markerStyle
+	
+	constructor(markerStyle?:Style) {
+		this.markerStyle = markerStyle || {}
+	}
+	
+	set markerStyle(val:Style) { this._markerStyle = val; }
+	get markerStyle():Style { return <Style>_.defaults(this._markerStyle, defaults.markerStyle)}
 	
 	public container(outer:D3Selection) {
 		this._container = outer.select('.wk-chart-marker-area')
@@ -18,10 +27,10 @@ export class DataMarker {
 		m
 			.attr('cx', function(d:Point) { return d[0] })
 			.attr('cy', function(d:Point) { return d[1] })
-			.attr('r', markers.markerSize)
+			.attr('r', defaults.markerSize)
 			.style('fill', color)
-			.style(markers.markerStyle)
-			.style('opacity', function(d:Point) { return d[2] ? 0 : markers.markerStyle['opacity'] || 1})
+			.style(this.markerStyle)
+			.style('opacity', (d:Point) => { return d[2] ? 0 : this.markerStyle['opacity'] || 1})
 			
 		this._markers.exit().remove()
 	}

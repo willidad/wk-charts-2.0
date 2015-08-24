@@ -1,72 +1,66 @@
-import { Style } from './../core/interfaces'
+import { Points, D3Selection, Style } from './../core/interfaces'
 import { Scale } from './../core/scale'
 import * as d3 from 'd3'
 import * as _ from 'lodash'
 import * as drawing from './../tools/drawing'
-import {dataLabels as labelDefaults} from './../core/defaults'
+import {dataLabels as defaults} from './../core/defaults'
 
-export class XYDataLabel extends XYElement {
+export class DataLabel {
 	
-	private _labelStyle:Style = {}
-	private _labelBgStyle:Style = {}
-	
-	set labelStyle(val:Style) { this._labelStyle = val; }
-	get labelStyle():Style { return <Style>_.defaults(this._labelStyle, labelDefaults.labelStyle)}
-	
-	set labelBgStyle(val:Style) { this._labelBgStyle = val; }
-	get labelBgStyle() { return <Style>_.defaults(this._labelBgStyle, labelDefaults.labelBgStyle)}
-	
-	public labelRotation:number = 0;
-	public labelOffset:[number,number] = [0,0];
-		
-	public targetContainer = 'wk-chart-label-area'
-	public needsPadding = true
-	
-	
-	protected getSelector():string { 
-		return '.wk-chart-label-marker' 
+	constructor(labelStyle?:Style, bgStyle?:Style, rotation?:number) {
+		this.style = labelStyle || {}
+		this.bgStyle = bgStyle || {}
+		this.rotation = rotation || 0
+		DataLabel.cnt += 1
+		this._id = DataLabel.cnt
 	}
 	
-	protected fadeInOut:boolean = true;
+	private static cnt:number = 0
+	private _id:number
+	private _style:Style
+	private _bgStyle:Style
+	private _container
+	private _labels
 	
-	private updateItem = (item:d3.Selection<any>, d) => {
-		if (this.isVertical) {
-			var text = item.select('g text')
-				.text(d.value)
-				.style('text-anchor', d.value < 0 ? 'end' : 'start')
-				.attr('dy', '0.35em')
-				.style(this.labelStyle)
-			item.select('g rect').style(this.labelBgStyle).attr(text.node().getBBox())
-			item.select('g').attr('transform', `translate(${(d.value > 0 ? 1 : -1) * labelDefaults.labelPadding},0) rotate(${this.labelRotation})`)
-		} else {
-			var text = item.select('g text')
-				.text(d.value)
-				.style('text-anchor', 'middle')
-				.attr('dy', d.value < 0 ? '0.71em' : null)
-				.style(this.labelStyle)
-			item.select('g rect').style(this.labelBgStyle)
-				.attr(text.node().getBBox())
-			item.select('g').attr('transform', `translate(0,${(d.value > 0 ? -1 : 1) * labelDefaults.labelPadding}) rotate(${this.labelRotation})`)
+	set style(val:Style) { this._style = val; }
+	get style():Style { return <Style>_.defaults(this._style, defaults.labelStyle)}
+	
+	set bgStyle(val:Style) { this._bgStyle = val; }
+	get bgStyle() { return <Style>_.defaults(this._bgStyle, defaults.labelBgStyle)}
+	
+	public rotation:number
+	private _labelOffset:[number,number] = [0,0];
+	
+	public container(outer:D3Selection) {
+		if (!this._container) {
+			this._container = outer.select('.wk-chart-label-area').append('g').attr('class', `.wk-chart-labels-${this._id}`)
 		}
 	}
 	
-	protected create(selection:d3.Selection<any>, caller:XYDataLabel) {
-		var lg = selection.append('g').attr('class', 'wk-chart-label-marker').append('g')
+	public draw(data, transition:boolean, duration:number, isVertical:boolean) {
+		this._labels = this._container.selectAll('.wk-charts-data-label').data(data, function(d, i) { return d.key })
+		
+		var lg = this._labels.enter().append('g').attr('class', 'wk-charts-data-label')
+			.style('opacity', 0)
 		lg.append('rect')
 		lg.append('text')
+		var textStyle = this.style
+		var bgStyle = this.bgStyle
+		var sel = transition ? this._labels.transition().duration(duration).each('end', function(d) { if (d.remove) d3.select(this).remove()}) : this._labels
+		
+		sel
+			.attr('transform', (d) => { return `translate(${isVertical ? d.x + d.width + defaults.labelPadding : d.x + d.width/2}, ${isVertical ? d.y + d.height/2 : d.y - defaults.labelPadding}) rotate(${this.rotation})`})
+			.style('opacity', function(d) { return d.remove ? 0 : 1})
+			.each(function (d) {
+				var s = d3.select(this)
+				var text = s.select('text')
+					.text(function(d) { return d.value })
+					.style(textStyle)
+					.style('text-anchor', isVertical ? 'start' : 'middle')
+					.attr('dy', isVertical ? '0.35em' : 0)
+				s.select('rect').style(bgStyle).attr(text.node().getBBox())
+			})
+		//this._labels.exit().remove()
+ 
 	}
-	protected update(selection:d3.Selection<any>, caller:XYDataLabel) {
-		selection.each(function (d) {
-			caller.updateItem(d3.select(this), d)
-		})
-	}
-	protected remove(selection:d3.Selection<any>, caller:XYElement) {
-		selection.remove()
-	}
-	
-	public beforeDraw = (container, data, drawingAreaSize?) => {
-		this.offset = this.keyScale.isOrdinal ? (this.keyScale.getRangeBand() * (1 - (this.labelOffset[1] - this.labelOffset[0]))) / 2 : 0
-	}
-	
-	
 }

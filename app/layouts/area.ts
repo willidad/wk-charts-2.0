@@ -3,6 +3,7 @@ import { Style, D3Selection } from './../core/interfaces'
 import { Layout } from './../core/layout'
 import { Scale } from './../core/scale'
 import { Point, Points, IInterpolator} from './../core/interfaces'
+import { DataMarker } from './../decorators/dataMarker'
 import { Linear} from './../interpolators/lineLinear'
 import { Hermite } from './../interpolators/lineHermite'
 import { area as defaults } from './../core/defaults'
@@ -19,10 +20,11 @@ export class Area extends Layout {
 		colorScale?:Scale, 
 		isVertical?:boolean,
 		spline?:boolean,
-		public dataMarkers?:boolean) {
+		dataMarkers?:DataMarker) {
 		
 		super(keyScale, keyProperty, valueScale, valueProperty, colorScale, isVertical)
 		this.spline = spline
+		this.dataMarkers = dataMarkers
 	}
 	
 	private _interpolatorY: IInterpolator
@@ -39,6 +41,9 @@ export class Area extends Layout {
 	
 	set areaStyle(val:Style) { this._areaStyle = val; }
 	get areaStyle():Style { return <Style>_.defaults(this._areaStyle, defaults.areaStyle) }
+	
+	set dataMarkers(val:DataMarker) { this._dataMarkers = val}
+	get dataMarkers():DataMarker { return this._dataMarkers}
 
 	set spline(val:boolean) {
 		this._spline = val
@@ -94,10 +99,10 @@ export class Area extends Layout {
 		}
 		this._path.style(this.areaStyle)
 		
-		if (this.dataMarkers) {
+		if (this._dataMarkers) {
 			var d = this._interpolatorY.getPathPoints()	
-			if (this.val0Fn) d.concat(this._interpolatorY0.getPathPoints())		
-			this._markers.draw(d,this.propertyColor(), transition, this._duration)
+			if (this.val0Fn) d = d.concat(this._interpolatorY0.getPathPoints())		
+			this._dataMarkers.draw(d,this.propertyColor(), transition, this._duration)
 		}
 		
 	}
