@@ -1,7 +1,6 @@
 
 import { Style, D3Selection } from './../core/interfaces'
 import { Layout } from './../core/layout'
-import { Point, Points} from './../interpolators/interpolator'
 import { column as defaults } from './../core/defaults'
 import * as _ from 'lodash'
 

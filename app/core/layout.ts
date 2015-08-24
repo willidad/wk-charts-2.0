@@ -1,4 +1,5 @@
 import { Scale } from './../core/scale'
+import { DataMarker } from './../decorators/dataMarker'
 import * as d3 from 'd3'
 import * as _ from 'lodash'
 import * as drawing from './../tools/drawing'
@@ -6,15 +7,6 @@ import { Data } from './../core/data'
 import { chart as chartDefaults ,axis as axisDefaults, duration} from './../core/defaults'
 
 export class Layout {
-	
-	private static cnt:number = 0
-	protected _id:number
-	protected _layoutG
-	protected _drawingAreaSize:{width:number, height:number}
-	protected _duration:number = duration
-	
-	protected dataMgr:Data 
-	protected diffSeq:any[]
 	
 	constructor(
 		public keyScale:Scale, 
@@ -27,6 +19,17 @@ export class Layout {
 		this._id = Layout.cnt;
 		this.dataMgr = new Data(this.key)
 	}
+	
+	private static cnt:number = 0
+	protected _id:number
+	protected _layoutG
+	protected _drawingAreaSize:{width:number, height:number}
+	protected _duration:number = duration
+	
+	protected _markers = new DataMarker()
+	
+	protected dataMgr:Data 
+	protected diffSeq:any[]
 	
 	protected valFn = (val):number => {
 		return this.valueScale.map(typeof val === 'object' ? val[this.valueProperty] : val)
@@ -84,6 +87,7 @@ export class Layout {
 	//override functions
 	public targetContainer = 'wk-chart-layout-area';
 	public needsPadding:boolean = false
+	public rowColor:string = undefined
 		
 	public getPadding = (container, data, drawingAreaSize):IMargins => {
 		var padding:IMargins = {top:0, bottom:0, left:0, right:0}
@@ -123,6 +127,7 @@ export class Layout {
 			this._layoutG = layoutArea.append('g').attr('class', `wk-layout-${this._id}` )
 		}
 		this._drawingAreaSize = drawingAreaSize
+		this._markers.container(container)
 	}
 	
 	public prepeareData(data:any[]) {

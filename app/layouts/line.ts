@@ -1,9 +1,10 @@
+import * as _ from 'lodash'
 import { Style, D3Selection, IInterpolator, Point, Points } from './../core/interfaces'
 import { Layout } from './../core/layout'
 import { Scale } from './../core/scale'
 import { Linear} from './../interpolators/lineLinear'
 import { Hermite } from './../interpolators/lineHermite'
-
+import { line as defaults } from './../core/defaults'
 
 export class Line extends Layout {
 	
@@ -26,7 +27,10 @@ export class Line extends Layout {
 	private _path
 	private _interpolatorY: IInterpolator
 	private _spline:boolean
-	private _markers
+	private _lineStyle:Style = {}
+	
+	set lineStyle(val:Style) { this._lineStyle = val; }
+	get lineStyle():Style { return <Style>_.defaults(this._lineStyle, defaults.lineStyle) }
 	
 	set spline(val:boolean) {
 		this._spline = val
@@ -63,20 +67,13 @@ export class Line extends Layout {
 		s.attr('d', `M${this._interpolatorY.path()}`)
 
 		if (this.colorScale) {
-			this._path.style('stroke', this.propertyColor()).style('fill','none')
+			this._path.style('stroke', this.rowColor || this.propertyColor()).style('fill','none')
 		}
 		
+		this._path.style(this.lineStyle)
+		
 		if (this.dataMarkers) {
-			this._markers = this._layoutG.selectAll('.wk-chart-markers').data(this._interpolatorY.getPathPoints(), function(d,i) { return i })
-			this._markers.enter().append('circle').attr('class', 'wk-chart-markers')
-			var m = transition ? this._markers.transition().duration(this._duration).each('end', function(d) { if (d[2]) d3.select(this).remove()}) : this._markers
-			m
-				.attr('cx', function(d:Point) { return d[0] })
-				.attr('cy', function(d:Point) { return d[1] })
-				.attr('r', 5)
-				.style('opacity', function(d:Point) { return d[2] ? 0 : 1})
-				.style('fill', this.propertyColor())
-			this._markers.exit().remove()
+			this._markers.draw(this._interpolatorY.getPathPoints(),this.propertyColor(), transition, this._duration)
 		}
 		
 	}

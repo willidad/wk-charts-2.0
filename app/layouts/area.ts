@@ -1,9 +1,11 @@
+import * as _ from 'lodash'
 import { Style, D3Selection } from './../core/interfaces'
 import { Layout } from './../core/layout'
 import { Scale } from './../core/scale'
-import { Point, Points, IInterpolator} from './../interpolators/interpolator'
+import { Point, Points, IInterpolator} from './../core/interfaces'
 import { Linear} from './../interpolators/lineLinear'
 import { Hermite } from './../interpolators/lineHermite'
+import { area as defaults } from './../core/defaults'
 
 export class Area extends Layout {
 	
@@ -25,15 +27,18 @@ export class Area extends Layout {
 	
 	private _interpolatorY: IInterpolator
 	private _interpolatorY0: IInterpolator
-	private _dataMapped:Points
-	private _dataMappedY0:Points
+	private _dataMapped
+	private _dataMappedY0
 	private _path
 	private _spline;boolean
-	private _markers
+	private _areaStyle:Style = {}
 	
 	private val0Fn(val?):number  {
 		return this.value0Property ? this.valueScale.map(val[this.value0Property]) : this.valueScale.map(0)
 	}
+	
+	set areaStyle(val:Style) { this._areaStyle = val; }
+	get areaStyle():Style { return <Style>_.defaults(this._areaStyle, defaults.areaStyle) }
 
 	set spline(val:boolean) {
 		this._spline = val
@@ -85,20 +90,14 @@ export class Area extends Layout {
 		s.attr('d', `M${this._interpolatorY.path()}L${this._interpolatorY0.path()}Z`)
 
 		if (this.colorScale) {
-			this._path.style('fill', this.propertyColor())
+			this._path.style('fill', this.rowColor || this.propertyColor())
 		}
+		this._path.style(this.areaStyle)
 		
 		if (this.dataMarkers) {
-			this._markers = this._layoutG.selectAll('.wk-chart-markers').data(this._interpolatorY.getPathPoints().concat(this._interpolatorY0.getPathPoints()), function(d,i) { return i })
-			this._markers.enter().append('circle').attr('class', 'wk-chart-markers')
-			var m = transition ? this._markers.transition().duration(this._duration).each('end', function(d) { if (d[2]) d3.select(this).remove()}) : this._markers
-			m
-				.attr('cx', function(d:Point) { return d[0] })
-				.attr('cy', function(d:Point) { return d[1] })
-				.attr('r', 5)
-				.style('opacity', function(d:Point) { return d[2] ? 0 : 1})
-				.style('fill', this.propertyColor())
-			this._markers.exit().remove()
+			var d = this._interpolatorY.getPathPoints()	
+			if (this.val0Fn) d.concat(this._interpolatorY0.getPathPoints())		
+			this._markers.draw(d,this.propertyColor(), transition, this._duration)
 		}
 		
 	}

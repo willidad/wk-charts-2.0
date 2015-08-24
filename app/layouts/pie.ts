@@ -99,7 +99,7 @@ export class Pie extends Layout {
 	protected draw(transition:boolean) {
 		
 		this.radius = Math.min(this._drawingAreaSize.width, this._drawingAreaSize.height) / 2 * (this.dataLabels ? 0.85 : 1)
-		var arc = d3.svg.arc().outerRadius(this.radius).innerRadius(this.innerRadius)
+		var arc:any = d3.svg.arc().outerRadius(this.radius).innerRadius(this.innerRadius)
 		var labelArc = d3.svg.arc().outerRadius(this.radius * 1.1).innerRadius(this.radius * 1.1)
 		var pie = d3.layout.pie()
 			.value(function(d):number { return d['val'] })
@@ -108,7 +108,7 @@ export class Pie extends Layout {
 		function arcTween(a) {
 		  	var i = d3.interpolate(this._current, a);
 		  	this._current = i(0);
-		  	return function(t:number):number {
+		  	return function(t) {
 		    	return arc(i(t));
 		  };
 		}
