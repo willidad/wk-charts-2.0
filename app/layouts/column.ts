@@ -44,34 +44,30 @@ export class Column extends Layout {
 	private _columns
 	
 	private mapData(idx: number, v, insert?:boolean, remove?:boolean):Box {
+		var ret
 		if (this.isVertical) {
-			return {
-					y: this.mapKeyIdx(idx) + this.keyScale.getRangeBand() * (insert || remove ? 0 : this.padding[0]),
-					x: this.val(v) < 0 ? this.valFn(v) : this.valFnZero(),
-					height: insert || remove ? 0 : this.keyScale.getRangeBand() * (1 - this.padding[0] - this.padding[1]),
-					width: Math.abs(this.valFn(v) - this.valFnZero()),
-					fill: this.rowColor || this.colorFn(v),
-					style:this.columnStyle,
-					insert:insert,
-					remove: remove, 
-					value:this.val(v),
-					key: this.key(v)
-				}
+			ret = {
+				y: this.mapKeyIdx(idx) + this.keyScale.getRangeBand() * (insert || remove ? 0 : this.padding[0]),
+				x: this.val(v) < 0 ? this.valFn(v) : this.valFnZero(),
+				height: insert || remove ? 0 : this.keyScale.getRangeBand() * (1 - this.padding[0] - this.padding[1]),
+				width: Math.abs(this.valFn(v) - this.valFnZero()),
+			}
 			
 		} else {
-			return {
-					x: this.mapKeyIdx(idx) + this.keyScale.getRangeBand() * (insert || remove ? 0 : this.padding[0]),
-					y: this.val(v) < 0 ? this.valFnZero() : this.valFn(v),
-					width: insert || remove ? 0 : this.keyScale.getRangeBand() * (1 - this.padding[0] - this.padding[1]),
-					height: Math.abs(this.valFnZero() - this.valFn(v)),
-					fill: this.rowColor || this.colorFn(v),
-					style:this.columnStyle,
-					insert: insert,
-					remove: remove,
-					value:this.val(v),
-					key: this.key(v)
-				}
+			ret = {
+				x: this.mapKeyIdx(idx) + this.keyScale.getRangeBand() * (insert || remove ? 0 : this.padding[0]),
+				y: this.val(v) < 0 ? this.valFnZero() : this.valFn(v),
+				width: insert || remove ? 0 : this.keyScale.getRangeBand() * (1 - this.padding[0] - this.padding[1]),
+				height: Math.abs(this.valFnZero() - this.valFn(v)),
+			}
 		}
+		ret.fill = this.rowColor || this.colorFn(v)
+		ret.style = this.columnStyle
+		ret.insert = insert
+		ret.remove = remove
+		ret.value = this.val(v)
+		ret.key = this.key(v)
+		return ret
 	}
 	
 	

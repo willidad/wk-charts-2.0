@@ -92,7 +92,7 @@ export function main(el: HTMLElement): void {
         //xScale.isInverted = true
         var yScale = chart.addScale('linear', ['y', 'y2'], DomainCalc.extentZero)
         var colorScale = chart.addScale('category10',[])      
-        axisBottom = chart.addAxis(Position.bottom, xScale, 'X - Scale')
+        axisBottom = chart.addAxis(Position.top, xScale, 'X - Scale')
         axisLeft = chart.addAxis(Position.left, yScale, 'Y - Scale')  
         var leftGrid = chart.addGrid(axisLeft)
         var gridBottom = chart.addGrid(axisBottom)

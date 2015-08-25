@@ -109,7 +109,7 @@ export class Chart {
 	
 	private drawGrids = (animate:boolean) => {
 		this.grids.forEach((grid) => {
-			grid.draw(this.d3Sel('.wk-chart-container'), this._ranges, animate)
+			grid.draw(this.d3Sel('.wk-chart-container'), this._ranges, this._layoutPadding, animate)
 		})
 	}
 	
@@ -175,8 +175,8 @@ export class Chart {
 	}
 	
 	private sizeRange = () => {
-		this._ranges.x = [this._layoutPadding.left, this._drawingAreaSize.width - this._layoutPadding.right - this._layoutPadding.right]
-		this._ranges.y = [this._drawingAreaSize.height-this._layoutPadding.bottom, this._layoutPadding.top - this._layoutPadding.bottom]
+		this._ranges.x = [this._layoutPadding.left, this._drawingAreaSize.width - this._layoutPadding.left - this._layoutPadding.right]
+		this._ranges.y = [this._drawingAreaSize.height - this._layoutPadding.bottom, this._layoutPadding.top]
 	}
 
 	
@@ -206,6 +206,7 @@ export class Chart {
 					<text style="text-anchor:middle;"></text>
 				</g>
 				<g class="wk-chart-container">
+					<g class="wk-chart-grid-area" />
 					<g class="wk-chart-layout-area" />
 					<g class="wk-chart-marker-area" />
 					<g class="wk-chart-label-area" />

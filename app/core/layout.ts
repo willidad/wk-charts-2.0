@@ -88,7 +88,6 @@ export class Layout {
 		}
 	}
 
-	//override functions
 	public targetContainer = 'wk-chart-layout-area';
 	public needsPadding:boolean = true
 	public rowColor:string = undefined
@@ -103,7 +102,6 @@ export class Layout {
 		this.data = data
 		this.draw(sizer,false)
 		var box = sizer.node().getBBox()
-		console.log('box', box, drawingAreaSize)
 		sizer.remove()
 		padding.left = box.x < 0 ? Math.abs(box.x) : 0
 		padding.top = box.y < 0 ? Math.abs(box.y) : 0
