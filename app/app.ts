@@ -10,6 +10,7 @@ import { Pie } from './layouts/pie'
 import { Donut } from './layouts/donut'
 import { Grid } from './core/grid'
 import { DataLabel } from './decorators/dataLabels'
+import { PieDataLabel } from './decorators/pieDataLabels'
 import { DataMarker } from './decorators/datamarker'
 import { DataTable } from './tools/data-table'
 
@@ -135,7 +136,8 @@ export function main(el: HTMLElement): void {
         var yScale = chart.addScale('linear', ['y', 'y2'], DomainCalc.extentZero)  
         var keyColors = chart.addScale('category10', ['x'])
         var pie = chart.addLayout(new Donut(xScale, 'x', yScale, 'y', keyColors))
-        chart.addDataLabels(pie)
+		pie.dataLabels = new PieDataLabel()
+        //chart.addDataLabels(pie)
         
         chart.draw(data)
     })

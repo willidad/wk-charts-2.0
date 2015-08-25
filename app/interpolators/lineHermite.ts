@@ -83,7 +83,7 @@ export class Hermite implements IInterpolator {
     public path():string {
         var path:string
         path = `${this._segs[0][0][0]},${this._segs[0][0][1]}`
-        path += this._segs.map(function(s) { return `C${s[1][0]},${s[1][1]},${s[2][0]},${s[2][1]},${s[3][0]},${s[3][1]}` })
+        path += this._segs.map(function(s) { return `C${s[1][0]},${s[1][1]},${s[2][0]},${s[2][1]},${s[3][0]},${s[3][1]}` }).join('')
         return path
     }
 	

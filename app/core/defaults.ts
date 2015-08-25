@@ -40,7 +40,7 @@ export var column = {
 }
 
 export var pie = {
-	pieStyle: {opacity: 0.4},
+	pieStyle: emptyStyle,
 	labelStyle: emptyStyle,
 	labelBgStyle: {fill:'none', stroke:'lightblue'}
 }
@@ -56,4 +56,4 @@ export var dataLabels = {
 	labelBgStyle: {fill:'none', stroke:'lightblue'}
 }
 
-export const duration = 3000
+export const duration = 1000

@@ -6,7 +6,7 @@ import { DataLabel } from './../decorators/dataLabels'
 import { column as defaults } from './../core/defaults'
 import * as _ from 'lodash'
 
-type Box = {x:number, y:number, height:number, width:number, fill:string, style:Style, remove?:boolean, value:any, key:any }
+type Box = {x:number, y:number, height:number, width:number, fill:string, style:Style, insert:boolean, remove:boolean, value:any, key:any }
 
 export class Column extends Layout {
 	
@@ -52,6 +52,7 @@ export class Column extends Layout {
 					width: Math.abs(this.valFn(v) - this.valFnZero()),
 					fill: this.rowColor || this.colorFn(v),
 					style:this.columnStyle,
+					insert:insert,
 					remove: remove, 
 					value:this.val(v),
 					key: this.key(v)
@@ -65,6 +66,7 @@ export class Column extends Layout {
 					height: Math.abs(this.valFnZero() - this.valFn(v)),
 					fill: this.rowColor || this.colorFn(v),
 					style:this.columnStyle,
+					insert: insert,
 					remove: remove,
 					value:this.val(v),
 					key: this.key(v)
@@ -80,11 +82,13 @@ export class Column extends Layout {
 	protected insertPointAtIdx(idx: number, val:any) {
 		if (idx < 0) this._dataMapped.unshift(this.mapData(idx, val, true))
 		else if (idx + 1 > this._dataMapped.length) this._dataMapped.push(this.mapData(idx + 1, val, true))
-		else this._dataMapped.splice(idx + 1, 0 ,this.mapData(idx + 1, val, false, true))
+		else this._dataMapped.splice(idx + 1, 0 ,this.mapData(idx + 1, val, true, false))
 	}
 	
 	protected removePointAtIdx(idx:number, val:any) {
-		this.insertPointAtIdx(idx, val)
+		if (idx < 0) this._dataMapped.unshift(this.mapData(idx, val, false, true))
+		else if (idx + 1 > this._dataMapped.length) this._dataMapped.push(this.mapData(idx + 1, val, false, true))
+		else this._dataMapped.splice(idx + 1, 0 ,this.mapData(idx + 1, val, false, true))
 	}	
 	
 	protected draw(container, transition:boolean) {

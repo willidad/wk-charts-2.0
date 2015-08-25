@@ -44,7 +44,7 @@ export class DataLabel {
 		
 		sel
 			.attr('transform', (d) => { return `translate(${isVertical ? d.x + d.width + defaults.labelPadding : d.x + d.width/2}, ${isVertical ? d.y + d.height/2 : d.y - defaults.labelPadding}) rotate(${this.rotation})`})
-			.style('opacity', function(d) { return d.remove ? 0 : 1})
+			.style('opacity', function(d) { return d.remove || d.insert ? 0 : 1})
 			.each(function (d) {
 				var s = d3.select(this)
 				var text = s.select('text')

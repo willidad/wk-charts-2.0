@@ -2,6 +2,7 @@ import { IMargins } from './interfaces'
 import { Scale } from './../core/scale'
 import { DataMarker } from './../decorators/dataMarker'
 import { DataLabel } from './../decorators/dataLabels'
+import { PieDataLabel } from './../decorators/pieDataLabels'
 import * as d3 from 'd3'
 import * as _ from 'lodash'
 import * as drawing from './../tools/drawing'
@@ -32,6 +33,7 @@ export class Layout {
 	protected diffSeq:any[]
 	protected _dataMarkers:DataMarker
 	protected _dataLabels:DataLabel
+	protected _pieDatalabels:PieDataLabel
 	
 	protected valFn = (val):number => {
 		return this.valueScale.map(typeof val === 'object' ? val[this.valueProperty] : val)
@@ -101,6 +103,7 @@ export class Layout {
 		this.data = data
 		this.draw(sizer,false)
 		var box = sizer.node().getBBox()
+		console.log('box', box, drawingAreaSize)
 		sizer.remove()
 		padding.left = box.x < 0 ? Math.abs(box.x) : 0
 		padding.top = box.y < 0 ? Math.abs(box.y) : 0

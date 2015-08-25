@@ -94,6 +94,7 @@ export class Area extends Layout {
 
 		var s = transition ? this._path.transition().duration(this._duration) : this._path
 		s.attr('d', `M${this._interpolatorY.path()}L${this._interpolatorY0.path()}Z`)
+	
 
 		if (this.colorScale) {
 			this._path.style('fill', this.rowColor || this.propertyColor())
