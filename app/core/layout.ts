@@ -100,18 +100,18 @@ export class Layout {
 	public getPadding = (container, data, drawingAreaSize):IMargins => { 
 		// draw the layout into a invisible container, measure its bouding box and retur the differences to the supplied drawing area size
 		var padding = {top:0, bottom:0, left:0, right:0}
-		var sizer = container.append('g')
+		
 		this.keyScale.setRange(this.isVertical ? [drawingAreaSize.height, 0] : [0, drawingAreaSize.width])
 		this.valueScale.setRange(this.isVertical ? [0, drawingAreaSize.width] : [drawingAreaSize.height, 0])
 		this.keyOffset = this.keyScale.isOrdinal ? this.keyScale.getRangeBand() / 2 : 0
 		this.data = data
 		var box = this.getBBox()
 		if (!box) {
+			var sizer = container.append('g')
 			this.draw(sizer,false)
 			var box = sizer.node().getBBox()
+			sizer.remove()
 		}
-		console.log (box)
-		sizer.remove()
 		padding.left = box.x < 0 ? Math.abs(box.x) : 0
 		padding.top = box.y < 0 ? Math.abs(box.y) : 0
 		padding.bottom = box.y + box.height > drawingAreaSize.height ? Math.abs(drawingAreaSize.height - box.y - box.height) : 0

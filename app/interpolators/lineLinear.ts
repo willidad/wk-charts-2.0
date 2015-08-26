@@ -122,7 +122,7 @@ export class Linear implements IInterpolator {
 		}	
 	}
 	
-	protected getBBox() {
+	public getBBox() {
 		var xRange = d3.extent(this._data.map(function(d) {return d[0]}))
 		var yRange = d3.extent(this._data.map(function(d) {return d[1]}))
 		return {

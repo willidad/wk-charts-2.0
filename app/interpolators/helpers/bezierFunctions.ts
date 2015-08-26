@@ -216,8 +216,6 @@ export function cubicBounds(p) {
 	var ay = 3*(-p[0][1] + 3*p[1][1] - 3*p[2][1] + p[3][1])
 	var by = 6*(p[0][1] - 2*p[1][1] + p[2][1])
 	var cy = 3*(p[1][1] - p[0][1])
-	console.log('x', ax, bx, cx)
-	console.log('y', ay, by, cy) 
 	// compute the roots of the derivatives for x and y. ignore complex roots (disc<0)
 	if (Math.abs(ax) < 1e-12) { // treat this a sa quadratic curve 
 		if (Math.abs(bx) > 1e-12) tx.push(-cx/bx) // if b is also 0 this is a straight line, i.e. has no roots

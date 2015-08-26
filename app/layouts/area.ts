@@ -109,7 +109,7 @@ export class Area extends Layout {
 		}
 	}
 	
-	public getBBox() {
+	protected getBBox() {
 		var bounds = [] 
 		bounds.push(this._interpolatorY.getBBox())
 		bounds.push(this._interpolatorY0.getBBox())

@@ -6,6 +6,7 @@ import { DataMarker } from './../decorators/dataMarker'
 import { Linear} from './../interpolators/lineLinear'
 import { Hermite } from './../interpolators/lineHermite'
 import { line as defaults } from './../core/defaults'
+import { outerBox } from './../tools/helpers'
 
 export class Line extends Layout {
 	
@@ -84,6 +85,12 @@ export class Line extends Layout {
 	}
 	
 	protected getBBox() {
-		return this._interpolatorY.getBBox()
+		var bounds = [] 
+		bounds.push(this._interpolatorY.getBBox())
+		if (this._dataMarkers) {
+			var d = this._interpolatorY.getPathPoints()	
+			bounds.push(this._dataMarkers.getBBox(d))	
+		}
+		return outerBox(bounds)
 	}
 }
