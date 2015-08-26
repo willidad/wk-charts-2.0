@@ -205,3 +205,64 @@ export function quadToCubic(p0:[number,number], cp:[number,number],p1:[number,nu
     return [p0, cp0, cp1, p1]
 }
 
+export function cubicBounds(p) {
+	// get factors for cubic derivative function for y and y
+	var tx = [], ty = [], px, py, pxMin, pyMin, pxMax, pyMax
+	
+	var ax = 3*(-p[0][0] + 3*p[1][0] - 3*p[2][0] + p[3][0])
+	var bx = 6*(p[0][0] - 2*p[1][0] + p[2][0])
+	var cx = 3*(p[1][0] - p[0][0])
+	
+	var ay = 3*(-p[0][1] + 3*p[1][1] - 3*p[2][1] + p[3][1])
+	var by = 6*(p[0][1] - 2*p[1][1] + p[2][1])
+	var cy = 3*(p[1][1] - p[0][1])
+	console.log('x', ax, bx, cx)
+	console.log('y', ay, by, cy) 
+	// compute the roots of the derivatives for x and y. ignore complex roots (disc<0)
+	if (Math.abs(ax) < 1e-12) { // treat this a sa quadratic curve 
+		if (Math.abs(bx) > 1e-12) tx.push(-cx/bx) // if b is also 0 this is a straight line, i.e. has no roots
+	} else {
+		var discrx = bx*bx - 4*ax*cx
+		if (discrx >= 0){
+			tx.push((-bx + Math.sqrt(discrx))/(2*ax))
+			tx.push((-bx - Math.sqrt(discrx))/(2*ax))
+		}
+	}
+	if (Math.abs(ay) < 1e-12) {
+		if (Math.abs(bx) > 1e-12) tx.push(-cy/by)
+	} else {
+		var discry = by*by - 4*ay*cy
+		if (discry >= 0){
+			ty.push((-by + Math.sqrt(discry))/(2*ay))
+			ty.push((-by - Math.sqrt(discry))/(2*ay))
+		}
+	}
+	// ignore roots < 0  or > 1 nad compute bezier points
+	px = tx.filter(function(t) { return t >= 0 && t <= 1}).map(function (t) { return bezierFn(t, p.map(function(p) { return p[0]}))})
+	py = ty.filter(function(t) { return t >= 0 && t <= 1}).map(function (t) { return bezierFn(t, p.map(function(p) { return p[1]}))})
+	// add the first and lat point of tthe path
+	px.push(p[0][0], p[3][0])
+	py.push(p[0][1], p[3][1])
+	// get the minimum and maximum values
+	pxMin = Math.min(...px)
+	pxMax = Math.max(...px)
+	pyMin = Math.min(...py)
+	pyMax = Math.max(...py)
+	
+	// return as rect attributes
+	return {x:{min:pxMin, max:pxMax} , y:{min:pyMin, max:pyMax}}
+}
+
+export function pathBounds(segs:Segment[]) {
+	var bounds = {x:{min:Infinity, max:-Infinity} , y:{min:Infinity, max:-Infinity}}
+	var yBounds = []
+	for (var s of segs) {
+		var sBounds = cubicBounds(s)
+		bounds.x.min = Math.min(bounds.x.min, sBounds.x.min)
+		bounds.x.max = Math.max(bounds.x.max, sBounds.x.max)
+		bounds.y.min = Math.min(bounds.y.min, sBounds.y.min)
+		bounds.y.max = Math.max(bounds.y.max, sBounds.y.max)
+	}
+	return {x:bounds.x.min, y:bounds.y.min, width:Math.abs(bounds.x.min - bounds.x.max), height:Math.abs(bounds.y.min - bounds.y.max)}
+}
+

@@ -198,4 +198,8 @@ export class Hermite implements IInterpolator {
 		  	this.splitSegAt(this._segs.length - i - 1, 0.5)
       	}
     }
+	
+	public getBBox() {
+		return bezier.pathBounds(this._segs)
+	}
 }

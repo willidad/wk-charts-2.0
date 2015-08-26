@@ -121,4 +121,16 @@ export class Linear implements IInterpolator {
 			this._data.splice(i1,0, this.isVertical ? [startVal, startKey, true] : [startKey, startVal, true])
 		}	
 	}
+	
+	protected getBBox() {
+		var xRange = d3.extent(this._data.map(function(d) {return d[0]}))
+		var yRange = d3.extent(this._data.map(function(d) {return d[1]}))
+		return {
+			x:xRange[0], 
+			y:yRange[0],
+			width:Math.abs(xRange[0] - xRange[1]),
+			height:Math.abs(yRange[0] - yRange[1])
+		}
+		return undefined
+	}
 }

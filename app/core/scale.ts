@@ -62,11 +62,13 @@ export class Scale {
 			// compute the minimum and maximum value
 			var min = Infinity
 			var max = -Infinity
-			for (var i = 0; i < data.length; i++) {
-				for (var j = 0; j < this.properties.length; j++) {
-					var v = data[i][this.properties[j]]
-					if (v > max) max = v
-					if (v < min) min = v
+			if (data) {
+				for (var i = 0; i < data.length; i++) {
+					for (var j = 0; j < this.properties.length; j++) {
+						var v = data[i][this.properties[j]]
+						if (v > max) max = v
+						if (v < min) min = v
+					}
 				}
 			}
 			switch (this.domainRange) {

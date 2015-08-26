@@ -40,5 +40,6 @@ export interface IInterpolator {
 	insertAtPointReverse(val:number):void
 	insertAtIdx(i:number):void
 	insertAtIdxReverse(i:number):void 
+	getBBox?():SVGRect
 }
 

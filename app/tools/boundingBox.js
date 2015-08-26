@@ -1,4 +1,4 @@
-// Source: http://blog.hackers-cafe.net/2009/06/how-to-calculate-bezier-curves-bounding.html
+// Source: http://blog.hackers-cafe.net/2009/06/how-to- calculate-bezier-curves-bounding.html
 // Original version: NISHIO Hirokazu
 // Modifications: Timo
 

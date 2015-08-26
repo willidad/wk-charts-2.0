@@ -91,6 +91,11 @@ export class Layout {
 	public targetContainer = 'wk-chart-layout-area';
 	public needsPadding:boolean = true
 	public rowColor:string = undefined
+	
+	// override
+	protected getBBox() {
+		return undefined
+	}
 		
 	public getPadding = (container, data, drawingAreaSize):IMargins => { 
 		// draw the layout into a invisible container, measure its bouding box and retur the differences to the supplied drawing area size
@@ -100,8 +105,12 @@ export class Layout {
 		this.valueScale.setRange(this.isVertical ? [0, drawingAreaSize.width] : [drawingAreaSize.height, 0])
 		this.keyOffset = this.keyScale.isOrdinal ? this.keyScale.getRangeBand() / 2 : 0
 		this.data = data
-		this.draw(sizer,false)
-		var box = sizer.node().getBBox()
+		var box = this.getBBox()
+		if (!box) {
+			this.draw(sizer,false)
+			var box = sizer.node().getBBox()
+		}
+		console.log (box)
 		sizer.remove()
 		padding.left = box.x < 0 ? Math.abs(box.x) : 0
 		padding.top = box.y < 0 ? Math.abs(box.y) : 0

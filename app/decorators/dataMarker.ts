@@ -30,4 +30,15 @@ export class DataMarker {
 			
 		this._markers.exit().remove()
 	}
+	
+	public getBBox(data) {
+		var xRange = d3.extent(data.map(function(d) {return d[0]}))
+		var yRange = d3.extent(data.map(function(d) {return d[1]}))
+		return {
+			x:xRange[0] - defaults.markerSize, 
+			y:yRange[0] - defaults.markerSize,
+			width:Math.abs(xRange[0] - xRange[1]) + 2*defaults.markerSize,
+			height:Math.abs(yRange[0] - yRange[1]) + 2*defaults.markerSize
+		}
+	}
 }

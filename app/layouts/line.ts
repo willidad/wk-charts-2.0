@@ -81,6 +81,9 @@ export class Line extends Layout {
 		if (this._dataMarkers) {
 			this._dataMarkers.draw(container,this._interpolatorY.getPathPoints(),this.propertyColor(), transition, this._duration)
 		}
-		
+	}
+	
+	protected getBBox() {
+		return this._interpolatorY.getBBox()
 	}
 }

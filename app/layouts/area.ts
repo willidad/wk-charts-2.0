@@ -7,6 +7,7 @@ import { DataMarker } from './../decorators/dataMarker'
 import { Linear} from './../interpolators/lineLinear'
 import { Hermite } from './../interpolators/lineHermite'
 import { area as defaults } from './../core/defaults'
+import { outerBox } from './../tools/helpers'
 
 export class Area extends Layout {
 	
@@ -106,6 +107,17 @@ export class Area extends Layout {
 			if (this.val0Fn) d = d.concat(this._interpolatorY0.getPathPoints())		
 			this._dataMarkers.draw(container, d, this.propertyColor(), transition, this._duration)
 		}
-		
+	}
+	
+	public getBBox() {
+		var bounds = [] 
+		bounds.push(this._interpolatorY.getBBox())
+		bounds.push(this._interpolatorY0.getBBox())
+		if (this._dataMarkers) {
+			var d = this._interpolatorY.getPathPoints()	
+			if (this.val0Fn) d = d.concat(this._interpolatorY0.getPathPoints())	
+			bounds.push(this._dataMarkers.getBBox(d))	
+		}
+		return outerBox(bounds)
 	}
 }
