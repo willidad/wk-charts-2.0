@@ -1,4 +1,6 @@
 import * as d3 from 'd3'
+import { Scale } from './scale'
+import { Data } from './data'
 
 export type Point = [number, number, boolean]
 export type Points = Point[]
@@ -43,3 +45,27 @@ export interface IInterpolator {
 	getBBox?():SVGRect
 }
 
+export interface ITooltip {
+	showGroup:boolean
+	keyScale?:Scale
+	properties?:string[]
+	isVertical?:boolean
+	data:any[]
+	container:D3Selection
+	enable()
+	disable()
+}
+
+export interface ITooltipData {
+	key:any
+	keyProperty
+	value:any
+	valueProperty
+	color:string
+	style?:Style
+	icon?:any
+}
+
+export interface ITooltipDataProvider {
+	getTooltipData(dataIdx:number):ITooltipData
+}

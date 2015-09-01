@@ -48,4 +48,7 @@ export class Data {
 		return this._prevData
 	}
 	
+	public getByKey(key:any):any {
+		return this._currentKeyIdx[key]
+	}
 }

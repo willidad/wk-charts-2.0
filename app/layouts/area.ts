@@ -54,11 +54,11 @@ export class Area extends Layout {
 
 	set data(val:any[]) {
 		this._dataMapped = val.map((d:any):[number,number] => {
-			return this.isVertical ? [this.valFn(d), this.keyFn(d) + this.keyOffset] : [this.keyFn(d) + this.keyOffset, this.valFn(d)]
+			return this.isVertical ? [this.scaleVal(d), this.scaleKey(d) + this.keyOffset] : [this.scaleKey(d) + this.keyOffset, this.scaleVal(d)]
 		})
 		if (this.val0Fn) {
 			this._dataMappedY0 = val.map((d:any):[number,number] => {
-				return this.isVertical ? [this.val0Fn(d), this.keyFn(d) + this.keyOffset] : [this.keyFn(d) + this.keyOffset, this.val0Fn(d)]
+				return this.isVertical ? [this.val0Fn(d), this.scaleKey(d) + this.keyOffset] : [this.scaleKey(d) + this.keyOffset, this.val0Fn(d)]
 			})
 		} else {
 			// y0 is not specified, use y start and end values
@@ -72,8 +72,8 @@ export class Area extends Layout {
 	}
 	
 	public insertPointAt(key:number) {
-		this._interpolatorY.insertAtPoint(this.keyFn(key) + this.keyOffset)
-		this._interpolatorY0.insertAtPointReverse(this.keyFn(key) + this.keyOffset)
+		this._interpolatorY.insertAtPoint(this.scaleKey(key) + this.keyOffset)
+		this._interpolatorY0.insertAtPointReverse(this.scaleKey(key) + this.keyOffset)
 	}
 	
 	protected removePointAt(key:any) {
@@ -98,14 +98,14 @@ export class Area extends Layout {
 	
 
 		if (this.colorScale) {
-			this._path.style('fill', this.rowColor || this.propertyColor())
+			this._path.style('fill', this.rowColor || this.colorScalePropertyName())
 		}
 		this._path.style(this.areaStyle)
 		
 		if (this._dataMarkers) {
 			var d = this._interpolatorY.getPathPoints()	
 			if (this.val0Fn) d = d.concat(this._interpolatorY0.getPathPoints())		
-			this._dataMarkers.draw(container, d, this.propertyColor(), transition, this._duration)
+			this._dataMarkers.draw(container, d, this.colorScalePropertyName(), transition, this._duration)
 		}
 	}
 	

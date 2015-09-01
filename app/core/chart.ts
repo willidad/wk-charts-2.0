@@ -1,5 +1,5 @@
 
-import { Style, IMargins } from './interfaces'
+import { Style, IMargins, ITooltip } from './interfaces'
 import { DomainCalc, Scale } from './scale'
 import { Position , Axis } from './axis'
 import { Layout}  from './layout'
@@ -23,6 +23,7 @@ export class Chart {
 	
 	private static _id:number = 0;
 	
+	private _id:number
 	private _container:HTMLElement
 	private _d3Container;
 	private _containerSize:ClientRect;
@@ -123,12 +124,8 @@ export class Chart {
 		if (animate) {
 			//console.log('animated Position')
 			cntr.transition().duration(duration).attr('transform', `translate(${this._layoutMargins.left}, ${this._layoutMargins.top})`)
-			this._d3Container.selectAll('.wk-chart-bottom').transition().duration(duration).attr('transform', `translate(0,${this._drawingAreaSize.height})`)
-			this._d3Container.selectAll('.wk-chart-right').transition().duration(duration).attr('transform', `translate(${this._drawingAreaSize.width})`)
 		} else {
 			cntr.attr('transform', `translate(${this._layoutMargins.left}, ${this._layoutMargins.top})`)
-			this._d3Container.selectAll('.wk-chart-bottom').attr('transform', `translate(0,${this._drawingAreaSize.height})`)
-			this._d3Container.selectAll('.wk-chart-right').attr('transform', `translate(${this._drawingAreaSize.width})`)
 		}
 	}
 	
@@ -177,21 +174,36 @@ export class Chart {
 	private sizeRange = () => {
 		this._ranges.x = [this._layoutPadding.left, this._drawingAreaSize.width - this._layoutPadding.left - this._layoutPadding.right]
 		this._ranges.y = [this._drawingAreaSize.height - this._layoutPadding.bottom, this._layoutPadding.top]
+		// size the background and mask areas
+		this._d3Container.select('.wk-chart-interaction-layer')
+			.attr('x', this._layoutPadding.left)
+			.attr('y', this._layoutPadding.top)
+			.attr('width', Math.abs(this._ranges.x[0] - this._ranges.x[1]))
+			.attr('height', Math.abs(this._ranges.y[0] - this._ranges.y[1]))
+	}
+	
+	private sizeClip(animate:boolean) {
+		var clip = this._d3Container.select(`defs #wk-chart-clip-${this._id} rect`);
+		
+		(animate ? clip.transition().duration(duration) : clip)
+			.attr('width', this._drawingAreaSize.width)
+			.attr('height', this._drawingAreaSize.height)
 	}
 
 	
-	constructor(drawInto:HTMLElement, public title?:string, public subTitle?:string) {	
+	constructor(drawInto:HTMLElement, public title?:string, public subTitle?:string, public tooltip?:ITooltip) {	
 		Chart._id += 1;
+		this._id = Chart._id
 		this._container = drawInto;
 		this._d3Container = d3.select(this._container)
 		this._container.innerHTML = `
 		<div class="wk-chart">
 			<svg class="wk-chart-svg" style="width:100%; height:100%">
 				<defs>
-					<clipPath class="wk-chart-clip-${Chart._id}">
+					<clipPath id="wk-chart-clip-${this._id}">
 						<rect />
 					</clipPath>
-					<mask class="wk-chart-clip-mask-${Chart._id}">
+					<mask class="wk-chart-clip-mask-${this._id}">
 						<rect class="wk-chart-brush wk-chart-brush-rect1" style="fill:rgba(255,255,255,0.5)"></rect>
 						<rect class="wk-chart-brush wk-chart-brush-extent" style="fill:#ffffff"></rect>
 						<rect class="wk-chart-brush wk-chart-brush-rect2" style="fill:rgba(255,255,255,0.5)"></rect>
@@ -207,11 +219,11 @@ export class Chart {
 				</g>
 				<g class="wk-chart-container">
 					<g class="wk-chart-grid-area" />
-					<g class="wk-chart-layout-area" />
+					<g class="wk-chart-layout-area" clip-path="url(#wk-chart-clip-${this._id})"/>
 					<g class="wk-chart-marker-area" />
 					<g class="wk-chart-label-area" />
 					<g class="wk-chart-interaction-area">
-						<rect class="wk-chart-interaction-layer" style="opacity:0;pointer-events:all;"/>
+						<rect class="wk-chart-interaction-layer" style="opacity:0;pointer-events:none;"/>
 					</g>
 				</g>
 			</svg>
@@ -267,44 +279,42 @@ export class Chart {
 			this._newData = false
 		}
 		
-		//console.log("draw called")
+		//register tooltip mouse handlers if tooltip object is provided
 		
-		// diff key data to prepeare animation
+		if (this.tooltip) {
+			this.tooltip.container = this._d3Container.select('.wk-chart-Container')
+			this.tooltip.data = this._data
+			this.tooltip.disable()
+		}
 		
-		this.setupLayouts()
-		this.prepeareData()
+		var animate:boolean = !this._initialDraw && this._newData // animate only if there is a data change 
+		this.setupLayouts() // inject data dependencies into layout objects
+		this.prepeareData() // diff key data to prepeare animation
 		
-		if (this._newData && !this._initialDraw) {
-			//this.drawStartLayouts()
+		if (animate) {
+			//setup animation start elements
 			for (var layout of this.layouts) {
 				layout.drawStart(this._oldData)
 			}
 		}
-		
-		this._containerSize = this._d3Container.select('.wk-chart-svg').node().getBoundingClientRect(); // get the outer bounds of teh drawing area
+		// resize and rescale based on new data
+		this._containerSize = this._d3Container.select('.wk-chart-svg').node().getBoundingClientRect(); // get the outer bounds of the drawing area
 		this._layoutMargins = <IMargins>_.assign(this._layoutMargins, chartDefaults.margins)
 		this.measureTitles(); // create the title elements and reserver space for them. Titles are not removed after measuring
 		this.measureAxis()
 		this.sizeLayoutArea() //measure space requirements for axis and compute layout size
-		
 		this.drawTitles()
 		this.updateDomains()
-		if (this._initialDraw || !this._newData) {
-			//console.log('initial draw')
-			this.positionLayout(false) // finally position the layout container
-			this.getLayoutPadding() // if needed draw the layout and measure if it fits into the drawing area
-			this.sizeRange() //add padding to the range values
-			this.drawAxis(false)
-			this.drawGrids(false)
-			this.drawEnd(false)
-		} else {
-			this.positionLayout(true) // finally position the layout container
-			this.getLayoutPadding() // if needed draw the layout and measure if it fits into the drawing area
-			this.sizeRange() //add padding to the range values
-			this.drawAxis(true)
-			this.drawGrids(true)
-			this.drawEnd(true) 
-			//console.log('animated draw')
+		this.positionLayout(animate) // finally position the layout container
+		this.getLayoutPadding() // get padding needs from the layouts (e.g. for data labels or markers)
+		this.sizeRange() //add padding to the range values
+		this.sizeClip(animate)
+		this.drawAxis(animate)
+		this.drawGrids(animate)
+		this.drawEnd(animate)
+		
+		if (this.tooltip) {
+			this.tooltip.enable()
 		}
 		
 		this._initialDraw = false

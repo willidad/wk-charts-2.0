@@ -27,7 +27,7 @@ export class DataMarker {
 			.style('fill', color)
 			.style(this.markerStyle)
 			.style('opacity', (d:Point) => { return d[2] ? 0 : this.markerStyle['opacity'] || 1})
-			
+			.style('pointer-events', 'none')
 		this._markers.exit().remove()
 	}
 	

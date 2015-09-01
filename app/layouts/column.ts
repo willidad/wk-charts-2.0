@@ -42,36 +42,39 @@ export class Column extends Layout {
 	private leftTopPadding = this.keyScale.getRangeBand() * this.padding[0]
 	private rightBottomPadding = this.keyScale.getRangeBand() * this.padding[1]
 	private _columns
+	private _isRangeInverse
 	
 	private mapData(idx: number, v, insert?:boolean, remove?:boolean):Box {
 		var ret
+		var keyOffset = this.keyScale.getRangeBand() * (insert || remove ? (this._isRangeInverse ? 1 : 0) : this.padding[0])
 		if (this.isVertical) {
 			ret = {
-				y: this.mapKeyIdx(idx) + this.keyScale.getRangeBand() * (insert || remove ? 0 : this.padding[0]),
-				x: this.val(v) < 0 ? this.valFn(v) : this.valFnZero(),
+				y: this.scaleKeyIdx(idx) + keyOffset,
+				x: this.val(v) < 0 ? this.scaleVal(v) : this.scaleZero(),
 				height: insert || remove ? 0 : this.keyScale.getRangeBand() * (1 - this.padding[0] - this.padding[1]),
-				width: Math.abs(this.valFn(v) - this.valFnZero()),
+				width: Math.abs(this.scaleVal(v) - this.scaleZero()),
 			}
 			
 		} else {
 			ret = {
-				x: this.mapKeyIdx(idx) + this.keyScale.getRangeBand() * (insert || remove ? 0 : this.padding[0]),
-				y: this.val(v) < 0 ? this.valFnZero() : this.valFn(v),
+				x: this.scaleKeyIdx(idx) + keyOffset,
+				y: this.val(v) < 0 ? this.scaleZero() : this.scaleVal(v),
 				width: insert || remove ? 0 : this.keyScale.getRangeBand() * (1 - this.padding[0] - this.padding[1]),
-				height: Math.abs(this.valFnZero() - this.valFn(v)),
+				height: Math.abs(this.scaleZero() - this.scaleVal(v)),
 			}
 		}
-		ret.fill = this.rowColor || this.colorFn(v)
+		ret.fill = this.rowColor || this.colorScaleKey(v)
 		ret.style = this.columnStyle
 		ret.insert = insert
 		ret.remove = remove
 		ret.value = this.val(v)
 		ret.key = this.key(v)
+		ret.data = {key:this.key(v), value:this.val(v)}
 		return ret
 	}
 	
-	
 	set data(val:any[]) {
+		this._isRangeInverse = this.keyScale.isInverseRange
 		this._dataMapped = val.map((d, i:number):Box => { return this.mapData(i, d) })
 	}
 	

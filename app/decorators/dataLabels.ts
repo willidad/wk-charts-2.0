@@ -49,10 +49,10 @@ export class DataLabel {
 				var s = d3.select(this)
 				var text = s.select('text')
 					.text(function(d) { return d.value })
-					.style(textStyle)
+					.style(textStyle).style('pointer-events', 'none')
 					.style('text-anchor', isVertical ? 'start' : 'middle')
 					.attr('dy', isVertical ? '0.35em' : 0)
-				s.select('rect').style(bgStyle).attr(text.node().getBBox())
+				s.select('rect').style(bgStyle).style('pointer-events', 'none').attr(text.node().getBBox())
 			})
 		this._labels.exit().remove()
 	}

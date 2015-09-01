@@ -7,7 +7,7 @@
     <link href="app/css/css.css" type="text/css" rel="stylesheet">
 </head>
 <body>
-    <div id="content"></div>
+    <div id="container"></div>
     <div>
         <input id="rotation" type="range" min="-180" max="180" value="0" onchange="rotate()" style="width:400px;">
         <span id="rotationvalue"></span>
@@ -30,10 +30,7 @@
     </div>
     
     <script>
-        System.import('app/app.ts').then(function(m) {
-            var element = document.getElementById("content");
-            m.main(element);
-        });
+        System.import('app/app')
         
         function rotate() {
             var rVal = document.getElementById('rotation').value;

@@ -9,9 +9,11 @@ export class Scale {
 	
 	private _d3Scale;
 	private _scaleType:string;
+	private _data:any[]
 	
-	constructor(type:string, public properties:string[], public domainRange:DomainCalc = DomainCalc.none) {
+	constructor(type:string, public properties:string[], public domainRange:DomainCalc = DomainCalc.none, isInverted?:boolean) {
 		this.type = type
+        this.isInverted = isInverted
 	}
 	 // setter and getter to create d3 scale
 	set type(t:string) {
@@ -27,6 +29,11 @@ export class Scale {
 	
 	get isOrdinal():boolean  {
 		return _.has(this._d3Scale, 'rangeBand');
+	}
+	 
+	get isInverseRange():boolean {
+		var r = this._d3Scale.range()
+		return r[0] > r[r.length - 1]
 	}
 	
 	public isInverted:boolean = false;
@@ -53,7 +60,7 @@ export class Scale {
 	}
 	
 	public setDomain = (data:any[]) => {
-		
+		this._data = data
 		if (this.domainRange === DomainCalc.none) {
 			if (this.properties.length === 1) {
 					this._d3Scale.domain(_.pluck(data, this.properties[0]))
@@ -98,7 +105,30 @@ export class Scale {
 			var range = this._d3Scale.range()
 			if (0 <= idx && idx < range.length) return range[idx]
 			if (idx < 0) return range[0]
-			if (idx >= range.length) return range[range.length - 1] + this.getRangeBand()
+			if (idx >= range.length) return range[range.length - 1] + (this.isInverseRange ? -this.getRangeBand() : this.getRangeBand())
+		}
+	}
+	
+	private bisectKey(val:any, data:any[]):any {
+		var bisect, idx
+			if (data[0] < data[data.length-1]) {
+				bisect = d3.bisector(function(a,b) { return a - b }).right
+				idx = bisect(data, val) - 1
+			} else {
+				bisect = d3.bisector(function(a,b) { return b - a }).left
+				idx = bisect(data, val)
+			}			
+			return idx
+	}
+	
+	public invert = (value:number):any => {
+		if (this._d3Scale.hasOwnProperty('invert')) {
+			var inv = this._d3Scale.invert(value)
+			return this.bisectKey(value, this._data)
+		} else if (this.isOrdinal) {			
+			return this.bisectKey(value, this._d3Scale.range())
+		} else {
+			return undefined
 		}
 	}
 }

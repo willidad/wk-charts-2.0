@@ -45,13 +45,13 @@ export class Line extends Layout {
 	
 	set data(val:any[]) {
 		this._dataMapped = val.map((d:any):Point => {
-			return this.isVertical ? [this.valFn(d), this.keyFn(d) + this.keyOffset, false] : [this.keyFn(d) + this.keyOffset, this.valFn(d), false]
+			return this.isVertical ? [this.scaleVal(d), this.scaleKey(d) + this.keyOffset, false] : [this.scaleKey(d) + this.keyOffset, this.scaleVal(d), false]
 		})		
 		this._interpolatorY.data(this._dataMapped)
 	}
 	
 	protected insertPointAt(key:any) {
-		this._interpolatorY.insertAtPoint(this.keyFn(key)  + this.keyOffset)
+		this._interpolatorY.insertAtPoint(this.scaleKey(key)  + this.keyOffset)
 	}
 	
 	protected removePointAt(key:any) {
@@ -74,13 +74,13 @@ export class Line extends Layout {
 		s.attr('d', `M${this._interpolatorY.path()}`)
 
 		if (this.colorScale) {
-			this._path.style('stroke', this.rowColor || this.propertyColor()).style('fill','none')
+			this._path.style('stroke', this.rowColor || this.colorScalePropertyName()).style('fill','none')
 		}
 		
 		this._path.style(this.lineStyle)
 		
 		if (this._dataMarkers) {
-			this._dataMarkers.draw(container,this._interpolatorY.getPathPoints(),this.propertyColor(), transition, this._duration)
+			this._dataMarkers.draw(container,this._interpolatorY.getPathPoints(),this.colorScalePropertyName(), transition, this._duration)
 		}
 	}
 	

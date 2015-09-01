@@ -1,4 +1,4 @@
-import { IMargins } from './interfaces'
+import { IMargins, ITooltipData, ITooltipDataProvider, Style } from './interfaces'
 import { Scale } from './../core/scale'
 import { DataMarker } from './../decorators/dataMarker'
 import { DataLabel } from './../decorators/dataLabels'
@@ -10,7 +10,7 @@ import { Data } from './../core/data'
 import { chart as chartDefaults ,axis as axisDefaults, duration} from './../core/defaults'
 import * as hlp from './../tools/helpers'
 
-export class Layout {
+export class Layout implements ITooltipDataProvider {
 	
 	constructor(
 		public keyScale:Scale, 
@@ -35,66 +35,51 @@ export class Layout {
 	protected _dataLabels:DataLabel
 	protected _pieDatalabels:PieDataLabel
 	
-	protected valFn = (val):number => {
-		return this.valueScale.map(typeof val === 'object' ? val[this.valueProperty] : val)
+	// data access conveniene functions
+	protected scaleVal = (val):number => { return this.valueScale.map(typeof val === 'object' ? val[this.valueProperty] : val) }
+	protected scaleZero = ():number => { return this.valueScale.map(0) }
+	protected val = (val):any => { return val[this.valueProperty] }
+	protected scaleKey = (val):number => { return this.keyScale.map(typeof val === 'object' ? val[this.keyProperty] : val) }
+	protected scaleKeyIdx = (idx:number) => { return this.keyScale.mapIdx(idx) }
+	protected key = (val):any => { return val[this.keyProperty] }
+	protected colorScalePropertyName = ():string => { return this.colorScale ? this.colorScale.map(this.valueProperty) :  undefined }
+	protected scaleColor = (val):any => { return this.colorScale ? this.colorScale.map(val) : undefined }	
+	protected colorScaleKey = (val):any => { return this.colorScale ? this.colorScale.map(val[this.keyProperty]) : undefined }
+	//-----------------------------------------------------------------------------------------
+	// implementation for ITooltipDataProvider
+	protected getColor(val):string {
+		return 	'red' //override		
+	}
+	protected getStyle():Style {
+		return 	{} //override	
 	}
 	
-	protected valFnZero = ():number => {
-		return this.valueScale.map(0)
-	}
-	
-	protected mapVal = (val):number => {
-		return this.valueScale.map(val)
-	}
-	
-	protected val = (val):any => {
-		return val[this.valueProperty]
-	}
-	
-	protected keyFn = (val):number => {
-		return this.keyScale.map(typeof val === 'object' ? val[this.keyProperty] : val)
-	}
-	
-	protected mapKey = (val):number => {
-		return this.keyScale.map(val)
-	}
-	
-	protected mapKeyIdx = (idx:number) => {
-		return this.keyScale.mapIdx(idx)
-	}
-	
-	protected key = (val):any => {
-		if (!val) debugger
-		return val[this.keyProperty]
-	}
-	
-	protected propertyColor = ():string => {
-		if (this.colorScale) {
-			return this.colorScale.map(this.valueProperty)
-		} else {
-			return null
+	public getTooltipData(dataIdx:number):ITooltipData {
+		var d = this.dataMgr.current
+		return {
+			key:this.key(d),
+			keyProperty: this.keyProperty,
+			value:this.val(d),
+			valueProperty: this.valueProperty,
+			color:this.getColor(d),
+			style:this.getStyle(),
 		}
 	}
+	//------------------------------------------------------------------------------------------
+	// layout padding provider
 	
-	protected mapColor = (val):any => {
-		return this.colorScale.map(val)
-	}	
-	
-	protected colorFn = (val):any => {
-		if (this.colorScale) {
-			return this.colorScale.map(val[this.keyProperty])
-		} else {
-			return null
-		}
-	}
-
 	public targetContainer = 'wk-chart-layout-area';
 	public needsPadding:boolean = true
 	public rowColor:string = undefined
+	public tooltipDispatch;
 	
-	// override
-	protected getBBox() {
-		return undefined
+	// override default implementation
+	protected getBBox(container?) {
+		var sizer = container.append('g')
+			this.draw(sizer,false)
+			var box = sizer.node().getBBox()
+			sizer.remove()
+			return box
 	}
 		
 	public getPadding = (container, data, drawingAreaSize):IMargins => { 
@@ -105,13 +90,7 @@ export class Layout {
 		this.valueScale.setRange(this.isVertical ? [0, drawingAreaSize.width] : [drawingAreaSize.height, 0])
 		this.keyOffset = this.keyScale.isOrdinal ? this.keyScale.getRangeBand() / 2 : 0
 		this.data = data
-		var box = this.getBBox()
-		if (!box) {
-			var sizer = container.append('g')
-			this.draw(sizer,false)
-			var box = sizer.node().getBBox()
-			sizer.remove()
-		}
+		var box = this.getBBox(container)
 		padding.left = box.x < 0 ? Math.abs(box.x) : 0
 		padding.top = box.y < 0 ? Math.abs(box.y) : 0
 		padding.bottom = box.y + box.height > drawingAreaSize.height ? Math.abs(drawingAreaSize.height - box.y - box.height) : 0
@@ -139,6 +118,7 @@ export class Layout {
 		this.valueScale.setDomain(data)
 	}
 	
+	//---------------------------------------------------------------------------------
 	
 	public drawStart = (data:any[]) => {
 		this.keyOffset = this.keyScale.isOrdinal ? this.keyScale.getRangeBand() / 2 : 0

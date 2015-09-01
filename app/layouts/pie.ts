@@ -1,5 +1,6 @@
 import { Layout } from './../core/layout'
 import { Style } from './../core/interfaces'
+import { Scale } from './../core/scale'
 import { PieDataLabel } from './../decorators/pieDatalabels'
 import { pie as pieDefaults, duration} from './../core/defaults'
 import * as d3 from 'd3'
@@ -8,6 +9,19 @@ import * as _ from 'lodash'
 type Arc = {key:any, val:number, value:any, insert:boolean, remove:boolean}
 
 export class Pie extends Layout {
+
+    constructor(
+
+        keyScale:Scale,
+        keyProperty:string,
+        valueScale:Scale,
+        valueProperty:string,
+        colorScale?:Scale,
+        dataLabels?:PieDataLabel) {
+
+        super(keyScale, keyProperty, valueScale, valueProperty, colorScale)
+        this.dataLabels = dataLabels
+    }
 	
 	private _pieStyle:Style = {};
 	private _dataLabelStyle:Style = {};
@@ -86,7 +100,7 @@ export class Pie extends Layout {
 		}
 		
 		path
-			.attr('fill', (d) => this.mapColor(d.data.key))
+			.attr('fill', (d) => this.scaleColor(d.data.key))
 			.style(this.pieStyle)
 		
 		path.exit().remove()

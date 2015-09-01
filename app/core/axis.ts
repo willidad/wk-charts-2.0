@@ -26,7 +26,7 @@ export class Axis {
 	
 	private getRotation = (degree:number):string => {
 		return [`rotate(${-degree}, 0, -10)`,`rotate(${degree}, 0, 10)`,`rotate(${degree}, -10, 0)`,`rotate(${degree}, 10, 0)`][this._orient]
-	}
+	};
 	
 	private getAnchor = (orient:Position, rotation:number):string => {
 		if (rotation === 0) return ['middle', 'middle', 'end', 'start'] [orient]
@@ -87,46 +87,49 @@ export class Axis {
 	}
 	
 	public getNeededSpace = (ctnr, data):number => {
-		this._d3Axis.scale(this._scale.getD3Scale()).orient(Position[this._orient])
-		this._scale.setDomain(data)
-		this._scale.setRange([0, 100]) // set arbitrary value
+		this._d3Axis.scale(this._scale.getD3Scale()).orient(Position[this._orient]);
+		this._scale.setDomain(data);
+		this._scale.setRange([0, 100]); // set arbitrary value
 		
-		var drawTo = d3.select(`.wk-chart-axis.wk-chart-${Position[this._orient]}`)
+		var drawTo = d3.select(`.wk-chart-axis.wk-chart-${Position[this._orient]}`);
 		if (drawTo.empty()) {
 			drawTo = ctnr.insert('g', '.wk-chart-layout-area').attr('class',`wk-chart-axis wk-chart-${Position[this._orient]}`)
 		}
-		var measuredDrawTo = drawTo.append('g')
-		measuredDrawTo.call(this._d3Axis)
+		var measuredDrawTo = drawTo.append('g');
+		measuredDrawTo.call(this._d3Axis);
 		// rotate Tick Labels
 		var ticks = measuredDrawTo.selectAll('.tick > text')
 			.attr('transform', this.getRotation(this.tickRotation))
 			.style('text-anchor', this.getAnchor(this._orient, this.tickRotation))
-			.attr('dy', this.getDY(this._orient, this.tickRotation))
+			.attr('dy', this.getDY(this._orient, this.tickRotation));
 		
-		this._requiredSpace = this.isVertical ? measuredDrawTo.node().getBBox().width : measuredDrawTo.node().getBBox().height 				
-		this._requiredSpace += this._titleHeight = this.title ? drawing.measureLabel(this.title,measuredDrawTo,this.titleStyle, this.titleBgStyle).height : 0		
+		this._requiredSpace = this.isVertical ? measuredDrawTo.node().getBBox().width : measuredDrawTo.node().getBBox().height;
+		this._requiredSpace += this._titleHeight = this.title ? drawing.measureLabel(this.title, measuredDrawTo, this.titleStyle, this.titleBgStyle).height : 0;
 		
-		measuredDrawTo.remove()
+		measuredDrawTo.remove();
 		
 		return this._requiredSpace
-	}
+	};
 	
-	public draw = (ctnr, data, layoutSize, ranges, animate:boolean) => {
+	public draw = (ctnr, data, drawingAreaSize, ranges, animate:boolean) => {
 		// setup scale
 		var d3Scale = this._scale.getD3Scale()
 		this._d3Axis.scale(d3Scale).orient(Position[this._orient])
 		this._scale.setDomain(data)
-		this._scale.setRange(this.isVertical ? ranges.y : ranges.x)
-		
+		this._scale.setRange(this.isVertical ? ranges.y : ranges.x)		
 		var drawTo = d3.select(`.wk-chart-axis.wk-chart-${Position[this._orient]}`)
 		if (drawTo.empty()) {
 			drawTo = ctnr.insert('g', '.wk-chart-layout-area').attr('class',`wk-chart-axis wk-chart-${Position[this._orient]}`)
 		}
 		
 		if (animate) {
-			drawTo.transition().duration(duration).call(this._d3Axis)
+			drawTo.transition().duration(duration)
+				.call(this._d3Axis)
+				.attr('transform', `translate(${this._orient === Position.right ? drawingAreaSize.width : 0}, ${this._orient === Position.bottom ? drawingAreaSize.height : 0})`)
 		} else {
-			drawTo.call(this._d3Axis)
+			drawTo
+				.call(this._d3Axis)
+				.attr('transform', `translate(${this._orient === Position.right ? drawingAreaSize.width : 0}, ${this._orient === Position.bottom ? drawingAreaSize.height : 0})`)
 		}
 		
 		// rotate labels if required
@@ -176,10 +179,10 @@ export class Axis {
 			
 			var l:any = animate ? labelG.transition().duration(duration) : labelG
 			switch (this._orient) {
-				case Position.left: l.attr('transform', `translate(${-this._requiredSpace}, ${layoutSize.height / 2}) rotate(-90)`) ;break
-				case Position.right: l.attr('transform', `translate(${this._requiredSpace}, ${layoutSize.height / 2}) rotate(90)`) ;break
-				case Position.top: l.attr('transform', `translate(${layoutSize.width / 2}, ${-this._requiredSpace})`) ;break
-				case Position.bottom: l.attr('transform', `translate(${layoutSize.width / 2}, ${this._requiredSpace})`) ;break
+				case Position.left: l.attr('transform', `translate(${-this._requiredSpace}, ${drawingAreaSize.height / 2}) rotate(-90)`) ;break
+				case Position.right: l.attr('transform', `translate(${this._requiredSpace}, ${drawingAreaSize.height / 2}) rotate(90)`) ;break
+				case Position.top: l.attr('transform', `translate(${drawingAreaSize.width / 2}, ${-this._requiredSpace})`) ;break
+				case Position.bottom: l.attr('transform', `translate(${drawingAreaSize.width / 2}, ${this._requiredSpace})`) ;break
 			}
 		}
 	}

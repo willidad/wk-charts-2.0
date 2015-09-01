@@ -33,7 +33,8 @@ export class Grid {
 				case Position.top: gs.attr('y1', ranges.y[0]).attr('y2', ranges.y[1]); break
 				case Position.bottom: gs.attr('y1', -ranges.y[0] - padding.bottom + padding.top).attr('y2', -ranges.y[1] - padding.bottom + padding.top); break
 			}
-			gridLine.style(_self.lineStyle)
+			gridLine.style(_self.lineStyle).style('pointer-events', 'none')
+			
 		}
 	}
 	
