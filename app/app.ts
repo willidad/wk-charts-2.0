@@ -6,19 +6,19 @@ var xScaleOrd:def.Scale = {
     id:'x',
 	type:'ordinal', 
 	properties:['x'], 
-	domainRange:def.DomainRangeCalc.extentZero
+	domainRange:def.DomainCalc.extentZero
 };
 var xScaleLin:def.Scale = {
     id:'x',
 	type:'linear', 
 	properties:['x1'], 
-	domainRange:def.DomainRangeCalc.extent
+	domainRange:def.DomainCalc.extent
 };
 var yScale:def.Scale = {
     id:'y',
 	type:'linear', 
 	properties:['y', 'y2'],
-	domainRange:def.DomainRangeCalc.extentZero
+	domainRange:def.DomainCalc.extentZero
 };
 var colorScale:def.Scale = {
     id:'color',
@@ -28,40 +28,40 @@ var colorScale:def.Scale = {
 
 var axisBottomOrd:def.Axis = {
 	orientation: def.Position.bottom,
-	scale:'x',
+	scaleId:'x',
 	title:'X-Axis',
     grid:true
 };
 var axisBottomLin:def.Axis = {
 	orientation: def.Position.bottom,
-	scale:'x',
+	scaleId:'x',
 	title:'X-Axis',
     grid:true
 };
 var axisLeft:def.Axis = {
 	orientation: def.Position.left,
-	scale:'y',
+	scaleId:'y',
 	title:'Y-Axis',
     grid:true
 };
 
 var area:def.Area = {
 	type:def.ChartType.area,
-	keyScale:'x',
+	keyScaleId:'x',
 	keyProperty:'x1',
-	valueScale:'y',
+	valueScaleId:'y',
 	value0Property:'y2',
 	valueProperty:'y',
-    colorScale:'color',
+    colorScaleId:'color',
 	spline:true,
 	dataMarkers:true
 };
 
 var line:def.Line = {
 	type:def.ChartType.line,
-	keyScale:xScaleLin,
+	keyScaleId:'x',
 	keyProperty:'x',
-	valueScale:yScale,
+	valueScaleId:'y',
 	valueProperty:'y',
 	spline:true,
 	dataMarkers:{fill:'#c0c0c0'}	
@@ -81,7 +81,7 @@ new DataTable('#data-table', data ,(data) => {
     chart.draw(data)
 });
 
-var container = d3.select('#container').node();
+var container = d3.select('#container'); 
 var chart = new Chart(container,chartDef);
 chart.draw(data);
 

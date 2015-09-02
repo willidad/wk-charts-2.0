@@ -2,3 +2,6 @@ jspm_packages
 node_modules
 typings
 build
+app/**/*.js
+app/**/*.js.map
+.idea

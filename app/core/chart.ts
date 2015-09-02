@@ -24,7 +24,7 @@ export class Chart {
 	private static _id:number = 0;
 	
 	private _id:number
-	private _container:HTMLElement
+	private _container:HTMLDivElement
 	private _d3Container;
 	private _containerSize:ClientRect;
 	private _layoutMargins:IMargins = {
@@ -191,11 +191,11 @@ export class Chart {
 	}
 
 	
-	constructor(drawInto:HTMLElement, public title?:string, public subTitle?:string, public tooltip?:ITooltip) {	
+	constructor(drawInto:d3.Selection<HTMLDivElement>, public title?:string, public subTitle?:string, public tooltip?:ITooltip) {	
 		Chart._id += 1;
 		this._id = Chart._id
-		this._container = drawInto;
-		this._d3Container = d3.select(this._container)
+		this._container = <HTMLDivElement>drawInto.node();
+		this._d3Container = drawInto
 		this._container.innerHTML = `
 		<div class="wk-chart">
 			<svg class="wk-chart-svg" style="width:100%; height:100%">

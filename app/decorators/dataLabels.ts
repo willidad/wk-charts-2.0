@@ -7,8 +7,8 @@ import {dataLabels as defaults} from './../core/defaults'
 
 export class DataLabel {
 	
-	constructor(labelStyle?:Style, bgStyle?:Style, rotation?:number) {
-		this.style = labelStyle || {}
+	constructor(style?:Style, bgStyle?:Style, rotation?:number) {
+		this.style = style || {}
 		this.bgStyle = bgStyle || {}
 		this.rotation = rotation || 0
 		DataLabel.cnt += 1
