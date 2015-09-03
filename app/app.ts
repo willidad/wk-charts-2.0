@@ -208,6 +208,8 @@ var pieChart:def.ChartDef = {
 	tooltip: { showElement:true, keyScaleId:'keyOrd', properties:['y'] }
 };
 
+console.log (JSON.stringify(pieChart))
+
 var data = [
 	{ x: 'aaaa', 	x1: 1, 	y: 12, 		y2: 10.5 },
 	{ x: 'bbb', 	x1: 2, 	y: 13.8762, y2: 3.123456 },
