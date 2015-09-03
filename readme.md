@@ -11,11 +11,11 @@ Before you start:
 
     npm install tsd -g
 	
-- install a local file server. I am using live-server: 
+- install a local file server. I am using live-server for development: 
 
     npm install live-server -g
 	
-- install dependencies: (launches default browser at port 8080)
+- install dependencies:
 
     jspm install 
 	
@@ -23,7 +23,7 @@ Before you start:
 	
 	tsd update --save
 	
-- run server: 
+- run server (launches default browser at port 8080): 
 
     live-server 
 	

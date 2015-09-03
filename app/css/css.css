@@ -17,3 +17,11 @@
 	font-family: Arial, Helvetica, sans-serif;
 	font-size:0.8em;
 }
+
+div.wk-chart-tooltip {
+	background-color: #3F3F3F;
+	padding: 5px
+}
+.wk-chart-tooltip table {
+	color: white
+}

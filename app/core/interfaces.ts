@@ -44,28 +44,3 @@ export interface IInterpolator {
 	insertAtIdxReverse(i:number):void 
 	getBBox?():SVGRect
 }
-
-export interface ITooltip {
-	showGroup:boolean
-	keyScale?:Scale
-	properties?:string[]
-	isVertical?:boolean
-	data:any[]
-	container:D3Selection
-	enable()
-	disable()
-}
-
-export interface ITooltipData {
-	key:any
-	keyProperty
-	value:any
-	valueProperty
-	color:string
-	style?:Style
-	icon?:any
-}
-
-export interface ITooltipDataProvider {
-	getTooltipData(dataIdx:number):ITooltipData
-}

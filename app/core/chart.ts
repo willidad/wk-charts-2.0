@@ -282,7 +282,7 @@ export class Chart {
 		//register tooltip mouse handlers if tooltip object is provided
 		
 		if (this.tooltip) {
-			this.tooltip.container = this._d3Container.select('.wk-chart-Container')
+			this.tooltip.container = this._d3Container
 			this.tooltip.data = this._data
 			this.tooltip.disable()
 		}

@@ -9,7 +9,8 @@ export class Scale {
 	
 	private _d3Scale;
 	private _scaleType:string;
-	private _data:any[]
+	private _data: any[]
+	private _keyData: any[]
 	
 	constructor(type:string, public properties:string[], public domainRange:DomainCalc = DomainCalc.none, isInverted?:boolean) {
 		this.type = type
@@ -61,9 +62,12 @@ export class Scale {
 	
 	public setDomain = (data:any[]) => {
 		this._data = data
+		if (this.properties.length === 1) {
+			this._keyData = _.pluck(data, this.properties[0])
+		}
 		if (this.domainRange === DomainCalc.none) {
 			if (this.properties.length === 1) {
-					this._d3Scale.domain(_.pluck(data, this.properties[0]))
+					this._d3Scale.domain(this._keyData)
 				}
 		} else {
 			// compute the minimum and maximum value
@@ -109,22 +113,22 @@ export class Scale {
 		}
 	}
 	
-	private bisectKey(val:any, data:any[]):any {
+	private bisectKey = (val:any, data:any[]):any => {
 		var bisect, idx
-			if (data[0] < data[data.length-1]) {
-				bisect = d3.bisector(function(a,b) { return a - b }).right
-				idx = bisect(data, val) - 1
-			} else {
-				bisect = d3.bisector(function(a,b) { return b - a }).left
-				idx = bisect(data, val)
-			}			
-			return idx
+		if (data[0] < data[data.length-1]) {
+			bisect = d3.bisector((a:any,b:any) => { return a - b }).right
+			idx = bisect(data, val) - 1
+		} else {
+			bisect = d3.bisector((a:any,b:any) => { return b - a }).left
+			idx = bisect(data, val)
+		}			
+		return idx
 	}
 	
 	public invert = (value:number):any => {
 		if (this._d3Scale.hasOwnProperty('invert')) {
 			var inv = this._d3Scale.invert(value)
-			return this.bisectKey(value, this._data)
+			return this.bisectKey(inv, this._keyData)
 		} else if (this.isOrdinal) {			
 			return this.bisectKey(value, this._d3Scale.range())
 		} else {

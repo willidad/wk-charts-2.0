@@ -13,6 +13,7 @@ import { Donut } from './../layouts/donut'
 import { DataMarker } from './../decorators/dataMarker'
 import { DataLabel } from './../decorators/dataLabels'
 import { PieDataLabel } from './../decorators/pieDataLabels'
+import { Tooltip } from './../behavior/tooltip'
 
 export class Chart implements def.Chart {
 	
@@ -50,7 +51,10 @@ export class Chart implements def.Chart {
  				case def.ChartType.area:
                     var la:def.Area = <def.Area>l;
                     layout = new Area(this.scales[la.keyScaleId], la.keyProperty, this.scales[la.valueScaleId], la.valueProperty, la.value0Property, this.scales[la.colorScaleId], la.isVertical, la.spline);
-                    if (la.dataMarkers) {
+					if (la.rowColor) {
+						layout.rowColor = la.rowColor
+					}
+					if (la.dataMarkers) {
                         var dm = new DataMarker()
                         if (typeof la.dataMarkers === 'object') {
                             dm.markerStyle = <def.Style>la.dataMarkers
@@ -62,7 +66,10 @@ export class Chart implements def.Chart {
 				case def.ChartType.line:
                     var ll:def.Line = <def.Line>l;
                     layout = new Line(this.scales[ll.keyScaleId], ll.keyProperty, this.scales[ll.valueScaleId], ll.valueProperty, this.scales[ll.colorScaleId], ll.isVertical, ll.spline);
-                    if (ll.dataMarkers) {
+					if (ll.rowColor) {
+						layout.rowColor = ll.rowColor
+					}
+					if (ll.dataMarkers) {
                         var dm = new DataMarker()
                         if (typeof ll.dataMarkers === 'object') {
                             dm.markerStyle = <def.Style>ll.dataMarkers
@@ -74,14 +81,17 @@ export class Chart implements def.Chart {
 				case def.ChartType.column:
                     var lc:def.Column = <def.Column>l;
                     layout = new Column(this.scales[lc.keyScaleId], lc.keyProperty, this.scales[lc.valueScaleId], lc.valueProperty, this.scales[lc.colorScaleId], lc.isVertical);
-                    if (lc.columnStyle) layout.columnStyle = lc.columnStyle;
+					if (lc.rowColor) {
+						layout.rowColor = lc.rowColor
+					}
+					if (lc.columnStyle) layout.columnStyle = lc.columnStyle;
                     if (lc.padding) layout.padding = lc.padding;
 					if (lc.dataLabels) {
 						var dl = new DataLabel()
 						if (typeof lc.dataLabels === 'object') {
                             dl.style = (<def.DataLabels>lc.dataLabels).style
                         }
-                        layout.dataMarkers = dm
+                        layout.dataLabels = dl
 					}
                     break;
 				case def.ChartType.pie:
@@ -98,7 +108,7 @@ export class Chart implements def.Chart {
 								dp.labelBgStyle = (<def.DataLabels>lp.dataLabels).bgStyle
 							}
                         }
-                        layout.dataMarkers = dm
+                        layout.dataLabels = dp
                     }
                     break;
 				case def.ChartType.donut:
@@ -115,7 +125,7 @@ export class Chart implements def.Chart {
 								dp.labelBgStyle = (<def.DataLabels>lp.dataLabels).bgStyle
 							}
                         }
-                        layout.dataMarkers = dm
+                        layout.dataLabels = dp
                     }
                     break;
 			}
@@ -153,6 +163,10 @@ export class Chart implements def.Chart {
                 //TODO : LabelFormat
             }
         }
+		
+		if (model.tooltip) {
+			this.chart.tooltip = new Tooltip(model.tooltip.showElement, this.scales[model.tooltip.keyScaleId],model.tooltip.properties, model.tooltip.isVertical )
+		}
 	}
 	
 	public draw(data:any) {

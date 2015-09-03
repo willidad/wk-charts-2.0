@@ -65,13 +65,20 @@ export interface Scale {
 	isInverted?:boolean
 }
 
+export interface Tooltip {
+	showElement?: boolean
+	keyScaleId: string
+	properties?: string[]
+	isVertical?: boolean
+}
+
 export interface ChartDef {
     scales:Scale[]
 	layouts:Layout[]
 	title?:StyledText | string
 	subTitle?:StyledText | string
 	axis?:Axis[]
-	tooltip?:Tooltip | boolean
+	tooltip?:Tooltip
 }
 
 export interface DataMarker {
@@ -82,10 +89,6 @@ export interface DataLabels {
 	style?:Style
 	bgStyle?:Style
 	rotation?:number
-}
-
-export interface Tooltip {
-	
 }
 
 interface Layout {

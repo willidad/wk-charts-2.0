@@ -8,6 +8,16 @@ System.config({
   "paths": {
     "github:*": "jspm_packages/github/*",
     "npm:*": "jspm_packages/npm/*"
+  },
+  "packages": {
+    "app": {
+      "defaultExtension": "ts",
+      "meta": {
+        "*.ts": {
+          "loader": "ts"
+        }
+      }
+    }
   }
 });
 
@@ -21,7 +31,10 @@ System.config({
     "lodash": "npm:lodash@3.10.1",
     "systemjs-builder": "npm:systemjs-builder@0.12.2",
     "ts": "github:frankwallis/plugin-typescript@2.0.6",
-    "typescript": "github:microsoft/typescript@1.5.4",
+    "typescript": "npm:typescript@1.6.0-dev.20150825",
+    "github:frankwallis/plugin-typescript@2.0.6": {
+      "typescript": "npm:typescript@1.6.0-dev.20150825"
+    },
     "github:jspm/nodelibs-assert@0.1.0": {
       "assert": "npm:assert@1.3.0"
     },
@@ -437,6 +450,15 @@ System.config({
       "source-map-support": "npm:source-map-support@0.2.10",
       "systemjs-json": "github:systemjs/plugin-json@0.1.0",
       "vm": "github:jspm/nodelibs-vm@0.1.0"
+    },
+    "npm:typescript@1.6.0-dev.20150825": {
+      "buffer": "github:jspm/nodelibs-buffer@0.1.0",
+      "child_process": "github:jspm/nodelibs-child_process@0.1.0",
+      "fs": "github:jspm/nodelibs-fs@0.1.2",
+      "os": "github:jspm/nodelibs-os@0.1.0",
+      "path": "github:jspm/nodelibs-path@0.1.0",
+      "process": "github:jspm/nodelibs-process@0.1.1",
+      "readline": "github:jspm/nodelibs-readline@0.1.0"
     },
     "npm:uglify-js@2.4.24": {
       "async": "npm:async@0.2.10",
