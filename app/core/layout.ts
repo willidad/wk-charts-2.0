@@ -1,4 +1,4 @@
-import { IMargins, ITooltipData, ITooltipDataProvider, Style } from './interfaces'
+import { IMargins, Style } from './interfaces'
 import { Scale } from './../core/scale'
 import { DataMarker } from './../decorators/dataMarker'
 import { DataLabel } from './../decorators/dataLabels'
@@ -10,7 +10,7 @@ import { Data } from './../core/data'
 import { chart as chartDefaults ,axis as axisDefaults, duration} from './../core/defaults'
 import * as hlp from './../tools/helpers'
 
-export class Layout implements ITooltipDataProvider {
+export class Layout {
 	
 	constructor(
 		public keyScale:Scale, 
@@ -54,7 +54,7 @@ export class Layout implements ITooltipDataProvider {
 		return 	{} //override	
 	}
 	
-	public getTooltipData(dataIdx:number):ITooltipData {
+	public getTooltipData(dataIdx:number) {
 		var d = this.dataMgr.current
 		return {
 			key:this.key(d),

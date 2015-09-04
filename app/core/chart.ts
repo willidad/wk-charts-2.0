@@ -1,5 +1,5 @@
 
-import { Style, IMargins, ITooltip } from './interfaces'
+import { Style, IMargins } from './interfaces'
 import { DomainCalc, Scale } from './scale'
 import { Position , Axis } from './axis'
 import { Layout}  from './layout'
@@ -9,6 +9,7 @@ import { Pie } from './../layouts/pie'
 import { Line } from './../layouts/line'
 import { Area } from './../layouts/area'
 import { Grid } from './grid'
+import { Tooltip } from './../behavior/tooltip'
 import * as d3 from 'd3'
 import * as _ from 'lodash'
 import * as drawing from './../tools/drawing'
@@ -191,7 +192,7 @@ export class Chart {
 	}
 
 	
-	constructor(drawInto:d3.Selection<HTMLDivElement>, public title?:string, public subTitle?:string, public tooltip?:ITooltip) {	
+	constructor(drawInto:d3.Selection<HTMLDivElement>, public title?:string, public subTitle?:string, public tooltip?:Tooltip) {	
 		Chart._id += 1;
 		this._id = Chart._id
 		this._container = <HTMLDivElement>drawInto.node();
@@ -236,7 +237,7 @@ export class Chart {
 	
 	
 	set titleStyle(val) { this._titleStyle = val };
-	get titleStyle() { return _.defaults(this._titleStyle, chartDefaults.titleStyle) }
+	get titleStyle() { return _.defaults(this._titleStyle, chartDefaults.titleStyle) }   
 	
 	set subTitleStyle(val) { this._subTitleStyle = val };
 	get subTitleStyle() { return _.defaults(this._subTitleStyle, chartDefaults.subTitleStyle) }
@@ -256,7 +257,7 @@ export class Chart {
 	public addAxis = (orientation:Position, scale:Scale, title?:string):Axis => {
 		var a = new Axis(orientation, scale, title)
 		this.axis.push(a)
-		return a
+		return a 
 	}
 	
 	public addGrid = (axis:Axis):Grid => {

@@ -9,22 +9,10 @@ System.config({
     "github:*": "jspm_packages/github/*",
     "npm:*": "jspm_packages/npm/*"
   },
-  "packages": {
-    "app": {
-      "defaultExtension": "ts",
-      "meta": {
-        "*.ts": {
-          "loader": "ts"
-        }
-      }
-    }
-  }
 });
 
 System.config({
   "map": {
-    "babel": "npm:babel-core@5.8.23",
-    "babel-runtime": "npm:babel-runtime@5.8.20",
     "core-js": "npm:core-js@0.9.18",
     "css": "github:systemjs/plugin-css@0.1.10",
     "d3": "npm:d3@3.5.6",

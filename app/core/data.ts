@@ -24,10 +24,10 @@ export class Data {
 			this._currentKeys.push(this.key(d))
 			this._currentKeyIdx[this.key(d)] = d
 		}
-		this._diffSeq = this._differ(this._prevKeys,this._currentKeys)
+		this._diffSeq = this._differ(this._prevKeys,this._currentKeys)  
 	}
 	
-	get diffSequence():[string, string][] {
+	get diffSequence():[string, string][] {  
 		return this._diffSeq
 	}
 	

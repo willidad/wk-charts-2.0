@@ -223,7 +223,7 @@ new DataTable('#data-table', data ,(data) => {
     chart.draw(data)
 });
 
-d3.selectAll('button').on('click', function(el) {
+d3.selectAll('button').on('click', function(el) {  
 	var chartList = {
 		areaHor: areaHor,
 		areaVert:areaVert,

@@ -119,14 +119,14 @@ export class Scale {
 			bisect = d3.bisector((a:any,b:any) => { return a - b }).right
 			idx = bisect(data, val) - 1
 		} else {
-			bisect = d3.bisector((a:any,b:any) => { return b - a }).left
+			bisect = d3.bisector((a:any,b:any) => { return b - a }).left 
 			idx = bisect(data, val)
 		}			
 		return idx
 	}
 	
 	public invert = (value:number):any => {
-		if (this._d3Scale.hasOwnProperty('invert')) {
+		if (this._d3Scale.hasOwnProperty('invert')) { 
 			var inv = this._d3Scale.invert(value)
 			return this.bisectKey(inv, this._keyData)
 		} else if (this.isOrdinal) {			
