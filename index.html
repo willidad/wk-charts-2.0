@@ -9,7 +9,7 @@
 <body>
     <div id="container"></div>
     <div>
-        <input id="rotation" type="range" min="-180" max="180" value="0" onchange="rotate()" style="width:400px;">
+        <input id="rotation" type="range" min="-180" max="180" value="0" style="width:400px;">
         <span id="rotationvalue"></span>
     </div>
     <div id="data-table">
@@ -24,20 +24,14 @@
         <button id="areaVert">Area Chart Vertical</button>
     </div>
     <div>
-        <label>Use Spline</label><input type="checkbox", id="useSpline" checked><br/>
-        <label>Use 0-base for Area</label><input type="checkbox", id="use0Base" checked><br/>
-        <label>Use Ordinal Keys</label><input type="checkbox", id="useOrdKeys">
+        <label>Use Spline</label><input id="spline" type="checkbox", id="useSpline" checked><br/>
+        <label>Use 0-base for Area</label><input id="base0" type="checkbox", id="use0Base" checked><br/>
+        <label>Use Ordinal Keys</label><input id="useOrd" type="checkbox", id="useOrdKeys">
     </div>
     
     <script>
         System.trace = true
         System.import('app/app')
-        
-        function rotate() {
-            var rVal = document.getElementById('rotation').value;
-            document.getElementById('rotationvalue').textContent = rVal
-        }
-		
     </script>
 
 </body>

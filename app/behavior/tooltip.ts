@@ -56,10 +56,11 @@ export class Tooltip {
 		console.log ('disable')
 		if (this.container && this.showElement) {
 			this.container.selectAll(this.selector)
+				.on ('mousemove', null)     
 				.on('mouseover', null)
 				.on('mouseout', null)
 		} else {
-			this.container.select('.wk-chart-interaction-layer')
+			this.container.select('.wk-chart-interaction-layer')    
 				.on('mousemove', null)
 				.on('mouseover', null)
 				.on('mouseout', null)

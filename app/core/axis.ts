@@ -74,8 +74,8 @@ export class Axis {
 		return this._scale
 	}
 	
-	get orientation() {
-		return this._orient
+	get orientation() { 
+		return this._orient 
 	}
 	
 	get ticks() {

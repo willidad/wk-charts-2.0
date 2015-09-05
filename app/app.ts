@@ -4,6 +4,8 @@ import { DataTable } from './tools/data-table'
 import * as _ from 'lodash'
 
 var chart
+var curChartDef: def.ChartDef
+var container
 
 var keyScaleOrd:def.Scale = {
     id:'keyOrd',
@@ -235,12 +237,51 @@ d3.selectAll('button').on('click', function(el) {
 	}
 	var id = d3.select(this).attr('id')
 	console.log(id)
-	var container = d3.select('#container');  
-	chart = new Chart(container,chartList[id]);
+	container = d3.select('#container');  
+	curChartDef = chartList[id]
+	chart = new Chart(container, curChartDef);
 	chart.draw(data);
 })
 
-var container = d3.select('#container');  
-chart = new Chart(container,areaHor);
+d3.select('#rotation').on('input', function() {
+	for (var a of curChartDef.axis) {
+		if (!a.tickLabelStyle) a.tickLabelStyle = {}
+		a.tickLabelStyle.rotation = Number(this.value)
+	}
+	chart = new Chart(container, curChartDef)
+	chart.draw(data)
+})
+
+d3.select('#spline').on('change', function() {
+	var sp = this.checked
+	for (var l of curChartDef.layouts) {
+		l.spline = sp
+	}
+	chart = new Chart(container, curChartDef);
+	chart.draw(data);
+});
+
+d3.select('#base0').on('change', function() {
+	var b0 = this.checked
+	for (var l of curChartDef.layouts) {
+		if (b0) {
+			l.value0Property = 'y2'
+		} else {
+			delete l.value0Property
+		}
+	}
+	chart = new Chart(container, curChartDef);
+	chart.draw(data); 
+}) 
+
+d3.select('#useOrd').on('change', function() {
+	
+})
+	
+// initial chart shown
+curChartDef = areaHor
+
+container = d3.select('#container');  
+chart = new Chart(container,curChartDef);
 chart.draw(data);
 

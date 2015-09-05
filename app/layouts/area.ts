@@ -12,9 +12,8 @@ import { outerBox } from './../tools/helpers'
 export class Area extends Layout {
 	
 	constructor(
-		
 		keyScale:Scale, 
-		keyProperty:string, 
+		keyProperty:string,
 		valueScale:Scale, 
 		valueProperty:string, 
 		public value0Property?:string,
@@ -104,7 +103,7 @@ export class Area extends Layout {
 		
 		if (this._dataMarkers) {
 			var d = this._interpolatorY.getPathPoints()	
-			if (this.val0Fn) d = d.concat(this._interpolatorY0.getPathPoints())		
+			if (this.value0Property) d = d.concat(this._interpolatorY0.getPathPoints())		
 			this._dataMarkers.draw(container, d, this.colorScalePropertyName(), transition, this._duration)
 		}
 	}

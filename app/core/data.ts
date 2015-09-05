@@ -31,7 +31,7 @@ export class Data {
 		return this._diffSeq
 	}
 	
-	public getCurrentVal(key:any):any {
+	public getCurrentVal(key:any):any { 
 		return this._currentKeyIdx[key]
 	}
 	
