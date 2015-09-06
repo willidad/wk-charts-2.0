@@ -4,6 +4,7 @@
 	stroke: black;
 	stroke-width: 1px;
 }
+
 .wk-chart-axis > tick > text {
 	fill:black
 }
@@ -22,6 +23,23 @@ div.wk-chart-tooltip {
 	background-color: #3F3F3F;
 	padding: 5px
 }
+
 .wk-chart-tooltip table {
-	color: white
+	color: white;	
+	font-family: Arial, Helvetica, sans-serif;
+	font-size:1em;
+}
+
+.wk-chart-tooltip th {
+	border-bottom: solid white 1px;
+}
+
+.wk-chart-tooltip .wk-chart-tt-name {
+	text-align: right;
+}
+
+.wk-chart-tooltip .wk-chart-tt-value {
+	text-align: left;
+	min-width: 20px;
+	padding-left: 8px;
 }

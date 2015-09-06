@@ -15,10 +15,14 @@ export class Tooltip {
 	protected _template = `
 		<div class="wk-chart-tooltip">
 			<table>
-				<tr><th><%- data.name%></th><th><%- data.value %></th>
-				<% _.forEach(data.details, function(d) { %>
-					<tr><td><%-d.name%></td><td><%- d.value %></td></tr>
+				<%if(data.name) {%>
+					<thead><tr><th class="wk-chart-tt-name"><%- data.name%> :</th><th class="wk-chart-tt-value"><%- data.value %></th></thead>
+				<%}%>
+				<tbody>
+					<% _.forEach(data.details, function(d) { %>
+						<tr><td class="wk-chart-tt-name"><%-d.name%> :</td><td class="wk-chart-tt-value"><%- d.value %></td></tr>
 					<%})%> 
+				<tbody>
 			</table>
 		</div > `
 	
@@ -92,8 +96,8 @@ export class Tooltip {
 	}
 	
 	private moveBox(pos: [number, number]) {
-		var x = pos[0] 
-		var y = pos[1]
+		var x = pos[0] + 10 // ensure cursor does no cover toolip text
+		var y = pos[1] + 10
 		var boxSize = (<HTMLElement>this.template.node()).getBoundingClientRect()
 		var containerBoxSize = (<HTMLElement>this.container.node()).getBoundingClientRect()
 		// Ensure box does not move outside the current body area
