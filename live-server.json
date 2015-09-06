@@ -1,4 +1,7 @@
 {
-  "wait":"300",
-  "ignore":"**/*.ts"
+	"watch": ["**/*.js", "**/*.css", "**/*.html"],
+	"ignore": ["jspm_packages", "node_modules"],
+  	"wait": "100",
+	"open": false
+	
 }

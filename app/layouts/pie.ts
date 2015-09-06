@@ -88,7 +88,7 @@ export class Pie extends Layout {
 		var path = container.selectAll('.wk-chart-pie-segment')
 			.data(segments, (d) => d.data.key) 
 		
-		path.enter().append('path').attr('class', 'wk-chart-pie-segment')
+		path.enter().append('path').attr('class', 'wk-chart-pie-segment wk-chart-tt-target')
 			.each(function(d) { this._current = d; })
 			
 		if (transition) {

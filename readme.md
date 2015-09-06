@@ -11,9 +11,9 @@ Before you start:
 
     npm install tsd -g
 	
-- install a local file server. I am using live-server for development: 
+- install a local file server. I am using my live-server fork for development: 
 
-    npm install live-server -g
+    npm install willidad/live-server -g
 	
 - install dependencies:
 
@@ -26,6 +26,9 @@ Before you start:
 - run server (launches default browser at port 8080): 
 
     live-server 
+	
+- to build, run tsc (the typescript compiler). If you are using VSCode as editor, enter `shift-ctrl b` to start the build process. 
+This will start tsc in watch mode, so the code will be re-compiled and re-loaded every time you save a change
 	
 have fun
 

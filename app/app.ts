@@ -157,7 +157,7 @@ var col: def.ChartDef = {
     scales:[keyScaleOrd, valScaleLin, colorScale],
 	layouts:[column1, column2],
 	axis: [keyAxisBottomOrd, valueAxisLeftLin],
-	tooltip: { keyScaleId:'keyOrd', properties:['y', 'y2'] }
+	tooltip: { showElement:true, keyScaleId:'keyOrd', properties:['y', 'y2'] }
 };
 
 var bar: def.ChartDef = {

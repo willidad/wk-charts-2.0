@@ -92,7 +92,7 @@ export class Column extends Layout {
 	
 	protected draw(container, transition:boolean) {
 		this._columns = container.selectAll('.wk-chart-column-bar').data(this._dataMapped, function(d:Box, i) { return i })
-		this._columns.enter().append('rect').attr('class','wk-chart-column-bar')
+		this._columns.enter().append('rect').attr('class','wk-chart-column-bar wk-chart-tt-target')
 		var cs = transition ? this._columns.transition().duration(this._duration).each('end', function(d:Box) { if (d.remove) d3.select(this).remove()}) : this._columns
 		cs
 			.attr('x', function(d:Box):number { return d.x })

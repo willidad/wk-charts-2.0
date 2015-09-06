@@ -4,10 +4,11 @@ import * as _ from 'lodash'
 
 export class Tooltip {
 	
-	protected selector = '.wk-chart-pie-segment'
+	protected selector = '.wk-chart-tt-target'
 	protected _container:D3Selection
 	protected _containerElem:HTMLElement
-	protected _containerSize:ClientRect
+	protected _containerSize: ClientRect
+	protected _ttTargetSelector
 	protected template: D3Selection
 	protected containerRect
 	protected _compiledTemplate
@@ -23,6 +24,7 @@ export class Tooltip {
 	
 	constructor(public showElement:boolean, public keyScale?:Scale, public properties?:string[], public isVertical?:boolean) {
 		this._compiledTemplate = _.template(this._template)
+		this._ttTargetSelector = this.showElement ? '.wk-chart-tt-target' : '.wk-chart-interaction-layer'
 	}
 	
 	set container(elem: D3Selection) {
@@ -37,48 +39,36 @@ export class Tooltip {
 	public data:any[]
 	
 	public enable() {
-		console.log('enable')
-		if (this.container && this.showElement) {
-			this.container.selectAll(this.selector)
-				.on ('mousemove', this.moveTT)    
-				.on('mouseover', this.showTT)
+		if (this.container) {
+			this.container.selectAll(this._ttTargetSelector)
+				.on('mousemove', this.showElement ? this.moveTT : this.moveAndUpdateTT)
+				.on('mouseover', this.showElement ? this.showElementTT : this.showGroupTT)
 				.on('mouseout', this.hideTT)
-		} else {
-			this.container.select('.wk-chart-interaction-layer')
-				.on('mousemove', this.moveAndUpdateTT)
-				.on('mouseover', this.showTT)
-				.on('mouseout', this.hideTT)
-				.style('pointer-events', 'all')
+				.style('pointer-events', 'all');
 		}
 	}
 	
 	public disable() {
-		console.log ('disable')
-		if (this.container && this.showElement) {
-			this.container.selectAll(this.selector)
-				.on ('mousemove', null)     
+		if (this.container) {
+			this.container.selectAll(this._ttTargetSelector)
+				.on('mousemove', null)     
 				.on('mouseover', null)
 				.on('mouseout', null)
-		} else {
-			this.container.select('.wk-chart-interaction-layer')    
-				.on('mousemove', null)
-				.on('mouseover', null)
-				.on('mouseout', null)
-				.style('pointer-events', 'none')
-		}
+				.style('pointer-events', 'none')}
 	}
 	
-	private showTT = () => {
+	private showElementTT = () => {
 		var obj:D3Selection = d3.select(d3.event.target)
 		this.template = this._container.append('div')
 			.style('position', 'absolute').style('pointer-events', 'none')
-
-		if (this.showElement) {
-			var data = d3.select(d3.event.target).datum()
-			console.log(data)
-			this.formatData(data.data.key, data.data.value)
-		}
-        
+		var data = d3.select(d3.event.target).datum()
+		this.formatSingleData(this.keyScale.properties[0], this.properties[0], data.data)
+	}
+	
+	private showGroupTT = () => {
+		var obj:D3Selection = d3.select(d3.event.target)
+		this.template = this._container.append('div')
+			.style('position', 'absolute').style('pointer-events', 'none')
 		this.moveBox(d3.mouse(this._containerElem))
 	}
 	
@@ -96,15 +86,14 @@ export class Tooltip {
 		if (dataIdx >=  0 && dataIdx < this.data.length) {
 			var data = this.data[dataIdx]
 			var key = data[this.keyScale.properties[0]]
-			this.formatDataList(key, this.keyScale.properties[0], this.properties, data)
+			this.formatDataList(this.keyScale.properties[0], this.properties, data)
 			this.moveBox(d3.mouse(this._containerElem))
 		}	
 	}
 	
 	private moveBox(pos: [number, number]) {
-		var x = pos[0]		
+		var x = pos[0] 
 		var y = pos[1]
-		//this.template.style('left', pos[0]).style('top', pos[1])
 		var boxSize = (<HTMLElement>this.template.node()).getBoundingClientRect()
 		var containerBoxSize = (<HTMLElement>this.container.node()).getBoundingClientRect()
 		// Ensure box does not move outside the current body area
@@ -114,10 +103,10 @@ export class Tooltip {
 		if (y + boxSize.height > containerBoxSize.bottom) {
 			y = (y - boxSize.height) > 0 ? y - boxSize.height : 0
 		} 
-		this.template.style('left',x).style('top', y)
+		this.template.style('left',x).style('top', y) 
 	}
 	
-	private formatDataList(key:any, keyProperty: string, properties:string[],data:any) {
+	private formatDataList(keyProperty: string, properties:string[],data:any) {
 		var ttData = { name: keyProperty, value: data[keyProperty], details: [] }
 		for (var p of properties) {
 			ttData.details.push({name:p, value:data[p]})
@@ -126,8 +115,8 @@ export class Tooltip {
 		this.template.html(html)
 	}
 	
-	private formatData(key: any, value: any) {
-		var ttData = { name: key, value: value, details: [] }
+	private formatSingleData(keyProperty:string, valueProperty:string, data:any) {
+		var ttData = { details: [{name:keyProperty, value:data.key}, {name:valueProperty, value:data.value}] }
 		var html = this._compiledTemplate({ data: ttData })
 		this.template.html(html)
 	}
