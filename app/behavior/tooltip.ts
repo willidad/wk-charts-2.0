@@ -4,15 +4,16 @@ import * as _ from 'lodash'
 
 export class Tooltip {
 	
-	protected selector = '.wk-chart-tt-target'
+	protected _selector = '.wk-chart-tt-target'
 	protected _container:D3Selection
 	protected _containerElem:HTMLElement
-	protected _containerSize: ClientRect
 	protected _ttTargetSelector
-	protected template: D3Selection
-	protected containerRect
+	protected _template: D3Selection
+	protected _ttMarker: D3Selection
+	protected _markerRect: D3Selection
+	protected _containerRect
 	protected _compiledTemplate
-	protected _template = `
+	protected _templateText = `
 		<div class="wk-chart-tooltip">
 			<table>
 				<%if(data.name) {%>
@@ -26,15 +27,16 @@ export class Tooltip {
 			</table>
 		</div > `
 	
-	constructor(public showElement:boolean, public keyScale?:Scale, public properties?:string[], public isVertical?:boolean) {
-		this._compiledTemplate = _.template(this._template)
+	constructor(public showElement:boolean, public keyScale?:Scale, public properties?:string[], public isVertical?:boolean, public showBand:boolean = false) {
+		this._compiledTemplate = _.template(this._templateText)
 		this._ttTargetSelector = this.showElement ? '.wk-chart-tt-target' : '.wk-chart-interaction-layer'
 	}
+	
+	public containerSize
 	
 	set container(elem: D3Selection) {
 		this._container = elem
 		this._containerElem = <HTMLElement>elem.node()
-		this._containerSize = this._containerElem.getBoundingClientRect()
 	}
 	get container(): D3Selection {
 		return this._container
@@ -63,7 +65,7 @@ export class Tooltip {
 	
 	private showElementTT = () => {
 		var obj:D3Selection = d3.select(d3.event.target)
-		this.template = this._container.append('div')
+		this._template = this._container.append('div')
 			.style('position', 'absolute').style('pointer-events', 'none')
 		var data = d3.select(d3.event.target).datum()
 		this.formatSingleData(this.keyScale.properties[0], this.properties[0], data.data)
@@ -71,13 +73,25 @@ export class Tooltip {
 	
 	private showGroupTT = () => {
 		var obj:D3Selection = d3.select(d3.event.target)
-		this.template = this._container.append('div')
+		this._template = this._container.append('div')
 			.style('position', 'absolute').style('pointer-events', 'none')
 		this.moveBox(d3.mouse(this._containerElem))
+		// create orientation line and markers
+		var markerContainer = this.container.select(this.showBand ? '.wk-chart-grid-area' : '.wk-chart-interaction-area') //show line above chart, markerarea behind
+		
+		this._ttMarker = markerContainer.append('g').attr('class', 'wk-chart-tt-marker')
+		this._markerRect = this._ttMarker.append('rect').style({ stroke: 'black', fill: 'lightGrey', 'stroke-width': 1, 'pointer-events': 'none', opacity: 0.3 })
+		var markerSize = this.showBand && this.keyScale.getRangeBand() ? this.keyScale.getRangeBand() : 1
+		if (this.isVertical) {
+			this._markerRect.attr('width', this.containerSize.width).attr('height', markerSize)
+		} else {
+			this._markerRect.attr('width', markerSize).attr('height', this.containerSize.height)
+		}
 	}
 	
 	private hideTT = () => {
-		this.template.remove()
+		this._template.remove()
+		if (this._ttMarker) this._ttMarker.remove()
 	}
 	
 	private moveTT = () => {
@@ -85,6 +99,7 @@ export class Tooltip {
 	}
 	
 	private moveAndUpdateTT = () => {
+		var markerPos, nextKeyPos
 		var mappedKey = d3.mouse(this.container.select('.wk-chart-interaction-layer').node())[this.isVertical ? 1 : 0]
 		var dataIdx = this.keyScale.invert(mappedKey)
 		if (dataIdx >=  0 && dataIdx < this.data.length) {
@@ -92,13 +107,21 @@ export class Tooltip {
 			var key = data[this.keyScale.properties[0]]
 			this.formatDataList(this.keyScale.properties[0], this.properties, data)
 			this.moveBox(d3.mouse(this._containerElem))
+			var keyPos = this.keyScale.map(key)
+			if (this.keyScale.isOrdinal) {
+				markerPos = this.keyScale.map(key) + (this.showBand ? 0 : this.keyScale.getRangeBand() / 2)                
+			} else {
+				markerPos = keyPos
+			}
+			 
+			this._ttMarker.attr('transform', `translate(${this.isVertical ? 0 : markerPos}, ${this.isVertical ? markerPos : 0})`)
 		}	
 	}
 	
 	private moveBox(pos: [number, number]) {
 		var x = pos[0] + 10 // ensure cursor does no cover toolip text
 		var y = pos[1] + 10
-		var boxSize = (<HTMLElement>this.template.node()).getBoundingClientRect()
+		var boxSize = (<HTMLElement>this._template.node()).getBoundingClientRect()
 		var containerBoxSize = (<HTMLElement>this.container.node()).getBoundingClientRect()
 		// Ensure box does not move outside the current body area
 		if (x + boxSize.width >= containerBoxSize.right) {
@@ -107,7 +130,7 @@ export class Tooltip {
 		if (y + boxSize.height > containerBoxSize.bottom) {
 			y = (y - boxSize.height) > 0 ? y - boxSize.height : 0
 		} 
-		this.template.style('left',x).style('top', y) 
+		this._template.style('left',x).style('top', y) 
 	}
 	
 	private formatDataList(keyProperty: string, properties:string[],data:any) {
@@ -116,13 +139,13 @@ export class Tooltip {
 			ttData.details.push({name:p, value:data[p]})
 		}
 		var html = this._compiledTemplate({ data: ttData })
-		this.template.html(html)
+		this._template.html(html)
 	}
 	
 	private formatSingleData(keyProperty:string, valueProperty:string, data:any) {
 		var ttData = { details: [{name:keyProperty, value:data.key}, {name:valueProperty, value:data.value}] }
 		var html = this._compiledTemplate({ data: ttData })
-		this.template.html(html)
+		this._template.html(html)
 	}
 
 }

@@ -315,6 +315,7 @@ export class Chart {
 		this.drawEnd(animate)
 		
 		if (this.tooltip) {
+			this.tooltip.containerSize = this._drawingAreaSize
 			this.tooltip.enable()
 		}
 		

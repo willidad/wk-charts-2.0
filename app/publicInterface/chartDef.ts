@@ -70,6 +70,7 @@ export interface Tooltip {
 	keyScaleId: string
 	properties?: string[]
 	isVertical?: boolean
+	showMarkerArea?:boolean
 }
 
 export interface ChartDef {

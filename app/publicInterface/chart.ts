@@ -165,7 +165,7 @@ export class Chart implements def.Chart {
         }
         
         if (model.tooltip) {
-			this.chart.tooltip = new Tooltip(model.tooltip.showElement, this.scales[model.tooltip.keyScaleId],model.tooltip.properties, model.tooltip.isVertical )
+			this.chart.tooltip = new Tooltip(model.tooltip.showElement, this.scales[model.tooltip.keyScaleId],model.tooltip.properties, model.tooltip.isVertical, model.tooltip.showMarkerArea)
         }
 	} //constructor
         

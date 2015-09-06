@@ -165,7 +165,7 @@ var bar: def.ChartDef = {
     scales:[keyScaleOrd, valScaleLin, colorScale],
 	layouts:[column1Vert, column2Vert],
 	axis: [keyAxisLeftOrd, valueAxisBottomLin],
-	tooltip: { keyScaleId:'keyOrd', properties:['y', 'y2'], isVertical:true }
+	tooltip: { keyScaleId:'keyOrd', properties:['y', 'y2'], isVertical:true, showMarkerArea:true }
 };
 
 var areaHor:def.ChartDef = {

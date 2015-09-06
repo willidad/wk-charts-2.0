@@ -127,7 +127,9 @@ export class Scale {
 	
 	public invert = (value:number):any => {
 		if (this._d3Scale.hasOwnProperty('invert')) { 
-			var inv = this._d3Scale.invert(value)
+			// ensure that value flips in the middle between two data points (at least of constant data intervals)
+			var interv = (this.getRange()[1] - this.getRange()[0]) / this._keyData.length
+			var inv = this._d3Scale.invert(value + interv / 2)			
 			return this.bisectKey(inv, this._keyData)
 		} else if (this.isOrdinal) {			
 			return this.bisectKey(value, this._d3Scale.range())
